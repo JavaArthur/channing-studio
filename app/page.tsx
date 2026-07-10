@@ -1,60 +1,48 @@
-import { getPosts, getPostsCount } from '@/lib/db'
+import { getPosts } from '@/lib/db'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
+import { getStudioContent } from '@/lib/studio-settings'
+import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
+import { selectFeaturedPosts } from '@/lib/studio-home'
 import { type Theme } from '@/lib/appearance'
-import type { SiteCategoryLink, SiteNavLink } from '@/lib/site'
+import type { SiteNavLink } from '@/lib/site'
 import { getSiteHeaderData } from '@/lib/site'
-import { HomeClient } from '@/components/HomeClient'
+import { StudioHome } from '@/components/StudioHome'
 import { getSiteUrl } from '@/lib/site-config'
-import { resolveRequestTheme } from '@/lib/server-appearance'
+import type { PostWithTags } from '@/lib/repositories/types'
 
-const PAGE_SIZE = 25
 const BASE_URL = getSiteUrl()
 
-// ISR: 页面缓存 1 小时后后台重新验证。
-// 需要 open-next.config.ts 配置 r2IncrementalCache + doShardedTagCache 才能生效。
 export const revalidate = 3600
 export const dynamicParams = true
 
 export const metadata = {
-  alternates: {
-    canonical: BASE_URL,
-  },
+  title: 'Channing Studio · 晨启AI',
+  description: 'AI 平台工程、内容自动化与真实交付的公开工作台。',
+  alternates: { canonical: BASE_URL },
 }
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>
-}) {
-  const { page: pageStr } = await searchParams
-  const currentPage = Math.max(1, parseInt(pageStr ?? '1', 10) || 1)
-
-  let posts: Awaited<ReturnType<typeof getPosts>> = []
-  let totalCount = 0
+export default async function Home() {
+  let content = DEFAULT_STUDIO_CONTENT
+  let posts: PostWithTags[] = []
   let navLinks: SiteNavLink[] = []
-  let categories: SiteCategoryLink[] = []
   let defaultTheme: Theme = 'default'
+
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const headerData = await getSiteHeaderData(env.DB)
-      ;[posts, totalCount] = await Promise.all([
-        getPosts(env.DB, PAGE_SIZE, (currentPage - 1) * PAGE_SIZE, false, false, false, false, 'post'),
-        getPostsCount(env.DB, false, false, false, false, 'post'),
+      const [headerData, studioContent, recentPosts] = await Promise.all([
+        getSiteHeaderData(env.DB),
+        getStudioContent(env.DB),
+        getPosts(env.DB, 25, 0, false, false, false, false, 'post'),
       ])
+      content = studioContent
+      posts = selectFeaturedPosts(recentPosts, content.featuredPostSlugs)
       navLinks = headerData.navLinks
-      categories = headerData.categories
       defaultTheme = headerData.defaultTheme
     }
-  } catch (e) {
-    console.error('Homepage: failed to fetch posts', e)
+  } catch (error) {
+    console.error('Studio homepage: failed to fetch content', error)
   }
-
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
-  const requestTheme = await resolveRequestTheme(defaultTheme)
-  const categorySlugMap: Record<string, string> = Object.fromEntries(
-    categories.map((cat) => [cat.name, cat.slug])
-  )
 
   return (
     <>
@@ -64,9 +52,9 @@ export default async function Home({
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'WebSite',
-            name: '晨启AI博客',
+            name: 'Channing Studio',
             url: BASE_URL,
-            description: '记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。',
+            description: metadata.description,
             potentialAction: {
               '@type': 'SearchAction',
               target: { '@type': 'EntryPoint', urlTemplate: `${BASE_URL}/search?q={search_term_string}` },
@@ -80,21 +68,18 @@ export default async function Home({
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
-            '@type': 'Organization',
-            name: '晨启AI博客',
+            '@type': 'Person',
+            name: 'Channing',
             url: BASE_URL,
-            logo: { '@type': 'ImageObject', url: `${BASE_URL}/icon-512.png` },
+            sameAs: content.profile.contactLinks.filter((link) => link.url.startsWith('http')).map((link) => link.url),
           }),
         }}
       />
-      <HomeClient
-        initialTheme={requestTheme}
+      <StudioHome
+        content={content}
         posts={posts}
-        categories={categories}
         navLinks={navLinks}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        categorySlugMap={categorySlugMap}
+        initialTheme={defaultTheme}
       />
     </>
   )

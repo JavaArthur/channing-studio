@@ -17,11 +17,15 @@ interface SiteHeaderProps {
   activeCategorySlug?: string | null
   stickyOnMobile?: boolean
   initialTheme?: Theme
+  studioMode?: boolean
 }
 
 const defaultNavLinks: NavLink[] = [
-  { label: 'GitHub', url: 'https://github.com/joeseesun/', openInNewTab: true },
-  { label: 'Twitter', url: 'https://x.com/vista8/', openInNewTab: true },
+  { label: '作品', url: '/work', openInNewTab: false },
+  { label: '文章', url: '/writing', openInNewTab: false },
+  { label: '实验室', url: '/labs', openInNewTab: false },
+  { label: '关于我', url: '/about', openInNewTab: false },
+  { label: 'GitHub', url: 'https://github.com/JavaArthur/chen-blog-opensource', openInNewTab: true },
   { label: 'RSS', url: '/feed.xml', openInNewTab: false },
 ]
 
@@ -35,8 +39,10 @@ export function SiteHeader({
   activeCategorySlug = null,
   stickyOnMobile = true,
   initialTheme = 'default',
+  studioMode = false,
 }: SiteHeaderProps) {
   const links = navLinks && navLinks.length > 0 ? navLinks : defaultNavLinks
+  const publicLinks = links.filter((link) => link.url !== '/admin' && link.label.toLowerCase() !== 'admin')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [categoryOpen, setCategoryOpen] = useState(false)
   const categoryRef = useRef<HTMLDivElement>(null)
@@ -94,6 +100,18 @@ export function SiteHeader({
 
   // 终端主题：logo 区域显示终端提示符
   const renderLogo = () => {
+    if (studioMode) {
+      return (
+        <Link
+          href="/"
+          className="flex-shrink-0 text-lg font-semibold tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200"
+          style={{ fontFamily: 'Georgia, "Noto Serif SC", serif' }}
+        >
+          Channing / Studio
+        </Link>
+      )
+    }
+
     if (theme === 'terminal') {
       return (
         <Link
@@ -154,6 +172,7 @@ export function SiteHeader({
     <header
       className={`site-header ${stickyOnMobile ? 'sticky' : 'sm:sticky'} top-0 z-40 border-b border-[var(--editor-line)] bg-[var(--background)]/95 backdrop-blur-sm`}
       data-site-header-theme={theme}
+      data-site-header-mode={studioMode ? 'studio' : 'blog'}
     >
       <div className="site-header-inner mx-auto max-w-3xl px-4 sm:px-6">
         <div className="h-14 flex items-center justify-between gap-4">
@@ -162,7 +181,7 @@ export function SiteHeader({
           {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-3 text-sm flex-shrink-0">
             {/* Category dropdown */}
-            {categories.length > 0 && (
+            {!studioMode && categories.length > 0 && (
               <div ref={categoryRef} className="relative">
                 <button
                   onClick={() => setCategoryOpen(!categoryOpen)}
@@ -208,9 +227,11 @@ export function SiteHeader({
               </div>
             )}
 
-            {links.map(link => renderLink(link))}
-            <Link href="/clippings" className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors duration-150">剪报</Link>
-            <Link href="/tools" className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors duration-150">工具</Link>
+            {publicLinks.map(link => renderLink(link))}
+            {!studioMode && <>
+              <Link href="/clippings" className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors duration-150">剪报</Link>
+              <Link href="/tools" className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors duration-150">工具</Link>
+            </>}
             <ThemeDropdown initialTheme={initialTheme} />
             <SearchEntry />
           </nav>
@@ -238,7 +259,7 @@ export function SiteHeader({
       >
         <div className="bg-[var(--background)]">
           {/* Mobile categories as horizontal pills */}
-          {categories.length > 0 && (
+          {!studioMode && categories.length > 0 && (
             <div className="px-4 py-3 border-b border-[var(--editor-line)]">
               <div className="flex flex-wrap gap-2">
                 <Link
@@ -272,12 +293,12 @@ export function SiteHeader({
 
           <nav className="flex flex-col text-sm">
             <div className="px-4 py-3 border-b border-[var(--editor-line)]">
-              <Link href="/clippings" className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors" onClick={() => setMobileMenuOpen(false)}>剪报</Link>
+              {!studioMode && <Link href="/clippings" className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors" onClick={() => setMobileMenuOpen(false)}>剪报</Link>}
             </div>
             <div className="px-4 py-3 border-b border-[var(--editor-line)]">
-              <Link href="/tools" className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors" onClick={() => setMobileMenuOpen(false)}>工具</Link>
+              {!studioMode && <Link href="/tools" className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors" onClick={() => setMobileMenuOpen(false)}>工具</Link>}
             </div>
-            {links.map(link => (
+            {publicLinks.map(link => (
               <div key={link.label} className="px-4 py-3 border-b border-[var(--editor-line)]">
                 {renderLink(link, () => setMobileMenuOpen(false))}
               </div>

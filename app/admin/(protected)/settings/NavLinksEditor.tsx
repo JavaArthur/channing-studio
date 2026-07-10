@@ -16,9 +16,11 @@ interface Props {
 }
 
 const defaultLinks: NavLink[] = [
-  { label: 'GitHub', url: 'https://github.com/joeseesun/', openInNewTab: true },
-  { label: 'Twitter', url: 'https://x.com/vista8/', openInNewTab: true },
-  { label: 'About', url: '/about', openInNewTab: false },
+  { label: '作品', url: '/work', openInNewTab: false },
+  { label: '文章', url: '/writing', openInNewTab: false },
+  { label: '实验室', url: '/labs', openInNewTab: false },
+  { label: '关于我', url: '/about', openInNewTab: false },
+  { label: 'GitHub', url: 'https://github.com/JavaArthur/chen-blog-opensource', openInNewTab: true },
   { label: 'RSS', url: '/feed.xml', openInNewTab: false },
 ]
 

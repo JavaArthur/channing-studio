@@ -161,31 +161,31 @@ git commit -m "feat(studio): add database-backed content settings"
 - Consumes: `StudioContent`、`getStudioContent`、现有 `getPosts`/`getPostsCount`、`getSiteHeaderData`。
 - Produces: 首页、作品、实验室、关于我和文章归档可访问；首页在 D1 失败时仍显示默认身份与作品，不显示空白。
 
-- [ ] **Step 1: 写首页数据边界测试**
+- [x] **Step 1: 写首页数据边界测试**
 
 在 `tests/lib/studio-content.test.ts` 增加“featuredPostSlugs 非空只取指定公开 slug，空数组取最近三篇”的纯逻辑测试；不在组件测试中 mock 整个 Cloudflare runtime。
 
-- [ ] **Step 2: 实现 Studio 首页**
+- [x] **Step 2: 实现 Studio 首页**
 
 `app/page.tsx` 保留 `revalidate = 3600`，并行读取 Studio 配置、站点头数据和最多 3 篇 `kind='post'` 公开文章；渲染 `StudioHome`。`StudioHome` 按设计顺序输出身份区、能力证据、精选作品、实验室、最新文章和页脚 CTA；整个页面只有一个 H1。
 
-- [ ] **Step 3: 实现 `/writing`**
+- [x] **Step 3: 实现 `/writing`**
 
 把当前文章列表查询迁移到 `app/writing/page.tsx`，保留分页参数、分类映射、主题切换、canonical 和 `HomeClient` 文章列表行为。根路径不再显示 25 篇文章列表，`/writing` 成为完整文章入口。
 
-- [ ] **Step 4: 实现三个静态路由**
+- [x] **Step 4: 实现三个静态路由**
 
 `/work`、`/labs`、`/about` 读取同一 Studio 配置，分别显示项目、实验室与个人介绍；所有链接使用 `Link` 或带 `noopener noreferrer` 的外链；D1 不可用时使用默认配置。
 
-- [ ] **Step 5: 更新公开导航和视觉样式**
+- [x] **Step 5: 更新公开导航和视觉样式**
 
 公开导航默认改为“作品、文章、实验室、关于我、GitHub、RSS、搜索”；过滤 `Admin`/`/admin`，保留后台深链；剪报与工具改为相关页入口，不再作为首页主导航。新增 `studio-*` CSS 类，复用暖纸张、墨蓝、铜橙变量和现有响应式断点，不引入新的字体依赖或渐变背景。
 
-- [ ] **Step 6: 更新全站 metadata**
+- [x] **Step 6: 更新全站 metadata**
 
 将 `app/layout.tsx`、首页和新路由的标题、描述、JSON-LD 统一为 Channing Studio / 晨启AI；canonical 统一走 `getSiteUrl()`，不再使用上游作者和错误默认域名。
 
-- [ ] **Step 7: 跑验证并提交**
+- [x] **Step 7: 跑验证并提交**
 
 运行：
 

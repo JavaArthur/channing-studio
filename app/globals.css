@@ -1880,3 +1880,184 @@ a.warm-editorial-story-kicker:hover {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Channing Studio */
+.site-header[data-site-header-mode="studio"] .site-header-inner {
+  max-width: 72rem;
+}
+
+.studio-eyebrow,
+.studio-card-label,
+.studio-index {
+  color: var(--editor-accent);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.studio-hero-title,
+.studio-page-title,
+.studio-section-title {
+  color: var(--editor-ink);
+  font-family: var(--logo-font, Georgia, "Noto Serif SC", serif);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.studio-hero-title {
+  font-size: clamp(2.75rem, 7vw, 5.8rem);
+  line-height: 1.02;
+}
+
+.studio-hero-subtitle {
+  color: var(--editor-ink);
+  font-size: clamp(1.15rem, 2vw, 1.65rem);
+  line-height: 1.45;
+}
+
+.studio-hero-statement,
+.studio-page-description {
+  color: var(--editor-muted);
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.studio-hero-note {
+  border-left: 2px solid var(--editor-accent);
+  padding-left: 1.25rem;
+}
+
+.studio-page-title {
+  font-size: clamp(2.75rem, 6vw, 5.25rem);
+  line-height: 1.08;
+}
+
+.studio-section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.15;
+}
+
+.studio-button {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.9rem;
+  font-weight: 600;
+  gap: 0.65rem;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.7rem 1.1rem;
+  transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.studio-button:hover {
+  transform: translateY(-1px);
+}
+
+.studio-button-primary {
+  background: var(--editor-accent);
+  color: var(--editor-accent-ink);
+}
+
+.studio-button-secondary {
+  border: 1px solid var(--editor-line);
+  color: var(--editor-ink);
+}
+
+.studio-button-secondary:hover {
+  background: var(--editor-soft);
+}
+
+.studio-card {
+  background: color-mix(in srgb, var(--editor-panel) 52%, transparent);
+  border: 1px solid var(--editor-line);
+  border-radius: 1rem;
+  display: block;
+  padding: 1.5rem;
+  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+.studio-card:hover {
+  background: var(--editor-panel);
+  border-color: color-mix(in srgb, var(--editor-accent) 55%, var(--editor-line));
+  transform: translateY(-2px);
+}
+
+.studio-card-title {
+  color: var(--editor-ink);
+  font-family: var(--logo-font, Georgia, "Noto Serif SC", serif);
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.studio-card-description {
+  color: var(--editor-muted);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.studio-card-arrow {
+  color: var(--editor-accent);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.studio-tag {
+  border: 1px solid var(--editor-line);
+  border-radius: 999px;
+  color: var(--editor-muted);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.68rem;
+  padding: 0.3rem 0.55rem;
+}
+
+.studio-lab-row,
+.studio-writing-row {
+  align-items: center;
+  color: inherit;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  min-height: 6.5rem;
+  padding: 1.35rem 0.25rem;
+  transition: padding 160ms ease, background-color 160ms ease;
+}
+
+.studio-lab-row:hover,
+.studio-writing-row:hover {
+  background: var(--editor-panel);
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.studio-inline-link {
+  color: var(--editor-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-underline-offset: 0.25rem;
+}
+
+.studio-inline-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 639px) {
+  .studio-lab-row,
+  .studio-writing-row {
+    align-items: flex-start;
+    min-height: 5.5rem;
+  }
+
+  .studio-page-main {
+    padding-top: 2.5rem;
+  }
+
+  .studio-card {
+    border-radius: 0.8rem;
+  }
+}
