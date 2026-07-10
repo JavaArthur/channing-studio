@@ -2007,6 +2007,48 @@ a.warm-editorial-story-kicker:hover {
   line-height: 1;
 }
 
+.studio-writing-title {
+  color: var(--editor-ink);
+  font-family: var(--logo-font, Georgia, "Noto Serif SC", serif);
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.studio-writing-description {
+  color: var(--editor-muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.studio-writing-date {
+  color: var(--stone-gray);
+  display: block;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  margin-top: 0.65rem;
+}
+
+.studio-empty-state {
+  border-block: 1px solid var(--editor-line);
+  color: var(--editor-muted);
+  padding: 5rem 1rem;
+  text-align: center;
+}
+
+.studio-empty-state p {
+  color: var(--editor-ink);
+  font-family: var(--logo-font, Georgia, "Noto Serif SC", serif);
+  font-size: 1.8rem;
+}
+
+.studio-empty-state span {
+  display: block;
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+}
+
 .studio-tag {
   border: 1px solid var(--editor-line);
   border-radius: 999px;

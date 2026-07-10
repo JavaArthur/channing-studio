@@ -293,9 +293,12 @@ git commit -m "fix(site): close identity and article semantics gaps"
 **Files:**
 - Modify: `README.md`
 - Modify: `DEPLOY.md`
+- Modify: `app/writing/page.tsx`
+- Modify: `components/SiteHeader.tsx`
+- Modify: `app/globals.css`
 - Modify: `docs/superpowers/specs/2026-07-10-channing-studio-design.md`（仅记录已验证差异）
 
-- [ ] **Step 1: 跑项目快速验证**
+- [x] **Step 1: 跑项目快速验证**
 
 运行：
 
@@ -305,7 +308,7 @@ npm run verify:quick
 
 预期：lint、Vitest、Next build 全部通过。
 
-- [ ] **Step 2: 运行视觉检查**
+- [x] **Step 2: 运行视觉检查**
 
 运行：
 
@@ -315,7 +318,7 @@ openwolf designqc --routes / /writing /work /labs /about
 
 读取 `.wolf/designqc-captures/` 中的截图，检查首屏层次、暖色对比度、移动端导航、CTA 触达面积和是否只有一个 H1；发现问题先修复再重跑。
 
-- [ ] **Step 3: Worker 预览冒烟**
+- [x] **Step 3: Worker 预览冒烟**
 
 运行：
 
@@ -323,7 +326,7 @@ openwolf designqc --routes / /writing /work /labs /about
 npm run preview
 ```
 
-逐页验证 `/`、`/writing`、`/work`、`/labs`、`/about`、`/admin`、`/admin/studio`、`/editor?new=1`；不在没有认证时提交任何表单。
+逐页验证 `/`、`/writing`、`/work`、`/labs`、`/about`、`/admin`、`/admin/studio`、`/editor?new=1`；不在没有认证时提交任何表单。公开路由和未认证跳转已通过；真实 Worker 远程 preview 仍需真实 `wrangler.local.toml` 才能复核。
 
 - [ ] **Step 4: 轮换 Cloudflare secrets**
 

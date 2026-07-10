@@ -1,9 +1,11 @@
 import { getPosts, getPostsCount } from '@/lib/db'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { type Theme } from '@/lib/appearance'
-import type { SiteCategoryLink, SiteNavLink } from '@/lib/site'
+import type { SiteNavLink } from '@/lib/site'
 import { getSiteHeaderData } from '@/lib/site'
-import { HomeClient } from '@/components/HomeClient'
+import { StudioCardLabel, StudioLink, StudioShell } from '@/components/StudioSection'
+import { Pagination } from '@/components/Pagination'
+import { formatDate } from '@/lib/format-date'
 import { getSiteUrl } from '@/lib/site-config'
 
 const PAGE_SIZE = 25
@@ -29,7 +31,6 @@ export default async function WritingPage({
   let posts: Awaited<ReturnType<typeof getPosts>> = []
   let totalCount = 0
   let navLinks: SiteNavLink[] = []
-  let categories: SiteCategoryLink[] = []
   let defaultTheme: Theme = 'default'
 
   try {
@@ -43,7 +44,6 @@ export default async function WritingPage({
       posts = writingPosts
       totalCount = count
       navLinks = headerData.navLinks
-      categories = headerData.categories
       defaultTheme = headerData.defaultTheme
     }
   } catch (error) {
@@ -51,28 +51,41 @@ export default async function WritingPage({
   }
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
-  const categorySlugMap: Record<string, string> = Object.fromEntries(
-    categories.map((category) => [category.name, category.slug]),
-  )
-
   return (
-    <>
-      <div className="border-b border-[var(--editor-line)] bg-[var(--background)]">
-        <div className="mx-auto max-w-3xl px-4 pb-8 pt-12 sm:px-6 sm:pt-16">
-          <p className="studio-eyebrow">WRITING / ARCHIVE</p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-[var(--editor-ink)] sm:text-5xl">持续记录</h1>
-          <p className="mt-4 text-base leading-7 text-[var(--editor-muted)]">把实践、判断和还没想透的部分写下来。</p>
+    <StudioShell
+      eyebrow="WRITING / ARCHIVE"
+      title="持续记录"
+      description="把实践、判断和还没想透的部分写下来。"
+      navLinks={navLinks}
+      initialTheme={defaultTheme}
+    >
+      {posts.length === 0 ? (
+        <div className="studio-empty-state">
+          <p>还没有文章</p>
+          <span>从后台开始写作，记录思考。</span>
         </div>
-      </div>
-      <HomeClient
-        initialTheme={defaultTheme}
-        posts={posts}
-        categories={categories}
-        navLinks={navLinks}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        categorySlugMap={categorySlugMap}
-      />
-    </>
+      ) : (
+        <>
+          <div className="divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
+            {posts.map((post) => (
+              <StudioLink key={post.slug} href={`/${post.slug}`}>
+                <article className="studio-writing-row group">
+                  <div className="min-w-0">
+                    <StudioCardLabel>{post.category || 'NOTE'}</StudioCardLabel>
+                    <h2 className="studio-writing-title mt-2">{post.title}</h2>
+                    {post.description && <p className="studio-writing-description mt-2">{post.description}</p>}
+                    <time className="studio-writing-date" dateTime={new Date(post.published_at * 1000).toISOString()}>
+                      {formatDate(post.published_at)}
+                    </time>
+                  </div>
+                  <span aria-hidden className="studio-card-arrow">↗</span>
+                </article>
+              </StudioLink>
+            ))}
+          </div>
+          <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/writing" />
+        </>
+      )}
+    </StudioShell>
   )
 }

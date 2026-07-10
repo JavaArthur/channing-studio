@@ -41,7 +41,7 @@ export function SiteHeader({
   initialTheme = 'default',
   studioMode = false,
 }: SiteHeaderProps) {
-  const links = navLinks && navLinks.length > 0 ? navLinks : defaultNavLinks
+  const links = studioMode ? defaultNavLinks : navLinks && navLinks.length > 0 ? navLinks : defaultNavLinks
   const publicLinks = links.filter((link) => link.url !== '/admin' && link.label.toLowerCase() !== 'admin')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [categoryOpen, setCategoryOpen] = useState(false)
