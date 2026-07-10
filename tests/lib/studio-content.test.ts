@@ -1,0 +1,83 @@
+import { describe, expect, it } from 'vitest'
+import {
+  DEFAULT_STUDIO_CONTENT,
+  parseStudioSettings,
+  type StudioContent,
+} from '@/lib/studio-content'
+
+describe('parseStudioSettings', () => {
+  it('returns safe defaults when settings are missing', () => {
+    const result = parseStudioSettings({})
+
+    expect(result.profile.title).toBe(DEFAULT_STUDIO_CONTENT.profile.title)
+    expect(result.projects).toEqual(DEFAULT_STUDIO_CONTENT.projects)
+    expect(result.labs).toEqual(DEFAULT_STUDIO_CONTENT.labs)
+    expect(result.featuredPostSlugs).toEqual([])
+  })
+
+  it('parses valid profile, projects, labs, and featured posts', () => {
+    const result = parseStudioSettings({
+      studio_profile: JSON.stringify({
+        eyebrow: 'AI Platform',
+        title: 'Channing',
+        subtitle: '工程与写作',
+        statement: '把复杂问题变成可交付系统。',
+        contactLinks: [{ label: 'GitHub', url: 'https://github.com/JavaArthur' }],
+        capabilities: [{ title: '平台工程', description: '从架构到交付。' }],
+      }),
+      studio_projects: JSON.stringify([
+        {
+          id: 'blog',
+          title: '晨启AI博客',
+          description: '自托管内容系统。',
+          href: 'https://note.aichanning.cn',
+          tags: ['Next.js'],
+          visible: true,
+        },
+      ]),
+      studio_labs: JSON.stringify([
+        {
+          id: 'clipper',
+          title: 'Chrome Clipper',
+          description: '网页剪藏。',
+          href: '/ecosystem/chrome-clipper',
+          type: 'tool',
+          visible: true,
+        },
+      ]),
+      studio_featured_posts: JSON.stringify(['one', 'two']),
+    })
+
+    expect(result.profile.title).toBe('Channing')
+    expect(result.projects[0]?.id).toBe('blog')
+    expect(result.labs[0]?.id).toBe('clipper')
+    expect(result.featuredPostSlugs).toEqual(['one', 'two'])
+  })
+
+  it('drops malformed entries and falls back for invalid JSON', () => {
+    const result = parseStudioSettings({
+      studio_profile: '{bad json',
+      studio_projects: JSON.stringify([
+        { id: 'valid', title: '有效', description: '说明', href: '/work', tags: [], visible: true },
+        { id: 42, title: '无效' },
+      ]),
+      studio_labs: JSON.stringify({ id: 'not-an-array' }),
+      studio_featured_posts: JSON.stringify([1, 'valid-slug', '']),
+    })
+
+    expect(result.profile).toEqual(DEFAULT_STUDIO_CONTENT.profile)
+    expect(result.projects).toHaveLength(1)
+    expect(result.labs).toEqual(DEFAULT_STUDIO_CONTENT.labs)
+    expect(result.featuredPostSlugs).toEqual(['valid-slug'])
+  })
+
+  it('does not mutate the default content while parsing', () => {
+    const before: StudioContent = structuredClone(DEFAULT_STUDIO_CONTENT)
+
+    parseStudioSettings({
+      studio_profile: JSON.stringify({ title: 'Changed' }),
+    })
+
+    expect(DEFAULT_STUDIO_CONTENT).toEqual(before)
+  })
+})

@@ -30,7 +30,7 @@
 - Consumes: 当前 `main` 的设计提交 `4349c62` 和用户工作区中未提交的页面主题改动。
 - Produces: 独立分支 `codex/channing-studio`，后续所有代码修改只在该 worktree 进行。
 
-- [ ] **Step 1: 确认 worktree 和忽略规则**
+- [x] **Step 1: 确认 worktree 和忽略规则**
 
 运行：
 
@@ -42,7 +42,7 @@ git check-ignore -q .worktrees
 
 预期：当前仍在 `main`；`.worktrees` 已被忽略；现有未提交文件只属于用户，不被清理。
 
-- [ ] **Step 2: 创建 worktree**
+- [x] **Step 2: 创建 worktree**
 
 运行：
 
@@ -53,7 +53,7 @@ cd .worktrees/codex-channing-studio
 
 预期：新目录指向 `codex/channing-studio`，主工作区的未提交改动不出现在新 worktree。
 
-- [ ] **Step 3: 安装依赖并跑基线测试**
+- [x] **Step 3: 安装依赖并跑基线测试**
 
 运行：
 
@@ -64,7 +64,7 @@ npm run test:run
 
 预期：基线测试通过；若失败，记录原始错误并停止，不把基线问题伪装成新改动。
 
-- [ ] **Step 4: 提交计划**
+- [x] **Step 4: 提交计划**
 
 运行：
 
@@ -87,7 +87,7 @@ git commit -m "docs(studio): add implementation plan"
 - Produces: `StudioProfile`、`StudioCapability`、`StudioProject`、`StudioLab`、`StudioContent` 类型；`DEFAULT_STUDIO_CONTENT`；`parseStudioSettings(values)`；`getStudioContent(db)`；`setStudioContent(db, content)`。
 - Consumes: `getSetting`、`setSetting` from `lib/repositories/settings.ts`。
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 测试必须覆盖：空设置返回默认身份和空集合；合法 JSON 返回完整配置；缺字段、错误类型和非法 JSON 被丢弃并回退；`studio_featured_posts` 空数组表示自动使用最新文章；设置写入把五个 key 序列化为 JSON。
 
@@ -99,7 +99,7 @@ npx vitest run tests/lib/studio-content.test.ts tests/lib/studio-settings.test.t
 
 预期：测试先因模块不存在而失败。
 
-- [ ] **Step 2: 实现最小类型和默认值**
+- [x] **Step 2: 实现最小类型和默认值**
 
 在 `lib/studio-content.ts` 中定义严格字段：
 
@@ -126,11 +126,11 @@ export interface StudioContent {
 
 默认内容只使用已确认的公开事实：晨启AI博客、Chrome Clipper、Obsidian Publisher、发布 Skill；不得添加雇主、客户或未经确认的指标。
 
-- [ ] **Step 3: 实现解析与 D1 适配**
+- [x] **Step 3: 实现解析与 D1 适配**
 
 `parseStudioSettings` 逐 key 做 JSON 解析、字段过滤和默认合并；`getStudioContent` 并行读取 `studio_profile`、`studio_projects`、`studio_labs`、`studio_featured_posts` 和旧 `default_theme/nav_links` 不混在同一配置对象内。`setStudioContent` 逐 key 调用 `setSetting`，不直接写 SQL。
 
-- [ ] **Step 4: 跑测试并提交**
+- [x] **Step 4: 跑测试并提交**
 
 运行：
 
