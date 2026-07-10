@@ -340,7 +340,7 @@ printf '%s' "$ADMIN_TOKEN_SALT" | npx wrangler secret put ADMIN_TOKEN_SALT -c wr
 
 预期：Cloudflare secret 列表只显示名称；不把 secret 值写入终端输出或 Git。
 
-- [ ] **Step 5: 部署并验证线上**
+- [x] **Step 5: 部署并验证线上**
 
 运行：
 
@@ -352,11 +352,11 @@ OPEN_NEXT_DEPLOY=true npx wrangler deploy -c wrangler.local.toml
 
 验证线上首页、文章 H1 数量、`/admin` 登录、`/admin/studio` 修改后回读、响应头和 canonical；不使用 `npm run deploy`。
 
-- [ ] **Step 6: 创建独立 GitHub 仓库（部署验证通过后）**
+- [x] **Step 6: 创建独立 GitHub 仓库（部署验证通过后）**
 
 先运行 `gh auth status`。认证有效时创建 `JavaArthur/channing-studio`（若已存在使用 `JavaArthur/channing-ai-studio`），保留旧远端为 `legacy`，只推送验证后的 `main`；认证失效时暂停并告诉用户执行登录，不删除旧仓库。
 
-- [ ] **Step 7: 提交最终变更**
+- [x] **Step 7: 提交最终变更**
 
 运行：
 
@@ -366,4 +366,4 @@ git diff --check
 git log --oneline -8
 ```
 
-预期：只包含本次 Studio 改动；生成最终交付摘要和用户必须完成的 secret/GitHub 操作清单。
+预期：只包含本次 Studio 改动；生成最终交付摘要和用户必须完成的 secret/GitHub 操作清单。Step 4 的 secret 轮换保留给用户确认新密码后执行。
