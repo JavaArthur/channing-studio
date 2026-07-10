@@ -10,12 +10,12 @@ import { PasswordPrompt } from '@/components/PasswordPrompt'
 import { DownloadMarkdown } from '@/components/DownloadMarkdown'
 import { TwitterEmbedsEnhancer } from '@/components/TwitterEmbedsEnhancer'
 import { getSiteHeaderData } from '@/lib/site'
-import { getRelatedPosts } from '@/lib/related-content'
 import { getPublicContentCacheNamespace } from '@/lib/cache'
 import { getSiteUrl } from '@/lib/site-config'
 import { resolveRequestTheme } from '@/lib/server-appearance'
 import { formatDate } from '@/lib/format-date'
 import { stripLeadingTitleHeading } from '@/lib/post-render'
+import { RelatedPosts } from '@/components/RelatedPosts'
 
 // Cloudflare Workers 缓存策略
 export const revalidate = 86400 // 24小时缓存
@@ -101,7 +101,6 @@ export default async function PostPage({
 
   const headerData = await getSiteHeaderData(db)
   const requestTheme = await resolveRequestTheme(headerData.defaultTheme)
-  const categorySlugMap = new Map(headerData.categories.map((category) => [category.name, category.slug]))
   const activeCategorySlug = headerData.categories.find((category) => category.name === post.category)?.slug ?? null
 
   // 密码保护逻辑保持公开路径纯粹，由前台管理员增强层在客户端接管编辑能力
@@ -178,9 +177,6 @@ export default async function PostPage({
   // 阅读时间估算（中文按 400 字/分钟）
   const textLength = post.content?.length || 0
   const readingMinutes = Math.max(1, Math.ceil(textLength / 400))
-  const related = !post.password
-    ? await getRelatedPosts(db, env, post, 3).catch(() => ({ strategy: 'fts' as const, source: 'rules' as const, results: [] }))
-    : { strategy: 'fts' as const, source: 'rules' as const, results: [] }
   const contentContainerId = `post-content-${post.slug}`
   const renderedHtml = stripLeadingTitleHeading(post.html, post.title)
 
@@ -303,53 +299,7 @@ export default async function PostPage({
             />
             <TwitterEmbedsEnhancer containerId={contentContainerId} html={renderedHtml} />
 
-            {related.results.length > 0 && (
-              <section className="mt-14 sm:mt-16 border-t border-[var(--editor-line)] pt-8 sm:pt-10">
-                <div className="flex items-center justify-between gap-3 mb-5">
-                  <div>
-                    <h2 className="text-lg sm:text-xl font-semibold text-[var(--editor-ink)]">继续阅读</h2>
-                    <p className="text-xs text-[var(--stone-gray)] mt-1">
-                      {related.source === 'vectorize' ? '基于向量召回' : '基于全文检索与主题相似度'}
-                    </p>
-                  </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-3">
-                  {related.results.map((item) => {
-                    const itemCategorySlug = item.category ? categorySlugMap.get(item.category) : null
-                    return (
-                      <Link
-                        key={item.slug}
-                        href={`/${item.slug}`}
-                        className="group rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]/55 p-4 transition-colors hover:border-[var(--editor-accent)]/35 hover:bg-[var(--editor-panel)]"
-                      >
-                        <div className="text-xs text-[var(--stone-gray)] mb-3 flex items-center gap-2 flex-wrap">
-                          {item.category && (
-                            itemCategorySlug ? (
-                              <span className="rounded-full border border-[var(--editor-accent)]/15 bg-[var(--editor-accent)]/8 px-2 py-0.5 text-[var(--editor-accent)]">
-                                {item.category}
-                              </span>
-                            ) : (
-                              <span>{item.category}</span>
-                            )
-                          )}
-                          <time>
-                            {formatDate(item.published_at)}
-                          </time>
-                        </div>
-                        <h3 className="text-base font-semibold leading-snug text-[var(--editor-ink)] group-hover:text-[var(--editor-accent)] transition-colors">
-                          {item.title}
-                        </h3>
-                        {item.description && (
-                          <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-[var(--editor-muted)]">
-                            {item.description}
-                          </p>
-                        )}
-                      </Link>
-                    )
-                  })}
-                </div>
-              </section>
-            )}
+            {!post.password && <RelatedPosts slug={post.slug} />}
           </article>
         </FrontPostAdminBoundary>
       </main>
