@@ -2,6 +2,7 @@ import { getSetting, setSetting } from '@/lib/repositories/settings'
 import type { Database } from '@/lib/repositories/schema'
 import {
   parseStudioSettings,
+  serializeStudioSettings,
   STUDIO_SETTING_KEYS,
   type StudioContent,
   type StudioSettingValues,
@@ -15,10 +16,8 @@ export async function getStudioContent(db: Database): Promise<StudioContent> {
 }
 
 export async function setStudioContent(db: Database, content: StudioContent): Promise<void> {
-  await Promise.all([
-    setSetting(db, 'studio_profile', JSON.stringify(content.profile)),
-    setSetting(db, 'studio_projects', JSON.stringify(content.projects)),
-    setSetting(db, 'studio_labs', JSON.stringify(content.labs)),
-    setSetting(db, 'studio_featured_posts', JSON.stringify(content.featuredPostSlugs)),
-  ])
+  const settings = serializeStudioSettings(content)
+  await Promise.all(
+    Object.entries(settings).map(([key, value]) => setSetting(db, key, value)),
+  )
 }

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_STUDIO_CONTENT,
   parseStudioSettings,
+  serializeStudioSettings,
   type StudioContent,
 } from '@/lib/studio-content'
 
@@ -79,5 +80,17 @@ describe('parseStudioSettings', () => {
     })
 
     expect(DEFAULT_STUDIO_CONTENT).toEqual(before)
+  })
+
+  it('serializes the four editable sections to settings payloads', () => {
+    const content = structuredClone(DEFAULT_STUDIO_CONTENT)
+    content.profile.title = 'New title'
+
+    expect(serializeStudioSettings(content)).toEqual({
+      studio_profile: JSON.stringify(content.profile),
+      studio_projects: JSON.stringify(content.projects),
+      studio_labs: JSON.stringify(content.labs),
+      studio_featured_posts: JSON.stringify(content.featuredPostSlugs),
+    })
   })
 })

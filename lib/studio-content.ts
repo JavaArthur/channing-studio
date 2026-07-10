@@ -1,6 +1,6 @@
 import type { SiteNavLink } from '@/lib/site'
 
-export interface StudioLink extends Pick<SiteNavLink, 'label' | 'url' | 'openInNewTab'> {}
+export type StudioLink = Pick<SiteNavLink, 'label' | 'url' | 'openInNewTab'>
 
 export interface StudioCapability {
   title: string
@@ -225,5 +225,14 @@ export function parseStudioSettings(values: StudioSettingValues): StudioContent 
     projects: parseProjects(parseJson(values.studio_projects), defaults.projects),
     labs: parseLabs(parseJson(values.studio_labs), defaults.labs),
     featuredPostSlugs: parseFeaturedPosts(parseJson(values.studio_featured_posts)),
+  }
+}
+
+export function serializeStudioSettings(content: StudioContent): Record<StudioSettingKey, string> {
+  return {
+    studio_profile: JSON.stringify(content.profile),
+    studio_projects: JSON.stringify(content.projects),
+    studio_labs: JSON.stringify(content.labs),
+    studio_featured_posts: JSON.stringify(content.featuredPostSlugs),
   }
 }

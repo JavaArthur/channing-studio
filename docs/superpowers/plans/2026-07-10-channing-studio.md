@@ -212,23 +212,23 @@ git commit -m "feat(studio): add personal homepage and public sections"
 - Consumes: `getStudioContent`、`setStudioContent`、现有 admin cookie 鉴权和 settings API。
 - Produces: 登录管理员可编辑身份、能力、作品、实验室和精选文章；保存后公开页面刷新回读。
 
-- [ ] **Step 1: 扩展 API 测试**
+- [x] **Step 1: 扩展 API 测试**
 
 在现有 settings route 测试中增加：未登录 POST 返回 401；`studio_projects` 对象数组被 JSON 序列化；空 key/undefined value 返回 400。不要改变现有 `font_mode` 等 key 的行为。
 
-- [ ] **Step 2: 实现管理页加载**
+- [x] **Step 2: 实现管理页加载**
 
 `page.tsx` 在受保护 layout 下读取 `getStudioContent(env.DB)`，将已经解析的配置传给客户端 `StudioManager`；无 DB 时显示明确的“数据库未配置”状态，不渲染假成功。
 
-- [ ] **Step 3: 实现客户端编辑器**
+- [x] **Step 3: 实现客户端编辑器**
 
 `StudioManager.tsx` 使用受控表单：文本字段、能力卡数组、作品/实验室增删与上下移、可见性开关、精选 slug 输入。保存按钮分别写入五个 settings key，所有 `resp.json()` 显式断言 `{ success?: boolean; error?: string }`，成功后显示状态并刷新页面。
 
-- [ ] **Step 4: 接入后台导航并验证鉴权**
+- [x] **Step 4: 接入后台导航并验证鉴权**
 
 在 admin header 增加“工作室”链接；不在公开 `SiteHeader` 添加 Admin。验证 `/admin/studio` 未登录重定向 `/admin/login`，登录后可访问。
 
-- [ ] **Step 5: 跑测试并提交**
+- [x] **Step 5: 跑测试并提交**
 
 运行：
 
