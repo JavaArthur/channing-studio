@@ -39,10 +39,10 @@ const SITE_URL = getSiteUrl()
 export const metadata: Metadata = {
   metadataBase: getSiteUrlObject(),
   title: {
-    default: '晨启AI博客',
-    template: '%s · 晨启AI博客',
+    default: 'Channing Studio · 晨启AI',
+    template: '%s · Channing Studio',
   },
-  description: '记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。',
+  description: 'AI 平台工程、内容自动化与真实交付的公开工作台。',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -63,24 +63,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'zh_CN',
     url: SITE_URL,
-    siteName: '晨启AI博客',
-    title: '晨启AI博客',
-    description: '记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。',
+    siteName: 'Channing Studio',
+    title: 'Channing Studio · 晨启AI',
+    description: 'AI 平台工程、内容自动化与真实交付的公开工作台。',
     images: [
       {
         url: '/icon-512.png',
         width: 512,
         height: 512,
-        alt: '晨启AI博客',
+        alt: 'Channing Studio',
       },
     ],
   },
   twitter: {
     card: 'summary',
-    site: '@vista8',
-    creator: '@vista8',
-    title: '晨启AI博客',
-    description: '记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。',
+    title: 'Channing Studio · 晨启AI',
+    description: 'AI 平台工程、内容自动化与真实交付的公开工作台。',
     images: ['/icon-512.png'],
   },
 };

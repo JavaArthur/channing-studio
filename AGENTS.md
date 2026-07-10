@@ -109,7 +109,7 @@ graph TD
 | CF Account | `01b7f083e0a678ebfc6378fc1f68a75a` |
 | D1 库名 / ID | `channing-blog-db` / `f19765b5-a4a9-4b82-b1a9-df92d802859c` |
 | R2 Bucket | `channing-blog-images` |
-| 后台入口 / 密码 | `/admin` / `wudichen` |
+| 后台入口 | `/admin`（使用 Cloudflare secret `ADMIN_PASSWORD` 登录） |
 
 ## 二、日常开发工作流
 

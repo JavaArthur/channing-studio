@@ -20,7 +20,7 @@ const defaultLinks: NavLink[] = [
   { label: '文章', url: '/writing', openInNewTab: false },
   { label: '实验室', url: '/labs', openInNewTab: false },
   { label: '关于我', url: '/about', openInNewTab: false },
-  { label: 'GitHub', url: 'https://github.com/JavaArthur/chen-blog-opensource', openInNewTab: true },
+  { label: 'GitHub', url: 'https://github.com/JavaArthur/channing-studio', openInNewTab: true },
   { label: 'RSS', url: '/feed.xml', openInNewTab: false },
 ]
 

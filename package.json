@@ -1,5 +1,5 @@
 {
-  "name": "channing-blog-opensource",
+  "name": "channing-studio",
   "version": "0.1.0",
   "private": false,
   "scripts": {
@@ -68,15 +68,15 @@
     "vitest": "^4.1.5",
     "wrangler": "^4.84.1"
   },
-  "description": "Open-source Cloudflare blog starter with Next.js 16, D1, R2, built-in themes, and AI provider presets.",
+  "description": "Channing's personal studio and database-backed Cloudflare publishing system.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joeseesun/channing-blog-opensource.git"
+    "url": "git+https://github.com/JavaArthur/channing-studio.git"
   },
-  "homepage": "https://github.com/joeseesun/channing-blog-opensource",
+  "homepage": "https://github.com/JavaArthur/channing-studio",
   "bugs": {
-    "url": "https://github.com/joeseesun/channing-blog-opensource/issues"
+    "url": "https://github.com/JavaArthur/channing-studio/issues"
   },
   "cloudflare": {
     "bindings": {

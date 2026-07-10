@@ -15,6 +15,7 @@ import { getPublicContentCacheNamespace } from '@/lib/cache'
 import { getSiteUrl } from '@/lib/site-config'
 import { resolveRequestTheme } from '@/lib/server-appearance'
 import { formatDate } from '@/lib/format-date'
+import { stripLeadingTitleHeading } from '@/lib/post-render'
 
 // Cloudflare Workers 缓存策略
 export const revalidate = 86400 // 24小时缓存
@@ -50,7 +51,7 @@ export async function generateMetadata({
     return {
       title: post.title,
       description: post.description,
-      authors: [{ name: '晨启AI' }],
+      authors: [{ name: 'Channing' }],
       alternates: {
         canonical: `${baseUrl}/${post.slug}`,
       },
@@ -60,13 +61,11 @@ export async function generateMetadata({
         type: 'article',
         publishedTime: new Date(post.published_at * 1000).toISOString(),
         modifiedTime: new Date(post.updated_at * 1000).toISOString(),
-        authors: ['晨启AI'],
+        authors: ['Channing'],
         images: [{ url: ogImage }],
       },
       twitter: {
         card: 'summary_large_image' as const,
-        site: '@vista8',
-        creator: '@vista8',
         title: post.title,
         description: post.description || undefined,
         images: [ogImage],
@@ -183,6 +182,7 @@ export default async function PostPage({
     ? await getRelatedPosts(db, env, post, 3).catch(() => ({ strategy: 'fts' as const, source: 'rules' as const, results: [] }))
     : { strategy: 'fts' as const, source: 'rules' as const, results: [] }
   const contentContainerId = `post-content-${post.slug}`
+  const renderedHtml = stripLeadingTitleHeading(post.html, post.title)
 
   return (
     <div className="min-h-screen bg-[var(--background)] flex flex-col">
@@ -205,8 +205,8 @@ export default async function PostPage({
             headline: post.title,
             description: post.description || '',
             image: ogImage,
-            author: { '@type': 'Person', name: '晨启AI', url: 'https://x.com/vista8' },
-            publisher: { '@type': 'Organization', name: '晨启AI博客', url: baseUrl, logo: { '@type': 'ImageObject', url: `${baseUrl}/icon-512.png` } },
+            author: { '@type': 'Person', name: 'Channing', url: baseUrl },
+            publisher: { '@type': 'Organization', name: 'Channing Studio', url: baseUrl, logo: { '@type': 'ImageObject', url: `${baseUrl}/icon-512.png` } },
             datePublished: new Date(post.published_at * 1000).toISOString(),
             dateModified: new Date(post.updated_at * 1000).toISOString(),
             mainEntityOfPage: { '@type': 'WebPage', '@id': `${baseUrl}/${post.slug}` },
@@ -233,7 +233,7 @@ export default async function PostPage({
         <FrontPostAdminBoundary
           slug={post.slug}
           title={post.title}
-          html={post.html}
+          html={renderedHtml}
           category={post.category}
           coverImage={post.cover_image}
           password={post.password}
@@ -299,9 +299,9 @@ export default async function PostPage({
               id={contentContainerId}
               data-admin-edit-trigger
               className="rich-content"
-              dangerouslySetInnerHTML={{ __html: post.html }}
+              dangerouslySetInnerHTML={{ __html: renderedHtml }}
             />
-            <TwitterEmbedsEnhancer containerId={contentContainerId} html={post.html} />
+            <TwitterEmbedsEnhancer containerId={contentContainerId} html={renderedHtml} />
 
             {related.results.length > 0 && (
               <section className="mt-14 sm:mt-16 border-t border-[var(--editor-line)] pt-8 sm:pt-10">

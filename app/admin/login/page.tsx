@@ -54,10 +54,10 @@ function AdminLoginForm() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#1f6f59] text-white text-xl font-bold mb-4">
-            乔
-          </div>
-          <h1 className="text-2xl font-bold text-[var(--editor-ink)]">晨启AI博客</h1>
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#1f6f59] text-white text-xl font-bold mb-4">
+              C
+            </div>
+          <h1 className="text-2xl font-bold text-[var(--editor-ink)]">Channing Studio</h1>
           <p className="text-sm text-[var(--editor-muted)] mt-1">管理后台</p>
         </div>
 

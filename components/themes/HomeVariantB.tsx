@@ -35,7 +35,7 @@ function EditorialNavBar({
   navLinks: SiteNavLink[]
 }) {
   const defaultLinks = [
-    { label: 'GitHub', url: 'https://github.com/joeseesun/', openInNewTab: true },
+    { label: 'GitHub', url: 'https://github.com/JavaArthur/channing-studio', openInNewTab: true },
     { label: 'Twitter', url: 'https://x.com/vista8/', openInNewTab: true },
     { label: 'RSS', url: '/feed.xml', openInNewTab: false },
   ]

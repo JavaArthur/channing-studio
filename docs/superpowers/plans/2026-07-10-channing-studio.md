@@ -252,6 +252,9 @@ git commit -m "feat(admin): add studio content management"
 - Modify: `components/themes/HomeVariantC.tsx`
 - Modify: `app/admin/(protected)/settings/NavLinksEditor.tsx`
 - Modify: `package.json`
+- Modify: `package-lock.json`
+- Modify: `app/layout.tsx`
+- Modify: `CLAUDE.md`
 - Modify: `README.md`
 - Modify: `AGENTS.md`
 - Modify: `lib/site-config.ts`
@@ -259,25 +262,25 @@ git commit -m "feat(admin): add studio content management"
 **Interfaces:**
 - Produces: 文章详情页 DOM 只有一个 H1；无上游作者/仓库兜底链接；仓库文档不再包含真实后台凭据；后台入口和新站点身份文案一致。
 
-- [ ] **Step 1: 写标题去重测试**
+- [x] **Step 1: 写标题去重测试**
 
 为 `stripLeadingTitleHeading(html, title)` 写测试：首个 h1 文本等于文章标题时移除；首个 h1 不同、h1 不在开头或 HTML 为空时保持原文。
 
-- [ ] **Step 2: 实现最小渲染修复**
+- [x] **Step 2: 实现最小渲染修复**
 
 在 `lib/post-render.ts` 添加无 DOM 依赖的安全字符串处理，并在 `app/[slug]/page.tsx` 只对公开渲染内容和 `TwitterEmbedsEnhancer` 使用处理后的 HTML；编辑器原始 HTML 和数据库字段不改写。
 
-- [ ] **Step 3: 清理身份与文档**
+- [x] **Step 3: 清理身份与文档**
 
 更新 `package.json` repository/homepage/bugs 到新仓库候选；更新 `lib/site-config.ts` 默认生产域名为 `https://note.aichanning.cn`；更新默认导航、登录页 logo 和 README；从 `AGENTS.md` 删除真实后台密码，只保留 secret 设置说明。
 
-- [ ] **Step 4: 验证安全边界并提交**
+- [x] **Step 4: 验证安全边界并提交**
 
 运行：
 
 ```bash
 npx vitest run tests/lib/post-render.test.ts
-git grep -n -E 'wudichen|CLOUDFLARE_API_TOKEN=[^$]|ADMIN_PASSWORD=[^你的]' -- ':!package-lock.json' ':!.env.example' || true
+# 运行凭据扫描，确认仓库不包含真实后台密码或 token 值
 git diff --check
 git add lib/post-render.ts tests/lib/post-render.test.ts 'app/[slug]/page.tsx' components/SiteHeader.tsx components/themes/HomeVariantB.tsx components/themes/HomeVariantC.tsx app/admin/'(protected)'/settings/NavLinksEditor.tsx app/admin/login/page.tsx package.json README.md AGENTS.md lib/site-config.ts
 git commit -m "fix(site): close identity and article semantics gaps"

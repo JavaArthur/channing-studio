@@ -1,5 +1,5 @@
 const DEV_SITE_URL = 'http://localhost:3000'
-const DEFAULT_PRODUCTION_SITE_URL = 'https://blog.channing.ai'
+const DEFAULT_PRODUCTION_SITE_URL = 'https://note.aichanning.cn'
 
 function parseSiteUrl(value: string): URL | null {
   try {

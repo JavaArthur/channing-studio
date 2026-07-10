@@ -1,18 +1,18 @@
-# 晨启AI博客（Channing Blog）
+# Channing Studio（晨启AI）
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/JavaArthur/chen-blog-opensource)
-[![Use this template](https://img.shields.io/badge/GitHub-Use%20this%20template-111111?logo=github)](https://github.com/JavaArthur/chen-blog-opensource/generate)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/JavaArthur/channing-studio)
+[![Use this template](https://img.shields.io/badge/GitHub-Use%20this%20template-111111?logo=github)](https://github.com/JavaArthur/channing-studio/generate)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> 基于 [qiaomu-blog-opensource](https://github.com/joeseesun/qiaomu-blog-opensource) 深度定制的个人博客系统，专注「自托管、可迁移、低成本」的内容创作闭环。
+> Channing 的个人工作室与自托管内容系统：用一个站点承载作品、实验室、文章和完整的发布工具链。
 
 - 在线站点：<https://note.aichanning.cn>
-- 上游仓库：<https://github.com/joeseesun/qiaomu-blog-opensource>
-- 当前仓库：<https://github.com/JavaArthur/chen-blog-opensource>
+- 项目仓库：<https://github.com/JavaArthur/channing-studio>
+- 上游项目：<https://github.com/joeseesun/qiaomu-blog-opensource>
 
-## 为什么 Fork
+## 项目定位
 
-平台账号可能被封，算法流量会波动，但自己的站点不会。这个 Fork 在上游基础上做了大量体验优化和工具链扩展，目标是打通「剪藏 / Obsidian / Claude Skill / 浏览器编辑器」整条内容生产链路，让写作的心智成本降到最低。
+这是一个数据库驱动的个人工作室。D1 继续保存文章、草稿、分类和站点设置；首页的身份、作品、实验室和精选文章通过 `/admin/studio` 动态维护。平台账号可能被封，算法流量会波动，但自己的站点不会。
 
 ## 相比上游的主要改进
 
@@ -27,7 +27,7 @@
 | 剪藏工具 | Chrome Clipper 支持 GFM 表格、剪藏后自动打开草稿编辑器 |
 | 发布工具链 | Obsidian 一键发布插件、Claude Skill 发布工具 |
 | 工程化 | 模块级 CLAUDE.md 文档树、完整的 AI 辅助开发指引 |
-| 品牌定制 | 全站 rebrand 为「晨启AI」 |
+| 个人工作室 | 首页、作品、实验室、关于我和文章归档统一到一个公开主站 |
 
 ## 核心能力
 
@@ -41,6 +41,7 @@
 - 图片右键菜单：下载、复制、设为封面、对齐、裁剪、参考生图
 - 发布状态：公开、草稿、密码访问、链接访问
 - Cloudflare Workers + D1 + R2 全家桶，月费 $5 级别，不需要维护服务器
+- Studio 内容通过 D1 `site_settings` 动态维护，不需要改代码才能更新首页
 
 ## 截图预览
 
@@ -104,8 +105,8 @@ npm run deploy
 ### 本地开发
 
 ```bash
-git clone https://github.com/JavaArthur/chen-blog-opensource.git
-cd chen-blog-opensource
+git clone https://github.com/JavaArthur/channing-studio.git
+cd channing-studio
 npm install
 cp .env.example .env.local
 npm run dev
@@ -115,9 +116,23 @@ npm run dev
 
 | 路径 | 说明 |
 |------|------|
-| `/` | 首页 |
-| `/admin` | 后台管理 |
-| `/editor` | 编辑器 |
+| `/` | Channing Studio 首页 |
+| `/work` | 作品 |
+| `/labs` | 实验室 |
+| `/writing` | 文章归档 |
+| `/about` | 关于我 |
+| `/admin` | 后台管理（登录入口） |
+| `/admin/studio` | 首页、作品、实验室内容管理 |
+| `/editor` | 文章编辑器 |
+
+### 发布与后台入口
+
+1. 访问 `https://note.aichanning.cn/admin`。
+2. 使用 Cloudflare Worker secret `ADMIN_PASSWORD` 登录；未登录访问 `/editor` 会自动跳回登录页。
+3. `/admin/posts` 管理文章状态，点“写文章”或访问 `/editor?new=1` 创建文章。
+4. `/admin/studio` 修改首页身份、能力卡、作品、实验室和精选文章；保存后刷新公开页面即可生效。
+
+后台密码只通过 Cloudflare secret 管理，不写入 README、`AGENTS.md` 或 Git 历史。
 
 ## 微信排版 API
 
@@ -191,7 +206,7 @@ ecosystem/
 
 ## 贡献
 
-欢迎提 Issue 和 PR。通用修复和新功能会同步贡献回上游仓库。
+欢迎提 Issue 和 PR。通用修复和新功能会在保留上游致谢的前提下独立维护。
 
 ## 致谢
 
@@ -199,7 +214,7 @@ ecosystem/
 
 ## 作者
 
-- **JavaArthur** — [GitHub](https://github.com/JavaArthur) / [博客](https://note.aichanning.cn)
+- **Channing** — [GitHub](https://github.com/JavaArthur) / [Studio](https://note.aichanning.cn)
 
 ## License
 

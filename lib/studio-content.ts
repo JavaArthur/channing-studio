@@ -58,7 +58,7 @@ export const DEFAULT_STUDIO_CONTENT: StudioContent = {
     subtitle: 'AI 平台工程落地者 · 内容创作者',
     statement: '我把重复三遍的事自动化，把工程判断写成可以复用的系统。',
     contactLinks: [
-      { label: 'GitHub', url: 'https://github.com/JavaArthur/chen-blog-opensource', openInNewTab: true },
+      { label: 'GitHub', url: 'https://github.com/JavaArthur/channing-studio', openInNewTab: true },
       { label: 'RSS', url: '/feed.xml', openInNewTab: false },
     ],
     capabilities: [

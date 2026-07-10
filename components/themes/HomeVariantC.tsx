@@ -27,7 +27,7 @@ function TerminalHeader({
   navLinks: SiteNavLink[]
 }) {
   const defaultLinks = [
-    { label: '~/github', url: 'https://github.com/joeseesun/', openInNewTab: true },
+    { label: '~/github', url: 'https://github.com/JavaArthur/channing-studio', openInNewTab: true },
     { label: '~/twitter', url: 'https://x.com/vista8/', openInNewTab: true },
     { label: '~/rss', url: '/feed.xml', openInNewTab: false },
   ]
