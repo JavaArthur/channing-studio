@@ -1,5 +1,6 @@
 import { getPosts } from '@/lib/db'
 import { getTools, type Tool } from '@/lib/repositories/tools'
+import { getPrompts, type Prompt } from '@/lib/repositories/prompts'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getStudioContent } from '@/lib/studio-settings'
 import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
@@ -27,20 +28,23 @@ export default async function Home() {
   let posts: PostWithTags[] = []
   let navLinks: SiteNavLink[] = []
   let tools: Tool[] = []
+  let prompts: Prompt[] = []
   let defaultTheme: Theme = 'default'
 
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, studioContent, recentPosts, toolRows] = await Promise.all([
+      const [headerData, studioContent, recentPosts, toolRows, promptRows] = await Promise.all([
         getSiteHeaderData(env.DB),
         getStudioContent(env.DB),
         getPosts(env.DB, 25, 0, false, false, false, false, 'post'),
         getTools(env.DB),
+        getPrompts(env.DB).catch(() => []),
       ])
       content = studioContent
       posts = selectFeaturedPosts(recentPosts, content.featuredPostSlugs)
       tools = toolRows
+      prompts = promptRows
       navLinks = headerData.navLinks
       defaultTheme = headerData.defaultTheme
     }
@@ -83,6 +87,7 @@ export default async function Home() {
         content={content}
         posts={posts}
         tools={tools}
+        prompts={prompts}
         navLinks={navLinks}
         initialTheme={defaultTheme}
       />

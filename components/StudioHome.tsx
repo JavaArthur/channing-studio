@@ -4,6 +4,7 @@ import type { PostWithTags } from '@/lib/repositories/types'
 import type { SiteNavLink } from '@/lib/site'
 import type { StudioContent, StudioLab, StudioProject } from '@/lib/studio-content'
 import type { Tool } from '@/lib/repositories/tools'
+import type { Prompt } from '@/lib/repositories/prompts'
 import { selectStudioTools } from '@/lib/studio-home'
 import { StudioCardLabel, StudioLink } from '@/components/StudioSection'
 import { SiteFooter } from '@/components/SiteFooter'
@@ -13,6 +14,7 @@ interface StudioHomeProps {
   content: StudioContent
   posts: PostWithTags[]
   tools: Tool[]
+  prompts: Prompt[]
   navLinks: SiteNavLink[]
   initialTheme: Theme
 }
@@ -72,7 +74,7 @@ function StudioToolCard({ tool }: { tool: Tool }) {
   )
 }
 
-export function StudioHome({ content, posts, tools, navLinks, initialTheme }: StudioHomeProps) {
+export function StudioHome({ content, posts, tools, prompts, navLinks, initialTheme }: StudioHomeProps) {
   const { profile } = content
 
   return (
@@ -115,6 +117,32 @@ export function StudioHome({ content, posts, tools, navLinks, initialTheme }: St
               </article>
             ))}
           </div>
+        </section>
+
+        <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div>
+              <p className="studio-eyebrow">PROMPTS / 06</p>
+              <h2 className="studio-section-title mt-3">常用提示词</h2>
+            </div>
+            <Link href="/prompts" className="studio-inline-link">查看全部提示词 →</Link>
+          </div>
+          {prompts.length > 0 ? (
+            <div className="mt-8 divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
+              {prompts.filter((prompt) => prompt.is_pinned === 1).slice(0, 3).map((prompt) => (
+                <Link key={prompt.id} href="/prompts" className="studio-writing-row group">
+                  <div className="min-w-0">
+                    <p className="studio-card-label">{prompt.category || 'PROMPT'}</p>
+                    <h3 className="mt-2 truncate text-lg font-semibold text-[var(--editor-ink)] group-hover:text-[var(--editor-accent)]">{prompt.title}</h3>
+                    {prompt.description && <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--editor-muted)]">{prompt.description}</p>}
+                  </div>
+                  <span aria-hidden className="studio-card-arrow shrink-0">↗</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 border-y border-[var(--editor-line)] py-10 text-sm text-[var(--editor-muted)]">提示词收藏还在建立中。</p>
+          )}
         </section>
 
         <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
@@ -167,7 +195,7 @@ export function StudioHome({ content, posts, tools, navLinks, initialTheme }: St
         <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <p className="studio-eyebrow">WRITING / 06</p>
+              <p className="studio-eyebrow">WRITING / 07</p>
               <h2 className="studio-section-title mt-3">最近写的</h2>
             </div>
             <Link href="/writing" className="studio-inline-link">查看全部文章 →</Link>

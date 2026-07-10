@@ -42,6 +42,7 @@ export default async function AdminProtectedLayout({
             <Link href="/admin/studio" className={navCls}>工作室</Link>
             <Link href="/admin/categories" className={navCls}>分类</Link>
             <Link href="/admin/tools" className={navCls}>工具</Link>
+            <Link href="/admin/prompts" className={navCls}>提示词</Link>
             <Link href="/admin/settings" className={navCls}>设置</Link>
             <div className="w-px h-4 bg-[var(--editor-line)] mx-2 hidden md:block" />
             <Tooltip label="写新文章">
