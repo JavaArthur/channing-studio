@@ -243,6 +243,25 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 );
 CREATE INDEX IF NOT EXISTS idx_login_attempts_ip_time ON login_attempts(ip, attempted_at);
 
+-- 提示词收藏
+CREATE TABLE IF NOT EXISTS prompts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  description TEXT,
+  prompt TEXT NOT NULL,
+  category TEXT,
+  tags TEXT,
+  source_url TEXT,
+  is_pinned INTEGER NOT NULL DEFAULT 0,
+  is_hidden INTEGER NOT NULL DEFAULT 0,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_prompts_public_order
+  ON prompts (is_hidden, is_pinned DESC, sort_order, updated_at DESC);
+
 -- 插入默认分类
 INSERT OR IGNORE INTO categories (name, slug) VALUES
   ('未分类', 'uncategorized'),
