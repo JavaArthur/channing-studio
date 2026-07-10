@@ -98,9 +98,12 @@ npm install
 cp .env.example .env.local    # 编辑填入上述变量
 npx wrangler login
 npm run cf:init -- --site-url=https://your-domain.com
-npm run build
-npm run deploy
+npm run cf-typegen
+npx opennextjs-cloudflare build
+OPEN_NEXT_DEPLOY=true npx wrangler deploy -c wrangler.local.toml
 ```
+
+不要使用 `npm run deploy` 作为已有 D1 数据库的日常部署入口；它会重复执行 schema。表结构变更请单独执行 `db/migrations/*.sql`。
 
 ### 本地开发
 
