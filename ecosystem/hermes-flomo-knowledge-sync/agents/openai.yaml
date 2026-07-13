@@ -1,0 +1,15 @@
+interface:
+  display_name: "Hermes Flomo Knowledge Sync"
+  short_description: "让 Hermes 定时筛选 Flomo 并回传知识工作台运行状态"
+  default_prompt: "Use $hermes-flomo-knowledge-sync in hourly mode to scan new Flomo memos and update the knowledge dashboard."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "flomo"
+      description: "Read-only Flomo memo search through the official MCP endpoint"
+      transport: "streamable_http"
+      url: "https://flomoapp.com/mcp"
+
+policy:
+  allow_implicit_invocation: true

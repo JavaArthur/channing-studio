@@ -7,6 +7,7 @@
 - [`chrome-clipper`](./chrome-clipper/README.md)：浏览器网页剪藏，直接进入博客草稿箱
 - [`obsidian-publisher`](./obsidian-publisher/README.md)：从 Obsidian 一键发布到博客
 - [`channing-blog-publish-skill`](./channing-blog-publish-skill/README.md)：从 Claude Skill / 命令工作流直接发布
+- [`hermes-flomo-knowledge-sync`](./hermes-flomo-knowledge-sync/SKILL.md)：只读扫描 Flomo、严格沉淀到 chen-notes，并回传私人工作台
 
 ## 统一接入方式
 

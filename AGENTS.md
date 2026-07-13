@@ -22,7 +22,8 @@
 | `/labs` | 实验室与工具链 |
 | `/tools` | 工具收藏 |
 | `/prompts` | 提示词收藏 |
-| `/admin` | 后台登录入口 |
+| `/admin` | 私人知识工作台 |
+| `/admin/login` | 后台登录入口 |
 | `/admin/studio` | 首页、项目、实验室配置 |
 | `/admin/tools` | 工具收藏管理 |
 | `/admin/prompts` | 提示词管理 |
@@ -50,12 +51,14 @@ OPEN_NEXT_DEPLOY=true npx wrangler deploy -c wrangler.local.toml
 - 工作室内容：`site_settings` 中的 `studio_*` 配置由 `/admin/studio` 管理。
 - 工具收藏：D1 `tools` 表，由 `/admin/tools` 管理。
 - 提示词收藏：D1 `prompts` 表，由 `/admin/prompts` 管理；新增表必须先写 migration。
+- 知识闭环：D1 只保存 Hermes 运行状态、来源标识和脱敏成果投影，不保存 Flomo 原文。
 - 公开页面只读取公开状态；后台 API 必须继续使用现有 admin session 鉴权。
 
 ## 安全边界
 
 - `.env*`、`wrangler.local.toml`、`.dev.vars`、备份 SQL、Token 和密钥永远不提交。
 - 管理密码只使用 Cloudflare secret `ADMIN_PASSWORD`，不要写入文档、测试或 Git 历史。
+- Hermes 协同只使用专用 Worker secret `HERMES_SYNC_TOKEN`，不得复用或代理 Flomo Token。
 - 修改生产 D1 前先导出备份；不要在本地随意执行 DELETE。
 - 任何外部链接都要限制为 `http` / `https`，用户输入的提示词正文不发送给第三方服务。
 

@@ -20,7 +20,8 @@ Channing 的个人工作室、技术写作和内容工具箱。
 | `/labs` | 实验室、生态工具和正在验证的工作流 |
 | `/tools` | 工具、仓库和软件收藏 |
 | `/prompts` | 可复制的提示词收藏 |
-| `/admin` | 后台登录 |
+| `/admin` | 私人知识工作台 |
+| `/admin/login` | 后台登录 |
 | `/admin/studio` | 工作室身份、项目和实验室配置 |
 | `/admin/tools` | 工具收藏管理 |
 | `/admin/prompts` | 提示词管理 |
@@ -63,6 +64,8 @@ npx opennextjs-cloudflare build
 OPEN_NEXT_DEPLOY=true npx wrangler deploy -c wrangler.local.toml
 ```
 
+生产环境还需要配置专用 Worker secret `HERMES_SYNC_TOKEN`。它只用于 Hermes Agent API，不得复用 Flomo Token、后台密码或博客 API Token。
+
 已有 D1 数据库时不要使用会重复执行 schema 的旧部署脚本。表结构变更先执行 migration：
 
 ```bash
@@ -76,6 +79,7 @@ npx wrangler d1 execute DB --remote --file=db/migrations/你的迁移.sql -c wra
 - `site_settings`：导航、主题和工作室配置。
 - `tools`：工具收藏及其标签、图标、排序。
 - `prompts`：提示词正文、分类、来源、隐藏/置顶状态和排序。
+- `agent_sync_runs`、`agent_source_items`、`knowledge_artifacts`：Hermes 运行状态和脱敏成果投影，不保存 Flomo 原文。
 - R2：文章图片、封面和媒体。
 
 ## 生态工具

@@ -92,6 +92,9 @@
       "AI_CONFIG_ENCRYPTION_SECRET": {
         "description": "用于加密保存 AI 供应商 Key。可用 `openssl rand -hex 32` 生成。"
       },
+      "HERMES_SYNC_TOKEN": {
+        "description": "Hermes 写入知识工作台状态的独立 Bearer Token，不要复用 Flomo 或后台 Token。"
+      },
       "AI_API_KEY": {
         "description": "可选。外部 AI 服务的 API Key，用于文本生成或生图能力。"
       }

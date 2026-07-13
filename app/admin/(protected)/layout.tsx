@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { isAdminAuthenticated, COOKIE_NAME } from '@/lib/admin-auth'
 import Link from 'next/link'
 import { LogoutButton } from './LogoutButton'
-import { PenLine, ExternalLink } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { AdminFooter } from '@/components/AdminFooter'
 import { Tooltip } from '@/components/Tooltip'
 
@@ -24,8 +24,8 @@ export default async function AdminProtectedLayout({
   return (
     <div className="min-h-screen bg-[var(--background)] flex flex-col">
       <header className="sticky top-0 z-40 bg-[var(--editor-panel)] border-b border-[var(--editor-line)]">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3 text-sm">
+        <div className="mx-auto flex min-h-14 max-w-6xl flex-col justify-center gap-1 px-4 py-2 sm:h-14 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-0">
+          <div className="flex shrink-0 items-center gap-3 whitespace-nowrap text-sm">
             <Link
               href="/"
               className="text-lg tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200"
@@ -37,7 +37,8 @@ export default async function AdminProtectedLayout({
             <span className="text-[var(--stone-gray)] hidden sm:inline">管理后台</span>
           </div>
 
-          <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide shrink-0">
+          <nav className="flex w-full shrink-0 items-center gap-0 overflow-x-auto scrollbar-hide sm:w-auto sm:gap-1">
+            <Link href="/admin" className={navCls}>工作台</Link>
             <Link href="/admin/posts" className={navCls}>文章</Link>
             <Link href="/admin/studio" className={navCls}>工作室</Link>
             <Link href="/admin/categories" className={navCls}>分类</Link>
@@ -45,16 +46,6 @@ export default async function AdminProtectedLayout({
             <Link href="/admin/prompts" className={navCls}>提示词</Link>
             <Link href="/admin/settings" className={navCls}>设置</Link>
             <div className="w-px h-4 bg-[var(--editor-line)] mx-2 hidden md:block" />
-            <Tooltip label="写新文章">
-              <Link
-                href="/editor"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--editor-accent)] text-white rounded-lg text-sm font-medium hover:brightness-105 transition-all whitespace-nowrap"
-                aria-label="写新文章"
-              >
-                <PenLine className="w-4 h-4" />
-                <span className="hidden md:inline">写文章</span>
-              </Link>
-            </Tooltip>
             <Tooltip label="查看博客">
               <Link
                 href="/"
