@@ -2,6 +2,8 @@ import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getSiteHeaderData } from '@/lib/site'
 import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
 import { getStudioContent } from '@/lib/studio-settings'
+import { getTools, type Tool } from '@/lib/repositories/tools'
+import { selectStudioTools } from '@/lib/studio-home'
 import { StudioCardLabel, StudioLink, StudioShell } from '@/components/StudioSection'
 import { getSiteUrl } from '@/lib/site-config'
 import type { Theme } from '@/lib/appearance'
@@ -17,13 +19,19 @@ export default async function LabsPage() {
   let content = DEFAULT_STUDIO_CONTENT
   let navLinks: SiteNavLink[] = []
   let defaultTheme: Theme = 'default'
+  let tools: Tool[] = []
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, studioContent] = await Promise.all([getSiteHeaderData(env.DB), getStudioContent(env.DB)])
+      const [headerData, studioContent, toolRows] = await Promise.all([
+        getSiteHeaderData(env.DB),
+        getStudioContent(env.DB),
+        getTools(env.DB),
+      ])
       navLinks = headerData.navLinks
       defaultTheme = headerData.defaultTheme
       content = studioContent
+      tools = toolRows
     }
   } catch (error) {
     console.error('Studio labs: failed to fetch content', error)
@@ -52,6 +60,22 @@ export default async function LabsPage() {
             </article>
           </StudioLink>
         ))}
+      </div>
+      <div className="mt-14 border-t border-[var(--editor-line)] pt-10">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="studio-eyebrow">TOOLS / 05</p>
+            <h2 className="studio-section-title mt-3">相关工具</h2>
+          </div>
+          <StudioLink href="/tools">完整工具箱 →</StudioLink>
+        </div>
+        {tools.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-3">
+            {selectStudioTools(tools).map((tool) => (
+              <StudioLink key={tool.id} href={tool.url || '/tools'}>{tool.name} ↗</StudioLink>
+            ))}
+          </div>
+        )}
       </div>
     </StudioShell>
   )

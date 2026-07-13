@@ -67,6 +67,7 @@ WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"
 # - ADMIN_PASSWORD
 # - ADMIN_TOKEN_SALT
 # - AI_CONFIG_ENCRYPTION_SECRET
+# - HERMES_SYNC_TOKEN
 # - AI_API_KEY
 # - CLOUDFLARE_ACCOUNT_ID (optional, for Workers AI model discovery)
 # - CLOUDFLARE_API_TOKEN (optional, for Workers AI model discovery)

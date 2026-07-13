@@ -7,10 +7,19 @@ const MAX_VECTOR_TEXT_LENGTH = 6000
 type RelatedStrategy = 'vectorize' | 'fts'
 type RelatedSource = 'vectorize' | 'fts' | 'rules'
 
-type RelatedSearchResult = {
+export type RelatedSearchResult = {
   strategy: RelatedStrategy
   source: RelatedSource
   results: PostWithTags[]
+}
+
+export function limitRelatedPosts<T extends { slug: string }>(
+  posts: T[] | null | undefined,
+  currentSlug: string,
+  limit = 3,
+): T[] {
+  if (!Array.isArray(posts) || limit <= 0) return []
+  return posts.filter((post) => post.slug !== currentSlug).slice(0, limit)
 }
 
 type PublicPostRow = Pick<

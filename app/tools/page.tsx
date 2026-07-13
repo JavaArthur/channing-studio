@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getTools } from '@/lib/repositories/tools'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
-import { SiteHeader } from '@/components/SiteHeader'
-import { SiteFooter } from '@/components/SiteFooter'
+import { StudioShell } from '@/components/StudioSection'
 import { getSiteHeaderData } from '@/lib/site'
 import { getSiteUrl } from '@/lib/site-config'
 import { resolveRequestTheme } from '@/lib/server-appearance'
@@ -45,29 +44,17 @@ export default async function ToolsPage() {
   const requestTheme = await resolveRequestTheme(headerData.defaultTheme)
 
   return (
-    <div className="min-h-full flex flex-col bg-[var(--background)]">
-      <SiteHeader
-        initialTheme={requestTheme}
-        navLinks={headerData.navLinks}
-        categories={headerData.categories}
-      />
-
-      <main className="page-main flex-1 mx-auto max-w-4xl w-full px-4 sm:px-6 py-10 sm:py-14">
-        <div className="mb-8 border-b border-[var(--editor-line)] pb-6">
-          <div className="text-xs uppercase tracking-[0.18em] text-[var(--stone-gray)] mb-3">
-            工具墙
-          </div>
-          <h1 className="article-display-title text-3xl sm:text-4xl font-bold text-[var(--editor-ink)] leading-tight">
-            好用的东西
-          </h1>
-          <p className="mt-3 text-sm text-[var(--editor-muted)]">
-            收藏的工具、仓库、Mac 软件，共 {tools.length} 件
-          </p>
-        </div>
-
+    <StudioShell
+      eyebrow="TOOLBOX / 05"
+      title="好用的东西"
+      description={`收藏的工具、仓库、Mac 软件，共 ${tools.length} 件。`}
+      navLinks={headerData.navLinks}
+      initialTheme={requestTheme}
+    >
         {tools.length === 0 ? (
-          <div className="py-20 text-center">
-            <p className="text-[var(--editor-muted)]">工具墙还是空的，去后台添加第一件</p>
+          <div className="studio-empty-state">
+            <p>工具箱还是空的</p>
+            <span>去后台添加第一件工具。</span>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
@@ -135,9 +122,6 @@ export default async function ToolsPage() {
             })}
           </div>
         )}
-      </main>
-
-      <SiteFooter />
-    </div>
+    </StudioShell>
   )
 }

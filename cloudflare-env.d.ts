@@ -2,11 +2,12 @@ declare interface D1PreparedStatement {
   bind(...values: unknown[]): D1PreparedStatement
   first<T = Record<string, unknown>>(): Promise<T | null>
   all<T = Record<string, unknown>>(): Promise<{ results: T[] }>
-  run(): Promise<{ meta: { last_row_id: number } }>
+  run(): Promise<{ meta: { last_row_id: number; changes?: number } }>
 }
 
 declare interface D1Database {
   prepare(query: string): D1PreparedStatement
+  batch(statements: D1PreparedStatement[]): Promise<Array<{ meta?: { changes?: number } }>>
 }
 
 declare interface KVNamespace {
@@ -66,6 +67,7 @@ declare interface CloudflareEnv {
   ADMIN_PASSWORD?: string
   ADMIN_TOKEN_SALT?: string
   AI_CONFIG_ENCRYPTION_SECRET?: string
+  HERMES_SYNC_TOKEN?: string
   NEXT_PUBLIC_SITE_URL?: string
   AI_API_KEY?: string
   AI_BASE_URL?: string

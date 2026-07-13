@@ -3,6 +3,9 @@ import type { Theme } from '@/lib/appearance'
 import type { PostWithTags } from '@/lib/repositories/types'
 import type { SiteNavLink } from '@/lib/site'
 import type { StudioContent, StudioLab, StudioProject } from '@/lib/studio-content'
+import type { Tool } from '@/lib/repositories/tools'
+import type { Prompt } from '@/lib/repositories/prompts'
+import { selectStudioTools } from '@/lib/studio-home'
 import { StudioCardLabel, StudioLink } from '@/components/StudioSection'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
@@ -10,6 +13,8 @@ import { SiteHeader } from '@/components/SiteHeader'
 interface StudioHomeProps {
   content: StudioContent
   posts: PostWithTags[]
+  tools: Tool[]
+  prompts: Prompt[]
   navLinks: SiteNavLink[]
   initialTheme: Theme
 }
@@ -49,7 +54,27 @@ function StudioLabCard({ lab }: { lab: StudioLab }) {
   )
 }
 
-export function StudioHome({ content, posts, navLinks, initialTheme }: StudioHomeProps) {
+function StudioToolCard({ tool }: { tool: Tool }) {
+  return (
+    <StudioLink href={tool.url || '/tools'}>
+      <article className="studio-card h-full">
+        <div className="flex items-start justify-between gap-4">
+          <StudioCardLabel>TOOL / {tool.type}</StudioCardLabel>
+          <span aria-hidden className="studio-card-arrow">↗</span>
+        </div>
+        <h3 className="studio-card-title mt-7">{tool.name}</h3>
+        {tool.description && <p className="studio-card-description mt-3 line-clamp-3">{tool.description}</p>}
+        {tool.tags.length > 0 && (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {tool.tags.map((tag) => <span key={tag} className="studio-tag">{tag}</span>)}
+          </div>
+        )}
+      </article>
+    </StudioLink>
+  )
+}
+
+export function StudioHome({ content, posts, tools, prompts, navLinks, initialTheme }: StudioHomeProps) {
   const { profile } = content
 
   return (
@@ -97,6 +122,32 @@ export function StudioHome({ content, posts, navLinks, initialTheme }: StudioHom
         <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
+              <p className="studio-eyebrow">PROMPTS / 06</p>
+              <h2 className="studio-section-title mt-3">常用提示词</h2>
+            </div>
+            <Link href="/prompts" className="studio-inline-link">查看全部提示词 →</Link>
+          </div>
+          {prompts.length > 0 ? (
+            <div className="mt-8 divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
+              {prompts.filter((prompt) => prompt.is_pinned === 1).slice(0, 3).map((prompt) => (
+                <Link key={prompt.id} href="/prompts" className="studio-writing-row group">
+                  <div className="min-w-0">
+                    <p className="studio-card-label">{prompt.category || 'PROMPT'}</p>
+                    <h3 className="mt-2 truncate text-lg font-semibold text-[var(--editor-ink)] group-hover:text-[var(--editor-accent)]">{prompt.title}</h3>
+                    {prompt.description && <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--editor-muted)]">{prompt.description}</p>}
+                  </div>
+                  <span aria-hidden className="studio-card-arrow shrink-0">↗</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 border-y border-[var(--editor-line)] py-10 text-sm text-[var(--editor-muted)]">提示词收藏还在建立中。</p>
+          )}
+        </section>
+
+        <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div>
               <p className="studio-eyebrow">SELECTED WORK / 03</p>
               <h2 className="studio-section-title mt-3">做过的东西</h2>
             </div>
@@ -125,7 +176,26 @@ export function StudioHome({ content, posts, navLinks, initialTheme }: StudioHom
         <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <p className="studio-eyebrow">WRITING / 05</p>
+              <p className="studio-eyebrow">TOOLBOX / 05</p>
+              <h2 className="studio-section-title mt-3">我正在用的东西</h2>
+            </div>
+            <Link href="/tools" className="studio-inline-link">查看工具箱 →</Link>
+          </div>
+          {tools.length > 0 ? (
+            <div className="mt-10 grid gap-5 sm:grid-cols-2">
+              {selectStudioTools(tools).map((tool) => <StudioToolCard key={tool.id} tool={tool} />)}
+            </div>
+          ) : (
+            <p className="mt-8 border-y border-[var(--editor-line)] py-10 text-sm text-[var(--editor-muted)]">
+              工具箱还没有公开内容，登录后台后可以添加第一件工具。
+            </p>
+          )}
+        </section>
+
+        <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div>
+              <p className="studio-eyebrow">WRITING / 07</p>
               <h2 className="studio-section-title mt-3">最近写的</h2>
             </div>
             <Link href="/writing" className="studio-inline-link">查看全部文章 →</Link>

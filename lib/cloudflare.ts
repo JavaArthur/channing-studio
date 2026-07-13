@@ -9,7 +9,7 @@ const BUILD_CONTEXT: CloudflareContext = {
     props: {},
     waitUntil() {},
     passThroughOnException() {},
-  } as unknown as ExecutionContext,
+  } as unknown as CloudflareContext['ctx'],
 }
 
 export async function getAppCloudflareContext() {
