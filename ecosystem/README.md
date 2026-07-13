@@ -7,7 +7,10 @@
 - [`chrome-clipper`](./chrome-clipper/README.md)：浏览器网页剪藏，直接进入博客草稿箱
 - [`obsidian-publisher`](./obsidian-publisher/README.md)：从 Obsidian 一键发布到博客
 - [`channing-blog-publish-skill`](./channing-blog-publish-skill/README.md)：从 Claude Skill / 命令工作流直接发布
-- [`hermes-flomo-knowledge-sync`](./hermes-flomo-knowledge-sync/SKILL.md)：只读扫描 Flomo、严格沉淀到 chen-notes，并回传私人工作台
+
+## 私人协同组件
+
+`hermes-flomo-knowledge-sync` 已迁移到独立私有仓库 [`JavaArthur/channing-agent-skills`](https://github.com/JavaArthur/channing-agent-skills/tree/main/skills/hermes-flomo-knowledge-sync)。博客只保留知识工作台和 Agent API，不保存 Flomo Token，也不再维护 Skill 源码副本。
 
 ## 统一接入方式
 
