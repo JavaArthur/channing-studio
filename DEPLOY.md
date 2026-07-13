@@ -17,6 +17,7 @@ cp .env.example .env.local
 ADMIN_PASSWORD=请替换为独立的高强度密码
 ADMIN_TOKEN_SALT=请替换为随机字符串
 AI_CONFIG_ENCRYPTION_SECRET=请替换为另一组随机字符串
+HERMES_SYNC_TOKEN=请替换为独立的随机字符串
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
 
@@ -46,6 +47,7 @@ npm run cf:init -- --site-url=https://your-domain.com --with-kv
 npx wrangler secret put ADMIN_PASSWORD -c wrangler.local.toml
 npx wrangler secret put ADMIN_TOKEN_SALT -c wrangler.local.toml
 npx wrangler secret put AI_CONFIG_ENCRYPTION_SECRET -c wrangler.local.toml
+npx wrangler secret put HERMES_SYNC_TOKEN -c wrangler.local.toml
 ```
 
 如需外部 AI：
@@ -64,13 +66,23 @@ OPEN_NEXT_DEPLOY=true npx wrangler deploy -c wrangler.local.toml
 
 不要使用 `npm run deploy` 作为生产部署入口：该脚本会重复执行 schema，在已有 D1 数据库上可能因表已存在而失败。表结构变更请单独执行对应 migration。
 
+已有数据库启用 Hermes 知识工作台时，按顺序执行：
+
+```bash
+npx wrangler d1 execute DB --remote --file=db/migrations/2026-07-13-add-agent-knowledge-loop.sql -c wrangler.local.toml
+npx wrangler d1 execute DB --remote --file=db/migrations/2026-07-13-add-artifact-run-version.sql -c wrangler.local.toml
+npx wrangler d1 execute DB --remote --file=db/migrations/2026-07-13-enforce-artifact-run-version.sql -c wrangler.local.toml
+```
+
 ## 后台与内容发布
 
 部署完成后访问 `https://你的域名/admin`，使用 Cloudflare secret `ADMIN_PASSWORD` 登录。登录后：
 
+- `/admin`：查看 Hermes 同步状态、知识成果和内容成长轨迹。
 - `/admin/posts`：管理文章列表、发布状态和删除操作。
 - `/editor?new=1`：新建并发布文章；文章正文和元数据写入 D1，图片上传到 R2。
 - `/admin/studio`：维护首页身份介绍、能力项、项目、实验室和精选文章 slug；保存后公开页面会读取最新的 D1 配置。
+- `/admin/prompts`：管理公开提示词收藏。
 
 如果后台无法登录，先确认 `ADMIN_PASSWORD` 与 `ADMIN_TOKEN_SALT` 都已通过 `wrangler secret put` 设置；不要把密码写进仓库文档或配置文件。
 

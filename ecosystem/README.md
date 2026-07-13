@@ -1,6 +1,6 @@
 # Ecosystem
 
-这个仓库不只开源博客主站，也把配套发布工具一起放进来了，方便你直接复用整套工作流。
+这个仓库不只维护 Channing Studio 主站，也保留配套发布工具，方便直接复用整套工作流。
 
 ## 包含的配套工具
 
@@ -10,7 +10,7 @@
 
 ## 私人协同组件
 
-`hermes-flomo-knowledge-sync` 已迁移到独立私有仓库 [`JavaArthur/channing-agent-skills`](https://github.com/JavaArthur/channing-agent-skills/tree/main/skills/hermes-flomo-knowledge-sync)。博客只保留知识工作台和 Agent API，不保存 Flomo Token，也不再维护 Skill 源码副本。
+`hermes-flomo-knowledge-sync` 已迁移到独立私有仓库 [`JavaArthur/channing-agent-skills`](https://github.com/JavaArthur/channing-agent-skills/tree/main/skills/hermes-flomo-knowledge-sync)。Channing Studio 只保留知识工作台和 Agent API，不保存 Flomo Token，也不再维护 Skill 源码副本。
 
 ## 统一接入方式
 
