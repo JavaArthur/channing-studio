@@ -1,6 +1,8 @@
 # gorkbot 通用工作台接入：笔记、收集箱、项目
 
-更新：2026-10-17。适用于支持 HTTP API 工具的 gorkbot。
+支持远程 MCP 的客户端可以使用 [MCP 接入指南](gorkbot-mcp-integration.md)，一次完成收集箱转笔记与关联项目。MCP 使用独立凭据，现有 HTTP API 和 Hermes Token 保持兼容。
+
+更新：2026-10-18。适用于支持 HTTP API 工具的 gorkbot。
 
 这套接口直接操作私人工作台的 `notes`、`inbox_items`、`projects`，不需要把普通内容伪装成 Flomo。原 Hermes / Flomo 同步接口保持不变。
 

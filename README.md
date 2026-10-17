@@ -6,7 +6,7 @@ Channing 的个人工作室、技术写作和内容工具箱。
 
 在线站点：<https://note.aichanning.cn>
 
-Bot 接入：[gorkbot 通用工作台 API（笔记、收集箱、项目）](docs/api/gorkbot-workspace-integration.md) · [可导入 OpenAPI](docs/api/gorkbot-workspace.openapi.json) · [原 Flomo 同步](docs/api/gorkbot-hermes-integration.md)。Agent 接口沿用 Hermes Token，后台登录与公开发布仍由管理员控制。
+Bot 接入：[MCP 指南（收集 → 笔记 → 项目）](docs/api/gorkbot-mcp-integration.md) · [现有 HTTP API](docs/api/gorkbot-workspace-integration.md) · [OpenAPI](docs/api/gorkbot-workspace.openapi.json) · [原 Flomo 同步](docs/api/gorkbot-hermes-integration.md)。MCP 使用独立读写凭据；现有 Agent API 沿用 Hermes Token，后台登录与公开发布仍由管理员控制。
 
 独立仓库：<https://github.com/JavaArthur/channing-studio>
 
@@ -67,6 +67,8 @@ OPEN_NEXT_DEPLOY=true npx wrangler deploy -c wrangler.local.toml
 ```
 
 生产环境还需要配置专用 Worker secret `HERMES_SYNC_TOKEN`。它用于通用工作台 `/api/agent/v1/brain/*` 与原 Hermes 同步 API，不得复用 Flomo Token、后台密码或博客 API Token。它现已具备私人笔记、收集箱和项目读写权限。
+
+MCP `/mcp` 使用独立的 `MCP_READ_TOKEN` / `MCP_WRITE_TOKEN`，仅接受专用凭据。配置步骤和兼容范围见 [MCP 接入文档](docs/api/gorkbot-mcp-integration.md)。
 
 部署脚本现已与数据库初始化分离。已有 D1 数据库必须先备份并演练增量 migration；不要重复执行完整 schema：
 
