@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS posts (
   deleted_at INTEGER, -- 软删除时间戳，NULL 表示未删除
   published_at INTEGER DEFAULT (strftime('%s', 'now')),
   updated_at INTEGER DEFAULT (strftime('%s', 'now')),
+  revision INTEGER NOT NULL DEFAULT 0,
   view_count INTEGER DEFAULT 0
 );
 
@@ -64,7 +65,9 @@ CREATE TABLE IF NOT EXISTS tools (
   is_pinned INTEGER DEFAULT 0,
   sort_order INTEGER DEFAULT 0,
   created_at INTEGER DEFAULT (strftime('%s', 'now')),
-  updated_at INTEGER DEFAULT (strftime('%s', 'now'))
+  updated_at INTEGER DEFAULT (strftime('%s', 'now')),
+  is_hidden INTEGER NOT NULL DEFAULT 1,
+  published_payload TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_tools_type ON tools(type);
@@ -253,10 +256,11 @@ CREATE TABLE IF NOT EXISTS prompts (
   tags TEXT,
   source_url TEXT,
   is_pinned INTEGER NOT NULL DEFAULT 0,
-  is_hidden INTEGER NOT NULL DEFAULT 0,
+  is_hidden INTEGER NOT NULL DEFAULT 1,
   sort_order INTEGER NOT NULL DEFAULT 0,
   created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
-  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  published_payload TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_prompts_public_order
@@ -332,3 +336,89 @@ INSERT OR IGNORE INTO categories (name, slug) VALUES
   ('未分类', 'uncategorized'),
   ('AI工具', 'ai-tools'),
   ('AI', 'ai');
+
+CREATE TABLE IF NOT EXISTS post_working_copies (
+  post_id INTEGER PRIMARY KEY REFERENCES posts(id) ON DELETE CASCADE,
+  payload TEXT NOT NULL,
+  revision INTEGER NOT NULL DEFAULT 1,
+  base_revision INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+
+CREATE TABLE IF NOT EXISTS inbox_items (
+  id TEXT PRIMARY KEY,
+  revision INTEGER NOT NULL DEFAULT 1,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL DEFAULT '',
+  source_url TEXT,
+  status TEXT NOT NULL DEFAULT 'inbox' CHECK(status IN ('inbox','organized','archived')),
+  target_type TEXT,
+  target_id TEXT,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE TABLE IF NOT EXISTS notes (
+  id TEXT PRIMARY KEY,
+  revision INTEGER NOT NULL DEFAULT 1,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL DEFAULT '',
+  source_url TEXT,
+  archived INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE TABLE IF NOT EXISTS projects (
+  id TEXT PRIMARY KEY,
+  revision INTEGER NOT NULL DEFAULT 1,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  next_action TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','paused','done','archived')),
+  public_url TEXT,
+  published_payload TEXT,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE TABLE IF NOT EXISTS project_links (
+  project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  kind TEXT NOT NULL CHECK(kind IN ('note','post','tool','prompt')),
+  target_id TEXT NOT NULL,
+  PRIMARY KEY(project_id,kind,target_id)
+);
+CREATE INDEX IF NOT EXISTS idx_inbox_status_updated ON inbox_items(status,updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_projects_status_updated ON projects(status,updated_at DESC);
+
+-- Existing admin writes also invalidate the Agent's version, including same-second edits.
+CREATE TRIGGER inbox_items_revision AFTER UPDATE ON inbox_items
+WHEN NEW.revision = OLD.revision
+BEGIN
+  UPDATE inbox_items SET revision=OLD.revision+1 WHERE id=NEW.id;
+END;
+CREATE TRIGGER notes_revision AFTER UPDATE ON notes
+WHEN NEW.revision = OLD.revision
+BEGIN
+  UPDATE notes SET revision=OLD.revision+1 WHERE id=NEW.id;
+END;
+CREATE TRIGGER projects_revision AFTER UPDATE ON projects
+WHEN NEW.revision = OLD.revision
+BEGIN
+  UPDATE projects SET revision=OLD.revision+1 WHERE id=NEW.id;
+END;
+CREATE TRIGGER project_links_revision_insert AFTER INSERT ON project_links
+BEGIN
+  UPDATE projects SET updated_at=strftime('%s','now') WHERE id=NEW.project_id;
+END;
+CREATE TRIGGER project_links_revision_delete AFTER DELETE ON project_links
+BEGIN
+  UPDATE projects SET updated_at=strftime('%s','now') WHERE id=OLD.project_id;
+END;
+
+-- Persist creation receipts; never store the authentication token or source content here.
+CREATE TABLE agent_brain_creates (
+  key_hash TEXT PRIMARY KEY,
+  kind TEXT NOT NULL CHECK(kind IN ('inbox','notes','projects')),
+  request_hash TEXT NOT NULL,
+  item_id TEXT NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);

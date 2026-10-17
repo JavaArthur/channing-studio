@@ -47,22 +47,22 @@ describe('/api/admin/settings route', () => {
   })
 
   it('returns a setting value for an authorized GET request', async () => {
-    mocks.getSetting.mockResolvedValue('serif')
+    mocks.getSetting.mockResolvedValue('[]')
 
     const response = await GET({
-      nextUrl: new URL('http://test.local/api/admin/settings?key=font_mode'),
+      nextUrl: new URL('http://test.local/api/admin/settings?key=nav_links'),
     } as never)
     const body = await response.json()
 
-    expect(mocks.getSetting).toHaveBeenCalledWith({ kind: 'db' }, 'font_mode')
-    expect(body).toEqual({ key: 'font_mode', value: 'serif' })
+    expect(mocks.getSetting).toHaveBeenCalledWith({ kind: 'db' }, 'nav_links')
+    expect(body).toEqual({ key: 'nav_links', value: '[]' })
   })
 
   it('rejects unauthorized requests before reading from the database', async () => {
     mocks.isAdminAuthenticated.mockResolvedValue(false)
 
     const response = await GET({
-      nextUrl: new URL('http://test.local/api/admin/settings?key=font_mode'),
+      nextUrl: new URL('http://test.local/api/admin/settings?key=nav_links'),
     } as never)
 
     expect(response.status).toBe(401)
@@ -72,8 +72,8 @@ describe('/api/admin/settings route', () => {
 
   it('stores non-string setting values as serialized JSON on POST', async () => {
     mocks.parseJsonBody.mockResolvedValue({
-      key: 'appearance',
-      value: { theme: 'paper', density: 'comfortable' },
+      key: 'nav_links',
+      value: [{ label:'作品', url:'/work', openInNewTab:false }],
     })
 
     const response = await POST({} as never)
@@ -81,8 +81,8 @@ describe('/api/admin/settings route', () => {
 
     expect(mocks.setSetting).toHaveBeenCalledWith(
       { kind: 'db' },
-      'appearance',
-      JSON.stringify({ theme: 'paper', density: 'comfortable' }),
+      'nav_links',
+      JSON.stringify([{ label:'作品', url:'/work', openInNewTab:false }]),
     )
     expect(body).toEqual({ success: true })
   })

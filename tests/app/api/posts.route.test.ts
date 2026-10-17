@@ -88,7 +88,7 @@ describe('/api/posts route', () => {
       }),
     )
     expect(mocks.invalidatePublicContentCache).toHaveBeenCalled()
-    expect(mocks.enqueueBackgroundJob).toHaveBeenCalledTimes(2)
+    expect(mocks.enqueueBackgroundJob).toHaveBeenCalledTimes(1)
     expect(body).toEqual(
       expect.objectContaining({
         success: true,

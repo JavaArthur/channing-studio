@@ -1,6 +1,7 @@
 export type PostKind = 'post' | 'clipping'
 
 export interface Post {
+  revision?: number
   id: number
   slug: string
   title: string

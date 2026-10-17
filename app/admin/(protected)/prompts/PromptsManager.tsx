@@ -1,5 +1,6 @@
 'use client'
 
+import { ResourceWithdrawal } from '@/components/ResourceWithdrawal'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Prompt } from '@/lib/repositories/prompts'
@@ -26,7 +27,7 @@ const EMPTY: FormState = {
   tags: '',
   source_url: '',
   is_pinned: false,
-  is_hidden: false,
+  is_hidden: true,
   sort_order: 0,
 }
 
@@ -42,7 +43,7 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((current) => ({ ...current, [key]: value }))
 
-  async function save() {
+  async function save(publish = false) {
     if (!form.title.trim() || !form.prompt.trim()) {
       setError('标题和提示词正文不能为空')
       return
@@ -60,7 +61,6 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
         tags: form.tags.split(/[,，]/).map((tag) => tag.trim()).filter(Boolean),
         source_url: form.source_url.trim() || null,
         is_pinned: form.is_pinned ? 1 : 0,
-        is_hidden: form.is_hidden ? 1 : 0,
         sort_order: form.sort_order,
       }
       const response = await fetch(editing ? `/api/admin/prompts/${form.id}` : '/api/admin/prompts', {
@@ -68,10 +68,15 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),
       })
-      const result = await response.json() as { success?: boolean; error?: string }
+      const result = await response.json() as { success?: boolean; error?: string; id?: number }
       if (!response.ok || !result.success) throw new Error(result.error || '保存失败')
+      if (!form.id && result.id) setForm(current => ({...current,id:result.id!}))
+      if (publish) {
+        const publication = await fetch(`/api/admin/resources/prompts/${form.id ?? result.id}/publication`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ publish: true }) })
+        if (!publication.ok) throw new Error('工作版本已保存，发布失败，请重试。')
+      }
       setForm(EMPTY)
-      setMessage(editing ? '已更新提示词。' : '已添加提示词。')
+      setMessage(publish ? '已公开发布。' : '已保存工作版本，公开内容保持不变。')
       router.refresh()
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : '保存失败')
@@ -111,6 +116,8 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
 
   return (
     <div className="space-y-8">
+      <p className="text-sm text-[var(--editor-muted)]">提示词只在你的浏览器中复制，不会发送给第三方服务。新收藏默认私密。</p>
+      <button className="brain-button" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
       <section className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-5">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-[var(--editor-ink)]">{editing ? '编辑提示词' : '添加提示词'}</h2>
@@ -127,10 +134,10 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--editor-muted)]">
           <div className="flex flex-wrap gap-4">
             <label className="flex items-center gap-2"><input type="checkbox" checked={form.is_pinned} onChange={(event) => setField('is_pinned', event.target.checked)} />置顶</label>
-            <label className="flex items-center gap-2"><input type="checkbox" checked={form.is_hidden} onChange={(event) => setField('is_hidden', event.target.checked)} />隐藏</label>
+
             <label className="flex items-center gap-2">排序<input className={`${inputClass} w-20`} type="number" value={form.sort_order} onChange={(event) => setField('sort_order', Number(event.target.value) || 0)} /></label>
           </div>
-          <button type="button" onClick={save} disabled={saving} className="rounded-lg bg-[var(--editor-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:brightness-105 disabled:opacity-50">{saving ? '保存中…' : editing ? '更新提示词' : '添加提示词'}</button>
+          <button type="button" onClick={() => void save()} disabled={saving} className="rounded-lg bg-[var(--editor-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:brightness-105 disabled:opacity-50">{saving ? '保存中…' : editing ? '更新提示词' : '添加提示词'}</button>
         </div>
         {message && <p className="mt-4 text-sm text-emerald-700">{message}</p>}
         {error && <p className="mt-4 text-sm text-rose-600">{error}</p>}
@@ -140,17 +147,17 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
         {initialPrompts.length === 0 ? (
           <div className="py-12 text-center text-sm text-[var(--editor-muted)]">还没有提示词，先添加第一条。</div>
         ) : initialPrompts.map((prompt) => (
-          <article key={prompt.id} className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
+          <article id={String(prompt.id)} key={prompt.id} className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-semibold text-[var(--editor-ink)]">{prompt.title}</h3>
                   {prompt.is_pinned === 1 && <span className="text-xs text-[var(--editor-accent)]">置顶</span>}
-                  {prompt.is_hidden === 1 && <span className="text-xs text-[var(--stone-gray)]">隐藏</span>}
+                  <span className="text-xs text-[var(--stone-gray)]">{prompt.is_hidden ? '私密' : '已公开'}</span>
                 </div>
                 {prompt.description && <p className="mt-1 text-sm text-[var(--editor-muted)]">{prompt.description}</p>}
               </div>
-              <div className="flex gap-3 text-xs text-[var(--editor-muted)]"><button type="button" onClick={() => edit(prompt)} className="hover:text-[var(--editor-ink)]">编辑</button><button type="button" onClick={() => remove(prompt)} className="text-rose-500 hover:underline">删除</button></div>
+              <div className="flex gap-3 text-xs text-[var(--editor-muted)]">{prompt.is_hidden === 0 && <ResourceWithdrawal kind="prompts" id={prompt.id}/>}<button type="button" onClick={() => edit(prompt)} className="hover:text-[var(--editor-ink)]">编辑</button><button type="button" onClick={() => remove(prompt)} className="text-rose-500 hover:underline">删除</button></div>
             </div>
             <pre className="mt-3 line-clamp-3 whitespace-pre-wrap rounded-lg bg-[var(--editor-soft)] p-3 text-xs leading-6 text-[var(--editor-muted)]">{prompt.prompt}</pre>
           </article>

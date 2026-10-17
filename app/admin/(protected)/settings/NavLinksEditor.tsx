@@ -18,10 +18,8 @@ interface Props {
 const defaultLinks: NavLink[] = [
   { label: '作品', url: '/work', openInNewTab: false },
   { label: '文章', url: '/writing', openInNewTab: false },
-  { label: '实验室', url: '/labs', openInNewTab: false },
+  { label: '资源', url: '/tools', openInNewTab: false },
   { label: '关于我', url: '/about', openInNewTab: false },
-  { label: 'GitHub', url: 'https://github.com/JavaArthur/channing-studio', openInNewTab: true },
-  { label: 'RSS', url: '/feed.xml', openInNewTab: false },
 ]
 
 export function NavLinksEditor({ initialValue, onSave, saving }: Props) {

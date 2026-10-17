@@ -88,7 +88,7 @@ describe('/api/admin/posts/[slug] route', () => {
       }),
     )
     expect(mocks.enqueueBackgroundJob).toHaveBeenCalledTimes(1)
-    expect(body).toEqual({ success: true, slug: 'next_slug' })
+    expect(body).toEqual({ success: true, slug: 'next_slug', revision: 1 })
   })
 
   it('renders html when admin update receives markdown content without html', async () => {

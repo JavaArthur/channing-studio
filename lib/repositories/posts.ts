@@ -1,4 +1,3 @@
-import { getCacheKey } from '@/lib/cache'
 import { mapPostWithTags, parsePostTags } from '@/lib/repositories/post-mappers'
 import { ensureSchema, type Database } from '@/lib/repositories/schema'
 import type {
@@ -10,6 +9,15 @@ import type {
   PostWithTags,
   StatsRow,
 } from '@/lib/repositories/types'
+
+export async function getFeaturedPosts(db: Database, slugs: string[]): Promise<PostWithTags[]> {
+  const selected = [...new Set(slugs)].slice(0, 10)
+  if (!selected.length) return []
+  const { results } = await db.prepare(`SELECT id,slug,title,description,category,tags,status,password,is_pinned,is_hidden,cover_image,kind,source_url,published_at,view_count,deleted_at
+    FROM posts WHERE slug IN (${selected.map(() => '?').join(',')}) AND status='published' AND deleted_at IS NULL AND is_hidden=0 AND password IS NULL AND (kind='post' OR kind IS NULL)`)
+    .bind(...selected).all<Post>()
+  return results.map(mapPostWithTags)
+}
 
 // 获取文章列表（默认只返回已发布文章）
 export async function getPosts(
@@ -81,24 +89,12 @@ export interface GetPostBySlugOptions {
 export async function getPostBySlug(
   db: Database,
   slug: string,
-  kv?: KVNamespace,
+  _kv?: KVNamespace,
   options?: GetPostBySlugOptions,
 ): Promise<PostWithTags | null> {
   await ensureSchema(db)
 
   const includeUnpublished = options?.includeUnpublished ?? false
-
-  if (kv) {
-    try {
-      const cacheKey = await getCacheKey(kv, `post:${slug}`)
-      const cached = await kv.get(cacheKey, 'json')
-      if (cached) {
-        return cached as PostWithTags
-      }
-    } catch {
-      // 缓存读取失败，继续查询数据库
-    }
-  }
 
   let post: Post | null
   if (includeUnpublished) {
@@ -118,12 +114,6 @@ export async function getPostBySlug(
   if (!post) return null
 
   const result = mapPostWithTags(post)
-
-  if (kv) {
-    getCacheKey(kv, `post:${slug}`)
-      .then((cacheKey) => kv.put(cacheKey, JSON.stringify(result), { expirationTtl: 3600 }))
-      .catch(() => {})
-  }
 
   return result
 }
@@ -266,6 +256,8 @@ export async function updatePost(
     source_url: string | null
     kind: PostKind
   }>,
+  expectedRevision?: number,
+  expectedDraftRevision?: number,
 ): Promise<void> {
   await ensureSchema(db)
 
@@ -345,13 +337,17 @@ export async function updatePost(
 
   if (updates.length === 0) return
 
-  updates.push("updated_at = strftime('%s', 'now')")
+  updates.push("updated_at = strftime('%s', 'now')", "revision = revision + 1")
   values.push(id)
 
-  await db
-    .prepare(`UPDATE posts SET ${updates.join(', ')} WHERE id = ?`)
+  if (expectedRevision !== undefined) values.push(expectedRevision)
+  if (expectedDraftRevision !== undefined) values.push(expectedDraftRevision)
+  const draftGuard = expectedDraftRevision !== undefined ? ' AND COALESCE((SELECT revision FROM post_working_copies WHERE post_id=posts.id),0) = ?' : ''
+  const result = await db
+    .prepare(`UPDATE posts SET ${updates.join(', ')} WHERE id = ?${expectedRevision !== undefined ? ' AND revision = ?' : ''}${draftGuard}`)
     .bind(...values)
     .run()
+  if (expectedRevision !== undefined && !result.meta.changes) throw new Error('REVISION_CONFLICT')
 
   if (data.category !== undefined && oldCategory !== null && oldCategory !== data.category) {
     await db

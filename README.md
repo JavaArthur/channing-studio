@@ -6,6 +6,8 @@ Channing 的个人工作室、技术写作和内容工具箱。
 
 在线站点：<https://note.aichanning.cn>
 
+Bot 接入：[gorkbot 通用工作台 API（笔记、收集箱、项目）](docs/api/gorkbot-workspace-integration.md) · [可导入 OpenAPI](docs/api/gorkbot-workspace.openapi.json) · [原 Flomo 同步](docs/api/gorkbot-hermes-integration.md)。Agent 接口沿用 Hermes Token，后台登录与公开发布仍由管理员控制。
+
 独立仓库：<https://github.com/JavaArthur/channing-studio>
 
 ![Channing Studio 首页](docs/screenshots/studio-home.png)
@@ -64,9 +66,9 @@ npx opennextjs-cloudflare build
 OPEN_NEXT_DEPLOY=true npx wrangler deploy -c wrangler.local.toml
 ```
 
-生产环境还需要配置专用 Worker secret `HERMES_SYNC_TOKEN`。它只用于 Hermes Agent API，不得复用 Flomo Token、后台密码或博客 API Token。
+生产环境还需要配置专用 Worker secret `HERMES_SYNC_TOKEN`。它用于通用工作台 `/api/agent/v1/brain/*` 与原 Hermes 同步 API，不得复用 Flomo Token、后台密码或博客 API Token。它现已具备私人笔记、收集箱和项目读写权限。
 
-已有 D1 数据库时不要使用会重复执行 schema 的旧部署脚本。表结构变更先执行 migration：
+部署脚本现已与数据库初始化分离。已有 D1 数据库必须先备份并演练增量 migration；不要重复执行完整 schema：
 
 ```bash
 npx wrangler d1 export DB --remote --output=backup-$(date +%F).sql -c wrangler.local.toml
@@ -104,3 +106,10 @@ git grep -n -I -E '(BEGIN (RSA|OPENSSH|EC|PGP) PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_
 ## 许可证
 
 MIT
+
+
+## 个人大脑改造（2026-10）
+
+公开网站与私人工作台已分开，统一使用白天/晚上配色。后台新增收件箱、私人笔记、项目、关联资料和统一搜索；文章保存工作稿与对外发布分离，工具/提示词通过公开快照发布。
+
+详细变更、数据迁移、验证与上线顺序见 [交付与上线说明](docs/2026-10-17-personal-brain-implementation.md)。`npm run dev` 默认本地开发；`npm run deploy` 需要显式设置 `CF_CONFIG_PATH`，不会执行 schema 或 seed。已有数据库必须先备份、盘点并演练增量 migration。

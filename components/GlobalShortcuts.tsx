@@ -1,41 +1,22 @@
 'use client'
-
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-
+import { usePathname, useRouter } from 'next/navigation'
 export function GlobalShortcuts() {
-  const router = useRouter()
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      // Cmd + K → 新建文章（Mac 标准快捷键）
-      if (e.metaKey && e.key.toLowerCase() === 'k') {
-        e.preventDefault()
-        // 检查是否已登录
-        if (document.cookie.includes('qmblog_admin=')) {
-          router.push('/editor')
-        } else {
-          console.log('请先登录后台')
-        }
-        return
-      }
-
-      // Ctrl + Cmd + N → 新建文章（备用快捷键）
-      if (e.ctrlKey && e.metaKey && e.key.toLowerCase() === 'n') {
-        e.preventDefault()
-        if (document.cookie.includes('qmblog_admin=')) {
-          router.push('/editor')
-        } else {
-          console.log('请先登录后台')
-        }
-        return
+  const router=useRouter()
+  const path=usePathname()
+  useEffect(()=>{
+    const handler=(event:KeyboardEvent)=>{
+      const privatePage=path.startsWith('/admin') || path==='/editor'
+      if((event.metaKey || event.ctrlKey) && event.key.toLowerCase()==='k' && privatePage) {
+        event.preventDefault()
+        router.push('/admin/search')
+      } else if(event.ctrlKey && event.metaKey && event.key.toLowerCase()==='n') {
+        event.preventDefault()
+        router.push('/editor?new=1')
       }
     }
-
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [router])
-
+    window.addEventListener('keydown',handler)
+    return ()=>window.removeEventListener('keydown',handler)
+  },[router,path])
   return null
 }
-

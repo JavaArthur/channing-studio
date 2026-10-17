@@ -1,53 +1,44 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { getClientThemePreference, isTheme, subscribeToThemeChange, THEME_CHANGE_EVENT, THEME_COOKIE_NAME } from '@/lib/appearance'
+import { getClientThemePreference, isTheme, normalizeTheme, subscribeToThemeChange, THEME_CHANGE_EVENT, THEME_COOKIE_NAME, THEME_STORAGE_KEY, COLOR_MODE_SCRIPT } from '@/lib/appearance'
 
-describe('appearance helpers', () => {
-  afterEach(() => {
-    vi.unstubAllGlobals()
+function browser(saved: string | null = null, dark = false, cookie = '') {
+  const storage = new Map(saved ? [[THEME_STORAGE_KEY, saved]] : [])
+  const root = { dataset: {} as Record<string,string>, style: { colorScheme: '' }, setAttribute: vi.fn() }
+  const media = { matches: dark, addEventListener: vi.fn(), removeEventListener: vi.fn() }
+  const localStorage = { getItem: (k:string) => storage.get(k) ?? null, setItem: (k:string,v:string) => storage.set(k,v), removeItem: (k:string) => storage.delete(k) }
+  const listeners = new Map<string, () => void>()
+  vi.stubGlobal('document', { cookie, documentElement: root })
+  vi.stubGlobal('localStorage', localStorage)
+  vi.stubGlobal('matchMedia', () => media)
+  vi.stubGlobal('window', { localStorage, matchMedia: () => media, addEventListener: (k:string,fn:()=>void) => listeners.set(k,fn), removeEventListener: (k:string) => listeners.delete(k) })
+  return { storage, root, listeners }
+}
+describe('two color modes', () => {
+  afterEach(() => vi.unstubAllGlobals())
+  it('renders light by default on the server', () => expect(getClientThemePreference()).toBe('light'))
+  it('only accepts light and dark while mapping the legacy terminal choice', () => {
+    expect(isTheme('dark')).toBe(true)
+    expect(isTheme('editorial')).toBe(false)
+    expect(normalizeTheme('terminal')).toBe('dark')
   })
-
-  it('uses the provided fallback when running without window', () => {
-    expect(getClientThemePreference('clarity')).toBe('clarity')
+  it('follows system until a choice is saved', () => {
+    browser(null,true); expect(getClientThemePreference()).toBe('dark')
+    browser('light',true); expect(getClientThemePreference()).toBe('light')
   })
-
-  it('uses the server-provided fallback when the theme cookie is missing', () => {
-    vi.stubGlobal('window', {})
-    vi.stubGlobal('document', { cookie: '' })
-
-    expect(getClientThemePreference('terminal')).toBe('terminal')
+  it('migrates legacy preference before paint and clears its cookie', () => {
+    const context=browser(null,false,`${THEME_COOKIE_NAME}=terminal`)
+    Function(COLOR_MODE_SCRIPT)()
+    expect(context.root.dataset.colorMode).toBe('dark')
+    expect(context.storage.get(THEME_STORAGE_KEY)).toBe('dark')
+    expect(document.cookie).toContain('Max-Age=0')
   })
-
-  it('prefers a valid saved client theme over the fallback', () => {
-    vi.stubGlobal('window', {})
-    vi.stubGlobal('document', { cookie: `${THEME_COOKIE_NAME}=editorial` })
-
-    expect(getClientThemePreference('terminal')).toBe('editorial')
-  })
-
-  it('accepts the warm editorial theme id', () => {
-    expect(isTheme('warm-editorial')).toBe(true)
-  })
-
-  it('subscribes to same-tab theme changes', () => {
-    const listeners = new Map<string, EventListener>()
-    const onStoreChange = vi.fn()
-
-    vi.stubGlobal('window', {
-      addEventListener: vi.fn((name: string, listener: EventListener) => {
-        listeners.set(name, listener)
-      }),
-      removeEventListener: vi.fn((name: string) => {
-        listeners.delete(name)
-      }),
-    })
-
-    const unsubscribe = subscribeToThemeChange(onStoreChange)
-
-    listeners.get(THEME_CHANGE_EVENT)?.(new Event(THEME_CHANGE_EVENT))
-
-    expect(onStoreChange).toHaveBeenCalledTimes(1)
-
-    unsubscribe()
-    expect(listeners.size).toBe(0)
+  it('listens to same tab, other tabs, and system changes and cleans up', () => {
+    const {listeners}=browser()
+    const changed=vi.fn()
+    const stop=subscribeToThemeChange(changed)
+    listeners.get(THEME_CHANGE_EVENT)?.()
+    listeners.get('storage')?.()
+    expect(changed).toHaveBeenCalledTimes(2)
+    stop(); expect(listeners.size).toBe(0)
   })
 })

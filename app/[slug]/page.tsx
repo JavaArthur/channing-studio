@@ -18,7 +18,7 @@ import { stripLeadingTitleHeading } from '@/lib/post-render'
 import { RelatedPosts } from '@/components/RelatedPosts'
 
 // Cloudflare Workers 缓存策略
-export const revalidate = 86400 // 24小时缓存
+export const dynamic = 'force-dynamic' // Password checks must never share a rendered response
 export const dynamicParams = true
 
 export async function generateMetadata({
@@ -119,17 +119,7 @@ export default async function PostPage({
             stickyOnMobile={false}
           />
           <main className="page-main mx-auto w-full max-w-3xl px-4 sm:px-6 flex-1 py-8 sm:py-12">
-            <FrontPostAdminBoundary
-              slug={post.slug}
-              title={post.title}
-              html={post.html}
-              category={post.category}
-              coverImage={post.cover_image}
-              password={post.password}
-              publishedAt={post.published_at}
-              viewCount={post.view_count}
-              content={post.content}
-            >
+            <FrontPostAdminBoundary slug={post.slug}>
               <PasswordPrompt />
             </FrontPostAdminBoundary>
           </main>
@@ -151,17 +141,7 @@ export default async function PostPage({
             stickyOnMobile={false}
           />
           <main className="page-main mx-auto w-full max-w-3xl px-4 sm:px-6 flex-1 py-8 sm:py-12">
-            <FrontPostAdminBoundary
-              slug={post.slug}
-              title={post.title}
-              html={post.html}
-              category={post.category}
-              coverImage={post.cover_image}
-              password={post.password}
-              publishedAt={post.published_at}
-              viewCount={post.view_count}
-              content={post.content}
-            >
+            <FrontPostAdminBoundary slug={post.slug}>
               <PasswordPrompt error={passwordError} />
             </FrontPostAdminBoundary>
           </main>
@@ -226,17 +206,7 @@ export default async function PostPage({
             </>
           )
         })()}
-        <FrontPostAdminBoundary
-          slug={post.slug}
-          title={post.title}
-          html={renderedHtml}
-          category={post.category}
-          coverImage={post.cover_image}
-          password={post.password}
-          publishedAt={post.published_at}
-          viewCount={post.view_count}
-          content={post.content}
-        >
+        <FrontPostAdminBoundary slug={post.slug}>
           <article>
             <header className="mb-10 sm:mb-12">
               <h1

@@ -85,16 +85,7 @@ export async function POST(req: NextRequest) {
     // 6. 清除缓存
     await invalidatePublicContentCache(env)
 
-    await enqueueBackgroundJob(
-      env,
-      {
-        type: 'process-post-ai',
-        postId,
-      },
-      {
-        waitUntil: ctx?.waitUntil?.bind(ctx),
-      },
-    )
+
 
     await enqueueBackgroundJob(
       env,

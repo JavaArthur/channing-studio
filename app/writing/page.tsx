@@ -11,7 +11,7 @@ import { getSiteUrl } from '@/lib/site-config'
 const PAGE_SIZE = 25
 const BASE_URL = getSiteUrl()
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 
 export const metadata = {
@@ -31,7 +31,7 @@ export default async function WritingPage({
   let posts: Awaited<ReturnType<typeof getPosts>> = []
   let totalCount = 0
   let navLinks: SiteNavLink[] = []
-  let defaultTheme: Theme = 'default'
+  let defaultTheme: Theme = 'light'
 
   try {
     const env = await getAppCloudflareEnv()

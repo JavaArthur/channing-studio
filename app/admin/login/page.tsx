@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { isSafeLink } from '@/lib/url'
 import { Suspense, useState, type FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -30,7 +31,7 @@ function AdminLoginForm() {
       if (res.ok) {
         const redirectTo = searchParams.get('redirect_to') || '/admin'
         // 安全检查：只允许跳转到本站路径
-        const safePath = redirectTo.startsWith('/') ? redirectTo : '/admin'
+        const safePath = redirectTo.startsWith('/') && isSafeLink(redirectTo) ? redirectTo : '/admin'
         router.push(safePath)
         router.refresh()
       } else {
@@ -54,11 +55,11 @@ function AdminLoginForm() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#1f6f59] text-white text-xl font-bold mb-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] text-xl font-bold mb-4">
               C
             </div>
           <h1 className="text-2xl font-bold text-[var(--editor-ink)]">Channing Studio</h1>
-          <p className="text-sm text-[var(--editor-muted)] mt-1">管理后台</p>
+          <p className="text-sm text-[var(--editor-muted)] mt-1">我的大脑</p>
         </div>
 
         {/* 登录表单 */}
@@ -82,7 +83,7 @@ function AdminLoginForm() {
                 placeholder="请输入管理密码"
                 autoFocus
                 autoComplete="current-password"
-                className="w-full border border-[var(--editor-line)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--editor-ink)] bg-[var(--editor-app-bg)] outline-none transition focus:border-[#1f6f59] focus:ring-2 focus:ring-[#1f6f59]/10 placeholder:text-[var(--editor-muted)]"
+                className="w-full border border-[var(--editor-line)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--editor-ink)] bg-[var(--editor-app-bg)] outline-none transition focus:border-[var(--editor-accent)] focus:ring-2 focus:ring-[var(--editor-accent)]/10 placeholder:text-[var(--editor-muted)]"
               />
             </div>
 
@@ -95,7 +96,7 @@ function AdminLoginForm() {
             <button
               type="submit"
               disabled={loading || !password}
-              className="w-full bg-[#1f6f59] text-white rounded-lg py-2.5 text-sm font-semibold hover:brightness-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] rounded-lg py-2.5 text-sm font-semibold hover:brightness-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? '登录中…' : '登录'}
             </button>
@@ -104,7 +105,7 @@ function AdminLoginForm() {
 
         <p className="text-center mt-6 text-xs text-[var(--editor-muted)]">
           <Link href="/" className="hover:text-[var(--editor-ink)] transition-colors">
-            ← 返回博客首页
+            ← 返回公开首页
           </Link>
         </p>
       </div>

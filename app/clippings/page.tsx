@@ -14,7 +14,7 @@ const PAGE_SIZE = 25
 const BASE_URL = getSiteUrl()
 
 export const dynamicParams = true
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 export const metadata = {
   title: '剪报',

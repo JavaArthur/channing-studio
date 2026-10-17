@@ -24,6 +24,12 @@ const nextConfig: NextConfig = {
   },
 
   headers: async () => [
+    ...['/admin/:path*', '/api/admin/:path*', '/editor', '/api/editor/:path*'].map(source => ({
+      source, headers: [
+        { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+      ],
+    })),
     {
       source: '/(.*)',
       headers: [

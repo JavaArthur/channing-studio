@@ -1,0 +1,86 @@
+:root {
+  color-scheme: light;
+  --background: #f7f8fa;
+  --foreground: #17202a;
+  --editor-app-bg: #f7f8fa;
+  --editor-panel: #ffffff;
+  --editor-soft: #edf0f5;
+  --editor-line: #dde2e8;
+  --editor-ink: #17202a;
+  --editor-muted: #526071;
+  --editor-accent: #2457c5;
+  --editor-accent-ink: #ffffff;
+  --editor-link: #2457c5;
+  --editor-code-bg: #edf0f5;
+  --editor-code-border: #dde2e8;
+  --editor-quote-bg: #edf0f5;
+  --editor-selection: #cfe0ff;
+  --stone-gray: #637083;
+  --border-warm: #dde2e8;
+  --coral: #2457c5;
+  --article-heading: #17202a;
+  --article-body: #283442;
+  --article-quote: #526071;
+  --article-quote-border: #2457c5;
+  --article-quote-nested-border: #a5b9df;
+  --article-quote-nested-bg: #f0f3f8;
+  --logo-font: var(--font-geist-sans), sans-serif;
+}
+:root[data-color-mode="dark"] {
+  color-scheme: dark;
+  --background: #111318;
+  --foreground: #e6eaf0;
+  --editor-app-bg: #111318;
+  --editor-panel: #191d24;
+  --editor-soft: #252c37;
+  --editor-line: #343c48;
+  --editor-ink: #e6eaf0;
+  --editor-muted: #a4afbd;
+  --editor-accent: #8ab4ff;
+  --editor-accent-ink: #111318;
+  --editor-link: #8ab4ff;
+  --editor-code-bg: #191d24;
+  --editor-code-border: #343c48;
+  --editor-quote-bg: #191d24;
+  --editor-selection: #334d76;
+  --stone-gray: #a4afbd;
+  --border-warm: #343c48;
+  --coral: #8ab4ff;
+  --article-heading: #e6eaf0;
+  --article-body: #ccd3de;
+  --article-quote: #a4afbd;
+  --article-quote-border: #8ab4ff;
+  --article-quote-nested-border: #526b96;
+  --article-quote-nested-bg: #1d2532;
+  --logo-font: var(--font-geist-sans), sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+:root:not([data-color-mode]) {
+  color-scheme: dark;
+  --background: #111318;
+  --foreground: #e6eaf0;
+  --editor-app-bg: #111318;
+  --editor-panel: #191d24;
+  --editor-soft: #252c37;
+  --editor-line: #343c48;
+  --editor-ink: #e6eaf0;
+  --editor-muted: #a4afbd;
+  --editor-accent: #8ab4ff;
+  --editor-accent-ink: #111318;
+  --editor-link: #8ab4ff;
+  --editor-code-bg: #191d24;
+  --editor-code-border: #343c48;
+  --editor-quote-bg: #191d24;
+  --editor-selection: #334d76;
+  --stone-gray: #a4afbd;
+  --border-warm: #343c48;
+  --coral: #8ab4ff;
+  --article-heading: #e6eaf0;
+  --article-body: #ccd3de;
+  --article-quote: #a4afbd;
+  --article-quote-border: #8ab4ff;
+  --article-quote-nested-border: #526b96;
+  --article-quote-nested-bg: #1d2532;
+  --logo-font: var(--font-geist-sans), sans-serif;
+}
+}

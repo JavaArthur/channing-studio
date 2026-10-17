@@ -75,7 +75,7 @@ export function HiddenToggle({ slug, isHidden }: HiddenToggleProps) {
         title={newHidden === 1 ? '隐藏文章' : '取消隐藏'}
         description={
           newHidden === 1
-            ? '隐藏后，文章不会在首页、RSS 和搜索中显示，但可以通过直接链接访问。'
+            ? '隐藏后，文章不会在首页、RSS 和搜索中显示，但可以通过直接私密。'
             : '取消隐藏后，文章将重新出现在首页、RSS 和搜索结果中。'
         }
         confirmText="确认"

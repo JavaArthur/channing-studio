@@ -1,19 +1,13 @@
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
-import { getPrompts, type Prompt } from '@/lib/repositories/prompts'
+import { getPrompts } from '@/lib/repositories/prompts'
 import { PromptsManager } from './PromptsManager'
 
 export const metadata = { title: '提示词管理' }
 
 export default async function AdminPromptsPage() {
   const env = await getAppCloudflareEnv()
-  let prompts: Prompt[] = []
-  if (env?.DB) {
-    try {
-      prompts = await getPrompts(env.DB, { includeHidden: true })
-    } catch (error) {
-      console.error('Prompts fetch error:', error)
-    }
-  }
+  if(!env?.DB) throw new Error('数据库未连接')
+  const prompts=await getPrompts(env.DB, { includeHidden:true })
 
   return (
     <div>

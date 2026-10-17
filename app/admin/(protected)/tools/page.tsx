@@ -6,15 +6,8 @@ export const metadata = { title: '工具管理' }
 
 export default async function AdminToolsPage() {
   const env = await getAppCloudflareEnv()
-  let tools: Awaited<ReturnType<typeof getTools>> = []
-
-  if (env?.DB) {
-    try {
-      tools = await getTools(env.DB)
-    } catch (error) {
-      console.error('Tools fetch error:', error)
-    }
-  }
+  if(!env?.DB) throw new Error('数据库未连接')
+  const tools=await getTools(env.DB, { includeHidden:true })
 
   return (
     <div>

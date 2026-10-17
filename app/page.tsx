@@ -2,7 +2,8 @@ import { getPosts } from '@/lib/db'
 import { getTools, type Tool } from '@/lib/repositories/tools'
 import { getPrompts, type Prompt } from '@/lib/repositories/prompts'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
-import { getStudioContent } from '@/lib/studio-settings'
+import { getPublicStudioContent } from '@/lib/public-studio'
+import { getFeaturedPosts } from '@/lib/repositories/posts'
 import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
 import { selectFeaturedPosts } from '@/lib/studio-home'
 import { type Theme } from '@/lib/appearance'
@@ -14,7 +15,7 @@ import type { PostWithTags } from '@/lib/repositories/types'
 
 const BASE_URL = getSiteUrl()
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 
 export const metadata = {
@@ -29,20 +30,21 @@ export default async function Home() {
   let navLinks: SiteNavLink[] = []
   let tools: Tool[] = []
   let prompts: Prompt[] = []
-  let defaultTheme: Theme = 'default'
+  let defaultTheme: Theme = 'light'
 
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
       const [headerData, studioContent, recentPosts, toolRows, promptRows] = await Promise.all([
         getSiteHeaderData(env.DB),
-        getStudioContent(env.DB),
+        getPublicStudioContent(env.DB),
         getPosts(env.DB, 25, 0, false, false, false, false, 'post'),
         getTools(env.DB),
         getPrompts(env.DB).catch(() => []),
       ])
       content = studioContent
-      posts = selectFeaturedPosts(recentPosts, content.featuredPostSlugs)
+      const featured = await getFeaturedPosts(env.DB, content.featuredPostSlugs)
+      posts = selectFeaturedPosts([...featured, ...recentPosts], content.featuredPostSlugs)
       tools = toolRows
       prompts = promptRows
       navLinks = headerData.navLinks

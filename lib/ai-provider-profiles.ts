@@ -175,13 +175,14 @@ export function resolveAiConfigSecret(env?: Record<string, unknown>): string {
     ? env.ADMIN_TOKEN_SALT
     : ''
 
-  return (
+  const secret = (
     envSecret ||
     process.env.AI_CONFIG_ENCRYPTION_SECRET ||
     envSalt ||
-    process.env.ADMIN_TOKEN_SALT ||
-    'qmblog-ai-config-secret'
+    process.env.ADMIN_TOKEN_SALT
   )
+  if (!secret) throw new Error('AI 配置加密密钥未配置，请设置 AI_CONFIG_ENCRYPTION_SECRET')
+  return secret
 }
 
 export async function encryptApiKey(apiKey: string, secret: string): Promise<string> {

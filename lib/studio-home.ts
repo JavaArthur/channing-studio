@@ -6,10 +6,11 @@ export function selectFeaturedPosts<T extends { slug: string }>(
   if (featuredSlugs.length === 0) return posts.slice(0, limit)
 
   const postsBySlug = new Map(posts.map((post) => [post.slug, post]))
-  return featuredSlugs
+  const selected = featuredSlugs
     .map((slug) => postsBySlug.get(slug))
     .filter((post): post is T => post !== undefined)
     .slice(0, limit)
+  return [...selected, ...posts.filter(post => !selected.some(item => item.slug === post.slug))].slice(0, limit)
 }
 
 export function selectStudioTools<T extends {

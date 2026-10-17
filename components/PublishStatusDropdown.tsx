@@ -28,9 +28,9 @@ const STATUS_CONFIG = {
     description: '需要密码才能查看',
   },
   unlisted: {
-    label: '链接访问',
+    label: '私密',
     icon: Link2,
-    description: '不在首页显示，但可通过链接访问',
+    description: '不在首页显示，但可通过私密',
   },
 }
 

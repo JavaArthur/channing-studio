@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": false,
   "scripts": {
-    "dev": "PREVIEW_REMOTE=1 bash scripts/cf-preview.sh",
+    "dev": "next dev",
     "dev:next": "next dev",
     "build": "next build",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:e2e": "playwright test",
     "verify": "bash scripts/verify.sh full",
     "verify:quick": "bash scripts/verify.sh quick",
     "preview": "bash scripts/cf-preview.sh",
@@ -54,6 +55,7 @@
     "turndown": "^7.2.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",

@@ -1,3 +1,4 @@
+import { isSafeLink } from '@/lib/url'
 import Link from 'next/link'
 import { SiteFooter } from '@/components/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader'
@@ -38,16 +39,17 @@ export function StudioShell({
   )
 }
 
-export function StudioLink({ href, children }: { href: string; children: ReactNode }) {
+export function StudioLink({ href, children, className = 'studio-inline-link' }: { href: string; children: ReactNode; className?:string }) {
+  if (!isSafeLink(href)) return <span>{children}</span>
   const external = href.startsWith('http')
   if (external) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="studio-inline-link">
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
         {children}
       </a>
     )
   }
-  return <Link href={href} className="studio-inline-link">{children}</Link>
+  return <Link href={href} className={className}>{children}</Link>
 }
 
 export function StudioCardLabel({ children }: { children: ReactNode }) {

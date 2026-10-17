@@ -1,3 +1,4 @@
+import { isSafeLink } from '@/lib/url'
 import { getSetting, setSetting } from '@/lib/db'
 import { isAdminAuthenticated, COOKIE_NAME } from '@/lib/admin-auth'
 import { getRouteEnvWithDb, jsonError, jsonOk, parseJsonBody } from '@/lib/server/route-helpers'
@@ -17,9 +18,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const key = req.nextUrl.searchParams.get('key')
-    if (!key) {
-      return jsonError('Missing key', 400)
-    }
+    if (key !== 'nav_links') return jsonError('Unsupported setting', 400)
 
     const route = await getRouteEnvWithDb('No DB')
     if (!route.ok) return route.response
@@ -43,10 +42,17 @@ export async function POST(req: NextRequest) {
       return jsonError('Missing key or value', 400)
     }
 
+    if (key !== 'nav_links') return jsonError('Unsupported setting', 400)
+    let links: unknown
+    try { links = typeof value === 'string' ? JSON.parse(value) : value } catch { return jsonError('无效导航', 400) }
+    if (!Array.isArray(links) || links.length > 12 || links.some(link =>
+      !link || typeof link.label !== 'string' || !link.label.trim() || link.label.length > 50 || typeof link.url !== 'string' || !isSafeLink(link.url)
+    )) return jsonError('导航需要标题和有效的站内路径或 http/https 链接', 400)
+
     const route = await getRouteEnvWithDb('No DB')
     if (!route.ok) return route.response
 
-    await setSetting(route.db, key, typeof value === 'string' ? value : JSON.stringify(value))
+    await setSetting(route.db, key, JSON.stringify(links.map(({label,url,openInNewTab}) => ({label:label.trim(),url,openInNewTab:Boolean(openInNewTab)}))))
     return jsonOk({ success: true })
   } catch (error) {
     console.error('Set setting error:', error)
