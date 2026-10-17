@@ -1,5 +1,7 @@
 # API 接口文档
 
+支持远程 MCP 的客户端可以使用 [MCP 接入指南](gorkbot-mcp-integration.md)，一次完成收集箱转笔记与关联项目。MCP 使用独立凭据，现有 HTTP API 和 Hermes Token 保持兼容。
+
 晨启博客系统对外提供的 REST API 接口文档。
 
 如果使用的是 **Hermes Token**：管理笔记、收集箱和项目请阅读 [gorkbot 通用工作台指南](gorkbot-workspace-integration.md)，并导入 [完整 OpenAPI 描述](gorkbot-workspace.openapi.json)。原 Flomo 同步流程见 [Hermes 指南](gorkbot-hermes-integration.md)。这套 Token 与本文的 `qm_` 博客 Token 不通用，`/api/admin/*` 工作台管理路由仍使用管理员会话。

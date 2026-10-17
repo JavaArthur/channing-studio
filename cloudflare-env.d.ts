@@ -68,6 +68,8 @@ declare interface CloudflareEnv {
   ADMIN_TOKEN_SALT?: string
   AI_CONFIG_ENCRYPTION_SECRET?: string
   HERMES_SYNC_TOKEN?: string
+  MCP_READ_TOKEN?: string
+  MCP_WRITE_TOKEN?: string
   NEXT_PUBLIC_SITE_URL?: string
   AI_API_KEY?: string
   AI_BASE_URL?: string
