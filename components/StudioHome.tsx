@@ -1,16 +1,17 @@
 import Link from 'next/link'
+import { ArrowUpRight, ArrowRight } from 'lucide-react'
 import type { Theme } from '@/lib/appearance'
 import type { PostWithTags } from '@/lib/repositories/types'
 import type { SiteNavLink } from '@/lib/site'
-import type { StudioContent, StudioLab, StudioProject } from '@/lib/studio-content'
+import type { StudioContent } from '@/lib/studio-content'
 import type { Tool } from '@/lib/repositories/tools'
 import type { Prompt } from '@/lib/repositories/prompts'
 import { selectStudioTools } from '@/lib/studio-home'
-import { StudioCardLabel, StudioLink } from '@/components/StudioSection'
-import { SiteFooter } from '@/components/SiteFooter'
-import { SiteHeader } from '@/components/SiteHeader'
-
-interface StudioHomeProps {
+import { SiteHeader } from './SiteHeader'
+import { SiteFooter } from './SiteFooter'
+import { StudioLink } from './StudioSection'
+import { formatDate } from '@/lib/format-date'
+interface Props {
   content: StudioContent
   posts: PostWithTags[]
   tools: Tool[]
@@ -18,209 +19,187 @@ interface StudioHomeProps {
   navLinks: SiteNavLink[]
   initialTheme: Theme
 }
-
-function StudioProjectCard({ project }: { project: StudioProject }) {
+export function StudioHome({ content, posts, tools, prompts, navLinks, initialTheme }: Props) {
+  const projects = content.projects.filter((p) => p.visible).slice(0, 3)
+  const resources = [
+    ...selectStudioTools(tools, 2).map((t) => ({
+      title: t.name,
+      description: t.description,
+      type: '工具',
+      href: t.url || '/tools',
+    })),
+    ...prompts
+      .slice(0, 2)
+      .map((p) => ({
+        title: p.title,
+        description: p.description,
+        type: '提示词',
+        href: '/prompts',
+      })),
+  ]
   return (
-    <StudioLink href={project.href}>
-      <article className="studio-card studio-project-card h-full">
-        <div className="flex items-start justify-between gap-4">
-          <StudioCardLabel>PROJECT / {project.id}</StudioCardLabel>
-          <span aria-hidden className="studio-card-arrow">↗</span>
-        </div>
-        <h3 className="studio-card-title mt-8">{project.title}</h3>
-        <p className="studio-card-description mt-3">{project.description}</p>
-        <div className="mt-6 flex flex-wrap gap-2">
-          {project.tags.map((tag) => <span key={tag} className="studio-tag">{tag}</span>)}
-        </div>
-      </article>
-    </StudioLink>
-  )
-}
-
-function StudioLabCard({ lab }: { lab: StudioLab }) {
-  return (
-    <StudioLink href={lab.href}>
-      <article className="studio-lab-row">
-        <div>
-          <StudioCardLabel>{lab.type.toUpperCase()}</StudioCardLabel>
-          <h3 className="mt-2 text-lg font-semibold text-[var(--editor-ink)]">{lab.title}</h3>
-        </div>
-        <div className="flex items-center gap-5">
-          <p className="hidden max-w-md text-sm leading-6 text-[var(--editor-muted)] sm:block">{lab.description}</p>
-          <span aria-hidden className="studio-card-arrow">↗</span>
-        </div>
-      </article>
-    </StudioLink>
-  )
-}
-
-function StudioToolCard({ tool }: { tool: Tool }) {
-  return (
-    <StudioLink href={tool.url || '/tools'}>
-      <article className="studio-card h-full">
-        <div className="flex items-start justify-between gap-4">
-          <StudioCardLabel>TOOL / {tool.type}</StudioCardLabel>
-          <span aria-hidden className="studio-card-arrow">↗</span>
-        </div>
-        <h3 className="studio-card-title mt-7">{tool.name}</h3>
-        {tool.description && <p className="studio-card-description mt-3 line-clamp-3">{tool.description}</p>}
-        {tool.tags.length > 0 && (
-          <div className="mt-5 flex flex-wrap gap-2">
-            {tool.tags.map((tag) => <span key={tag} className="studio-tag">{tag}</span>)}
-          </div>
-        )}
-      </article>
-    </StudioLink>
-  )
-}
-
-export function StudioHome({ content, posts, tools, prompts, navLinks, initialTheme }: StudioHomeProps) {
-  const { profile } = content
-
-  return (
-    <div className="studio-site min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col">
-      <SiteHeader initialTheme={initialTheme} navLinks={navLinks} studioMode />
-      <main className="studio-home-main mx-auto w-full max-w-6xl flex-1 px-5 sm:px-8 lg:px-10">
-        <section className="studio-hero grid gap-10 border-b border-[var(--editor-line)] py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20 lg:py-28">
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader initialTheme={initialTheme} navLinks={navLinks} />
+      <main className="mx-auto w-full max-w-6xl flex-1 px-6 sm:px-10">
+        <section className="grid gap-12 border-b border-[var(--editor-line)] py-16 sm:py-24 lg:grid-cols-[1.6fr_1fr] lg:gap-20">
           <div>
-            <p className="studio-eyebrow">{profile.eyebrow}</p>
-            <h1 className="studio-hero-title mt-5 max-w-4xl">{profile.title}</h1>
-            <p className="studio-hero-subtitle mt-6 max-w-2xl">{profile.subtitle}</p>
-            <p className="studio-hero-statement mt-6 max-w-xl">{profile.statement}</p>
+            <p className="brain-kicker">Channing Studio / 思考与实践</p>
+            <h1 className="mt-7 max-w-3xl text-4xl font-semibold leading-[1.2] tracking-tight sm:text-5xl lg:text-6xl">
+              {content.profile.title}
+            </h1>
+            <p className="mt-7 max-w-xl text-base leading-8 text-[var(--editor-muted)]">
+              {content.profile.statement}
+            </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/work" className="studio-button studio-button-primary">查看作品 <span aria-hidden>↗</span></Link>
-              <Link href="/writing" className="studio-button studio-button-secondary">阅读文章 <span aria-hidden>→</span></Link>
+              <Link href="/work" className="brain-button">
+                查看作品
+                <ArrowUpRight size={16} />
+              </Link>
+              <Link href="/writing" className="brain-secondary">
+                阅读文章
+                <ArrowRight size={16} />
+              </Link>
             </div>
           </div>
-          <aside className="studio-hero-note self-end lg:pb-2">
-            <p className="studio-eyebrow">FIELD NOTES / 01</p>
-            <p className="mt-5 text-xl leading-8 text-[var(--editor-ink)] sm:text-2xl sm:leading-9">
-              “AI 是磨刀石，我是刀。”
-            </p>
-            <p className="mt-4 text-sm leading-7 text-[var(--editor-muted)]">
-              这里记录平台工程、内容自动化和真实交付里的判断，不把漂亮的概念当成完成的工作。
-            </p>
+          <aside className="self-end rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-7">
+            <p className="brain-kicker">About the studio</p>
+            <p className="mt-5 text-xl font-medium leading-8">{content.profile.subtitle}</p>
+            <div className="mt-7 space-y-3">
+              {content.profile.capabilities.slice(0, 3).map((c, i) => (
+                <div
+                  key={c.title}
+                  className="flex gap-4 border-t border-[var(--editor-line)] pt-3 text-sm"
+                >
+                  <span className="font-mono text-[var(--editor-muted)]">0{i + 1}</span>
+                  <span>{c.title}</span>
+                </div>
+              ))}
+            </div>
+            <Link href="/about" className="mt-6 inline-block text-sm text-[var(--editor-accent)]">
+              更多关于我 →
+            </Link>
           </aside>
         </section>
-
-        <section className="studio-section py-16 sm:py-24">
-          <div className="studio-section-heading">
-            <p className="studio-eyebrow">CAPABILITIES / 02</p>
-            <h2 className="studio-section-title mt-3">我把什么变成系统</h2>
-          </div>
-          <div className="mt-10 grid gap-px overflow-hidden border border-[var(--editor-line)] bg-[var(--editor-line)] md:grid-cols-3">
-            {profile.capabilities.map((capability, index) => (
-              <article key={capability.title} className="studio-capability-card bg-[var(--background)] p-6 sm:p-8">
-                <span className="studio-index">0{index + 1}</span>
-                <h3 className="mt-12 text-xl font-semibold text-[var(--editor-ink)]">{capability.title}</h3>
-                <p className="mt-4 text-sm leading-7 text-[var(--editor-muted)]">{capability.description}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <p className="studio-eyebrow">PROMPTS / 06</p>
-              <h2 className="studio-section-title mt-3">常用提示词</h2>
+        {projects.length > 0 && (
+          <section className="py-14 sm:py-20">
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="brain-kicker">Selected work</p>
+                <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+                  让想法成为实际的东西
+                </h2>
+              </div>
+              <Link href="/work" className="text-sm text-[var(--editor-muted)]">
+                全部作品 ↗
+              </Link>
             </div>
-            <Link href="/prompts" className="studio-inline-link">查看全部提示词 →</Link>
-          </div>
-          {prompts.length > 0 ? (
-            <div className="mt-8 divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
-              {prompts.filter((prompt) => prompt.is_pinned === 1).slice(0, 3).map((prompt) => (
-                <Link key={prompt.id} href="/prompts" className="studio-writing-row group">
-                  <div className="min-w-0">
-                    <p className="studio-card-label">{prompt.category || 'PROMPT'}</p>
-                    <h3 className="mt-2 truncate text-lg font-semibold text-[var(--editor-ink)] group-hover:text-[var(--editor-accent)]">{prompt.title}</h3>
-                    {prompt.description && <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--editor-muted)]">{prompt.description}</p>}
+            <div className="mt-8 grid gap-5 md:grid-cols-2">
+              {projects.map((project, i) => (
+                <StudioLink
+                  className="group block text-[var(--editor-ink)]"
+                  key={project.id}
+                  href={project.href}
+                >
+                  <article className="h-full rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-7 sm:p-8">
+                    <div className="flex justify-between">
+                      <span className="brain-kicker">Project / 0{i + 1}</span>
+                      <ArrowUpRight size={20} />
+                    </div>
+                    <h3 className="mt-9 text-xl font-semibold">{project.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-[var(--editor-muted)]">
+                      {project.description}
+                    </p>
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-md bg-[var(--editor-soft)] px-2 py-1 text-xs text-[var(--editor-muted)]"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </article>
+                </StudioLink>
+              ))}
+            </div>
+          </section>
+        )}
+        {posts.length > 0 && (
+          <section className="border-t border-[var(--editor-line)] py-14 sm:py-20">
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="brain-kicker">Writing & notes</p>
+                <h2 className="mt-3 text-2xl font-semibold sm:text-3xl">实践中的记录</h2>
+              </div>
+              <Link href="/writing" className="text-sm text-[var(--editor-muted)]">
+                全部文章 ↗
+              </Link>
+            </div>
+            <div className="mt-8 divide-y divide-[var(--editor-line)]">
+              {posts.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/${post.slug}`}
+                  className="group flex items-start justify-between gap-6 py-6"
+                >
+                  <div>
+                    <p className="mb-2 text-xs text-[var(--editor-muted)]">
+                      {formatDate(post.published_at)} · {post.category || '随笔'}
+                    </p>
+                    <h3 className="text-lg font-medium group-hover:text-[var(--editor-accent)]">
+                      {post.title}
+                    </h3>
+                    {post.description && (
+                      <p className="mt-2 line-clamp-2 max-w-3xl text-sm leading-7 text-[var(--editor-muted)]">
+                        {post.description}
+                      </p>
+                    )}
                   </div>
-                  <span aria-hidden className="studio-card-arrow shrink-0">↗</span>
+                  <ArrowUpRight size={20} className="mt-5 shrink-0" />
                 </Link>
               ))}
             </div>
-          ) : (
-            <p className="mt-8 border-y border-[var(--editor-line)] py-10 text-sm text-[var(--editor-muted)]">提示词收藏还在建立中。</p>
-          )}
-        </section>
-
-        <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <p className="studio-eyebrow">SELECTED WORK / 03</p>
-              <h2 className="studio-section-title mt-3">做过的东西</h2>
-            </div>
-            <Link href="/work" className="studio-inline-link">全部作品 →</Link>
-          </div>
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
-            {content.projects.filter((project) => project.visible).map((project) => (
-              <StudioProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        </section>
-
-        <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <p className="studio-eyebrow">LAB / 04</p>
-              <h2 className="studio-section-title mt-3">正在折腾</h2>
-            </div>
-            <Link href="/labs" className="studio-inline-link">进入实验室 →</Link>
-          </div>
-          <div className="mt-8 divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
-            {content.labs.filter((lab) => lab.visible).map((lab) => <StudioLabCard key={lab.id} lab={lab} />)}
-          </div>
-        </section>
-
-        <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <p className="studio-eyebrow">TOOLBOX / 05</p>
-              <h2 className="studio-section-title mt-3">我正在用的东西</h2>
-            </div>
-            <Link href="/tools" className="studio-inline-link">查看工具箱 →</Link>
-          </div>
-          {tools.length > 0 ? (
-            <div className="mt-10 grid gap-5 sm:grid-cols-2">
-              {selectStudioTools(tools).map((tool) => <StudioToolCard key={tool.id} tool={tool} />)}
-            </div>
-          ) : (
-            <p className="mt-8 border-y border-[var(--editor-line)] py-10 text-sm text-[var(--editor-muted)]">
-              工具箱还没有公开内容，登录后台后可以添加第一件工具。
-            </p>
-          )}
-        </section>
-
-        <section className="studio-section border-t border-[var(--editor-line)] py-16 sm:py-24">
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <p className="studio-eyebrow">WRITING / 07</p>
-              <h2 className="studio-section-title mt-3">最近写的</h2>
-            </div>
-            <Link href="/writing" className="studio-inline-link">查看全部文章 →</Link>
-          </div>
-          <div className="mt-8 divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
-            {posts.map((post) => (
-              <Link key={post.slug} href={`/${post.slug}`} className="studio-writing-row group">
-                <div className="min-w-0">
-                  <p className="studio-card-label">{post.category || 'THOUGHTS'}</p>
-                  <h3 className="mt-2 truncate text-lg font-semibold text-[var(--editor-ink)] group-hover:text-[var(--editor-accent)]">{post.title}</h3>
-                  {post.description && <p className="mt-2 line-clamp-2 text-sm leading-6 text-[var(--editor-muted)]">{post.description}</p>}
-                </div>
-                <span aria-hidden className="studio-card-arrow shrink-0">↗</span>
+          </section>
+        )}
+        {resources.length > 0 && (
+          <section className="border-t border-[var(--editor-line)] py-14 sm:py-20">
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="brain-kicker">Useful things</p>
+                <h2 className="mt-3 text-2xl font-semibold sm:text-3xl">值得复用的工具与方法</h2>
+              </div>
+              <Link href="/tools" className="text-sm text-[var(--editor-muted)]">
+                资源收藏 ↗
               </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="studio-contact-section border-t border-[var(--editor-line)] py-16 sm:py-20">
-          <p className="studio-eyebrow">KEEP IN TOUCH / 06</p>
-          <div className="mt-5 flex flex-wrap items-end justify-between gap-8">
-            <h2 className="max-w-2xl text-3xl leading-tight text-[var(--editor-ink)] sm:text-4xl">如果你也在把复杂事变简单，欢迎交流。</h2>
-            <div className="flex flex-wrap gap-4">
-              {profile.contactLinks.map((link) => <StudioLink key={link.url} href={link.url}>{link.label} ↗</StudioLink>)}
             </div>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {resources.map((item, i) => (
+                <StudioLink
+                  className="group block text-[var(--editor-ink)]"
+                  key={i}
+                  href={item.href}
+                >
+                  <div className="h-full rounded-xl border border-[var(--editor-line)] p-5">
+                    <p className="brain-kicker">{item.type}</p>
+                    <h3 className="mt-4 font-semibold">{item.title}</h3>
+                    <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--editor-muted)]">
+                      {item.description}
+                    </p>
+                  </div>
+                </StudioLink>
+              ))}
+            </div>
+          </section>
+        )}
+        <section className="flex flex-wrap items-center justify-between gap-6 border-t border-[var(--editor-line)] py-12">
+          <p className="text-lg font-medium">如果你也在把复杂事变简单，欢迎交流。</p>
+          <div className="flex gap-5 text-sm text-[var(--editor-accent)]">
+            {content.profile.contactLinks.map((link) => (
+              <StudioLink key={link.url} href={link.url}>
+                {link.label} ↗
+              </StudioLink>
+            ))}
           </div>
         </section>
       </main>

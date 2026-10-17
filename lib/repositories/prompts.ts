@@ -1,3 +1,4 @@
+import { publicResourceColumns } from './publications'
 import { ensureSchema, type Database } from '@/lib/repositories/schema'
 
 export interface PromptRow {
@@ -72,11 +73,10 @@ export async function getPrompts(
   options: { includeHidden?: boolean; category?: string; tag?: string; limit?: number } = {},
 ): Promise<Prompt[]> {
   await ensureSchema(db)
-  const where = options.includeHidden ? '' : 'WHERE is_hidden = 0'
+  const where = options.includeHidden ? '' : 'WHERE is_hidden = 0 AND published_payload IS NOT NULL'
   const { results } = await db
     .prepare(
-      `SELECT id, title, description, prompt, category, tags, source_url,
-              is_pinned, is_hidden, sort_order, created_at, updated_at
+      `SELECT ${options.includeHidden ? '*' : publicResourceColumns('prompts')}
        FROM prompts ${where}
        ORDER BY is_pinned DESC, sort_order ASC, updated_at DESC`,
     )
@@ -103,7 +103,7 @@ export async function createPrompt(db: Database, data: PromptInput): Promise<num
       JSON.stringify(normalizePromptTags(data.tags)),
       data.source_url ?? null,
       data.is_pinned === 1 ? 1 : 0,
-      data.is_hidden === 1 ? 1 : 0,
+      1,
       Number.isFinite(data.sort_order) ? data.sort_order : 0,
     )
     .run()
@@ -126,7 +126,7 @@ export async function updatePrompt(
   if (data.tags !== undefined) { updates.push('tags = ?'); values.push(JSON.stringify(normalizePromptTags(data.tags))) }
   if (data.source_url !== undefined) { updates.push('source_url = ?'); values.push(data.source_url) }
   if (data.is_pinned !== undefined) { updates.push('is_pinned = ?'); values.push(data.is_pinned === 1 ? 1 : 0) }
-  if (data.is_hidden !== undefined) { updates.push('is_hidden = ?'); values.push(data.is_hidden === 1 ? 1 : 0) }
+  if (data.is_hidden === 1) { updates.push('is_hidden = ?'); values.push(1) }
   if (data.sort_order !== undefined) { updates.push('sort_order = ?'); values.push(data.sort_order) }
   if (updates.length === 0) return
 

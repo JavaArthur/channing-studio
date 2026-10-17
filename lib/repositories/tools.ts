@@ -1,3 +1,4 @@
+import { publicResourceColumns } from './publications'
 import { ensureSchema, type Database } from '@/lib/repositories/schema'
 
 export type ToolType = 'url' | 'repo' | 'mac-app' | 'other'
@@ -10,6 +11,7 @@ export interface ToolRow {
   description: string | null
   tags: string | null
   icon: string | null
+  is_hidden: number
   is_pinned: number
   sort_order: number
   created_at: number
@@ -20,49 +22,22 @@ export interface Tool extends Omit<ToolRow, 'tags'> {
   tags: string[]
 }
 
-let toolsSchemaReady = false
-
-// 确保 tools 表存在（无状态环境下的自愈迁移）
-export async function ensureToolsSchema(db: Database): Promise<void> {
-  if (toolsSchemaReady) return
-  await ensureSchema(db)
-  try {
-    await db
-      .prepare(
-        `CREATE TABLE IF NOT EXISTS tools (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          url TEXT,
-          type TEXT NOT NULL DEFAULT 'url',
-          description TEXT,
-          tags TEXT,
-          icon TEXT,
-          is_pinned INTEGER DEFAULT 0,
-          sort_order INTEGER DEFAULT 0,
-          created_at INTEGER DEFAULT (strftime('%s', 'now')),
-          updated_at INTEGER DEFAULT (strftime('%s', 'now'))
-        )`,
-      )
-      .run()
-    toolsSchemaReady = true
-  } catch (error) {
-    console.error('Tools schema migration failed:', error)
-  }
-}
+export async function ensureToolsSchema(db: Database): Promise<void> { await ensureSchema(db) }
 
 function parseTags(value: string | null): string[] {
-  return value ? JSON.parse(value) : []
+  try { const tags = value ? JSON.parse(value) : []; return Array.isArray(tags) ? tags.filter(t => typeof t === 'string') : [] } catch { return [] }
 }
 
 function mapTool(row: ToolRow): Tool {
   return { ...row, tags: parseTags(row.tags) }
 }
 
-export async function getTools(db: Database): Promise<Tool[]> {
+export async function getTools(db: Database, options: { includeHidden?: boolean } = {}): Promise<Tool[]> {
   await ensureToolsSchema(db)
   const { results } = await db
     .prepare(
-      `SELECT * FROM tools
+      `SELECT ${options.includeHidden ? '*' : publicResourceColumns('tools')} FROM tools
+       ${options.includeHidden ? '' : 'WHERE is_hidden = 0 AND published_payload IS NOT NULL'}
        ORDER BY is_pinned DESC, sort_order ASC, created_at DESC`,
     )
     .all<ToolRow>()

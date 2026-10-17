@@ -1,3 +1,4 @@
+import { clearWorkingCopy } from '@/lib/repositories/drafts'
 import { deletePost, getPostBySlug, updatePost } from '@/lib/db'
 import { isAdminAuthenticated, COOKIE_NAME } from '@/lib/admin-auth'
 import { invalidatePublicContentCache } from '@/lib/cache'
@@ -46,6 +47,8 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
   try {
     const {
+      expected_revision,
+      expected_draft_revision,
       slug: nextSlugRaw,
       title,
       content,
@@ -59,6 +62,8 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       tags,
       description,
     } = await parseJsonBody<{
+      expected_draft_revision?: number
+      expected_revision?: number
       slug?: string
       title?: string
       content?: string
@@ -80,7 +85,9 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       ? html
       : (typeof content === 'string' ? await renderPostMarkdownToHtml(content) : undefined)
 
-    await updatePost(db, post.id, {
+    if (expected_revision !== undefined && (!Number.isInteger(expected_revision) || expected_revision < 0)) return jsonError('无效版本', 400)
+    if (expected_draft_revision !== undefined && (!Number.isInteger(expected_draft_revision) || expected_draft_revision < 0 || expected_revision === undefined)) return jsonError('无效工作稿版本', 400)
+    const update = {
       slug: nextSlug || undefined,
       title,
       content,
@@ -93,7 +100,11 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       cover_image,
       tags,
       description: normalizedDescription,
-    })
+    }
+    if (expected_draft_revision !== undefined) await updatePost(db, post.id, update, expected_revision, expected_draft_revision)
+    else if (expected_revision !== undefined) await updatePost(db, post.id, update, expected_revision)
+    else await updatePost(db, post.id, update)
+    if (expected_revision !== undefined && (html !== undefined || content !== undefined)) await clearWorkingCopy(db, post.id, expected_revision)
 
     // 清除 KV 缓存（失败不影响保存结果）
     try {
@@ -113,8 +124,9 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       },
     )
 
-    return jsonOk({ success: true, slug: nextSlug || slug })
+    return jsonOk({ success: true, slug: nextSlug || slug, revision: (post.revision ?? 0) + 1 })
   } catch (err) {
+    if (err instanceof Error && err.message === 'REVISION_CONFLICT') return jsonError('文章已更新，请重新打开后继续。', 409)
     if (err instanceof Error && /UNIQUE constraint failed: posts\.slug/i.test(err.message)) {
       return jsonError('slug 已存在，请换一个', 409)
     }

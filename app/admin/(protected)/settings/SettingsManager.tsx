@@ -1,181 +1,124 @@
 'use client'
-
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 import { Tabs } from '@/components/Tabs'
-import type { RuntimeCapabilities } from '@/lib/runtime-capabilities'
-import { normalizeTheme, setClientThemePreference, type BodyFont, type Theme } from '@/lib/appearance'
+import { ThemeDropdown } from '@/components/ThemeDropdown'
 import { NavLinksEditor } from './NavLinksEditor'
-import { CustomJsEditor } from './CustomJsEditor'
 import { ApiTokensManager } from './ApiTokensManager'
-import { ThemeManager } from './ThemeManager'
-import { CategoryManager } from '../categories/CategoryManager'
-import { AiProviderManager } from './AiProviderManager'
-import { AiActionsManager } from './AiActionsManager'
-import { AiImageProviderManager } from './AiImageProviderManager'
-import { AiImageActionsManager } from './AiImageActionsManager'
-import { AiPostGeneratorsManager } from './AiPostGeneratorsManager'
 import { RuntimeCapabilitiesPanel } from './RuntimeCapabilitiesPanel'
-
-interface Category {
-  name: string
-  slug: string
-  post_count: number
+import type { RuntimeCapabilities } from '@/lib/runtime-capabilities'
+const AiProviderManager = dynamic(() =>
+  import('./AiProviderManager').then((m) => m.AiProviderManager),
+)
+const AiActionsManager = dynamic(() => import('./AiActionsManager').then((m) => m.AiActionsManager))
+const AiImageProviderManager = dynamic(() =>
+  import('./AiImageProviderManager').then((m) => m.AiImageProviderManager),
+)
+const AiImageActionsManager = dynamic(() =>
+  import('./AiImageActionsManager').then((m) => m.AiImageActionsManager),
+)
+const AiPostGeneratorsManager = dynamic(() =>
+  import('./AiPostGeneratorsManager').then((m) => m.AiPostGeneratorsManager),
+)
+function AdvancedPanel({ label, children }: { label: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <details className="brain-panel" onToggle={(event) => setOpen(event.currentTarget.open)}>
+      <summary className="cursor-pointer font-medium">{label}</summary>
+      {open && <div className="mt-6">{children}</div>}
+    </details>
+  )
 }
-
 interface Props {
   initialNavLinks: string
-  initialCustomJs: string
-  initialCategories: Category[]
-  initialBodyFont: string
-  initialDefaultTheme: string
   initialRuntimeCapabilities: RuntimeCapabilities
 }
-
-export function SettingsManager({
-  initialNavLinks,
-  initialCustomJs,
-  initialCategories,
-  initialBodyFont,
-  initialDefaultTheme,
-  initialRuntimeCapabilities,
-}: Props) {
+export function SettingsManager({ initialNavLinks, initialRuntimeCapabilities }: Props) {
   const [saving, setSaving] = useState(false)
-  const [msg, setMsg] = useState('')
-
-  const persistSetting = async (key: string, value: string) => {
-    const res = await fetch('/api/admin/settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ key, value }),
-    })
-    if (!res.ok) throw new Error('保存失败')
-  }
-
-  const save = async (key: string, value: string) => {
+  const [message, setMessage] = useState('')
+  async function save(value: string) {
     setSaving(true)
-    setMsg('')
+    setMessage('')
     try {
-      await persistSetting(key, value)
-      setMsg('已保存')
-      setTimeout(() => setMsg(''), 2000)
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'nav_links', value }),
+      })
+      if (!res.ok) throw new Error('导航格式不正确或保存失败')
+      setMessage('导航已保存。')
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : '保存失败')
+      setMessage(e instanceof Error ? e.message : '保存失败')
     } finally {
       setSaving(false)
     }
   }
-
-  const saveThemeSettings = async ({ theme, font }: { theme: Theme; font: BodyFont }) => {
-    setSaving(true)
-    setMsg('')
-    try {
-      await Promise.all([
-        persistSetting('default_theme', theme),
-        persistSetting('body_font', font),
-      ])
-      setClientThemePreference(theme)
-      setMsg('已保存')
-      setTimeout(() => setMsg(''), 2000)
-    } catch (e) {
-      setMsg(e instanceof Error ? e.message : '保存失败')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const tabs = [
-    {
-      id: 'nav',
-      label: '导航设置',
-      content: (
-        <div className="space-y-4">
-          {msg && (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
-              {msg}
+  return (
+    <Tabs
+      defaultTab="general"
+      tabs={[
+        {
+          id: 'general',
+          label: '基础设置',
+          content: (
+            <div className="space-y-7">
+              <section className="brain-panel">
+                <h2 className="font-medium">白天与晚上</h2>
+                <div className="mt-4 flex items-center justify-between gap-5">
+                  <p className="text-sm text-[var(--editor-muted)]">
+                    全站共用日夜配色，首次跟随系统。手动选择只保存在当前浏览器。
+                  </p>
+                  <ThemeDropdown />
+                </div>
+              </section>
+              <section className="brain-panel">
+                <h2 className="mb-5 font-medium">公开导航</h2>
+                <NavLinksEditor initialValue={initialNavLinks} onSave={save} saving={saving} />
+                {message && (
+                  <p role="status" className="mt-3 text-sm">
+                    {message}
+                  </p>
+                )}
+              </section>
             </div>
-          )}
-          <NavLinksEditor
-            initialValue={initialNavLinks}
-            onSave={(val) => save('nav_links', val)}
-            saving={saving}
-          />
-        </div>
-      ),
-    },
-    {
-      id: 'categories',
-      label: '分类设置',
-      content: <CategoryManager initialCategories={initialCategories} />,
-    },
-    {
-      id: 'code',
-      label: '自定义代码',
-      content: (
-        <div className="space-y-4">
-          {msg && (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
-              {msg}
+          ),
+        },
+        {
+          id: 'connections',
+          label: '连接与访问',
+          content: (
+            <div className="space-y-6">
+              <p className="text-sm text-[var(--editor-muted)]">
+                为实际使用的发布工具创建独立 Token。私人笔记与项目 API 仅接受后台会话。
+              </p>
+              <ApiTokensManager />
+              <RuntimeCapabilitiesPanel capabilities={initialRuntimeCapabilities} />
             </div>
-          )}
-          <p className="text-sm text-[var(--editor-muted)]">
-            此代码会注入到所有页面的 &lt;head&gt; 中，适合添加统计代码（如 Google Analytics、百度统计等）。
-          </p>
-          <CustomJsEditor
-            initialValue={initialCustomJs}
-            onSave={(val) => save('custom_js', val)}
-            saving={saving}
-          />
-        </div>
-      ),
-    },
-    {
-      id: 'theme',
-      label: '主题管理',
-      content: (
-        <ThemeManager
-          initialTheme={normalizeTheme(initialDefaultTheme)}
-          initialFont={(initialBodyFont || 'default') as BodyFont}
-          onSave={saveThemeSettings}
-          saving={saving}
-        />
-      ),
-    },
-    {
-      id: 'tokens',
-      label: 'API Token',
-      content: <ApiTokensManager />,
-    },
-    {
-      id: 'ai-provider',
-      label: 'AI 模型',
-      content: <AiProviderManager />,
-    },
-    {
-      id: 'ai-actions',
-      label: 'AI 操作',
-      content: <AiActionsManager />,
-    },
-    {
-      id: 'ai-image-provider',
-      label: '图片模型',
-      content: <AiImageProviderManager />,
-    },
-    {
-      id: 'ai-image-actions',
-      label: '图片提示',
-      content: <AiImageActionsManager />,
-    },
-    {
-      id: 'ai-post-generators',
-      label: '文章生成',
-      content: <AiPostGeneratorsManager />,
-    },
-    {
-      id: 'runtime',
-      label: '运行环境',
-      content: <RuntimeCapabilitiesPanel capabilities={initialRuntimeCapabilities} />,
-    },
-  ]
-
-  return <Tabs tabs={tabs} defaultTab="nav" />
+          ),
+        },
+        {
+          id: 'advanced',
+          label: '高级功能',
+          content: (
+            <div className="space-y-4">
+              <p className="text-sm text-[var(--editor-muted)]">
+                AI 功能按需使用。普通收集与保存不会自动调用外部模型。
+              </p>
+              {[
+                ['文本模型', <AiProviderManager key="provider" />],
+                ['文本操作', <AiActionsManager key="actions" />],
+                ['图片模型', <AiImageProviderManager key="images" />],
+                ['图片提示', <AiImageActionsManager key="image-actions" />],
+                ['文章生成', <AiPostGeneratorsManager key="generators" />],
+              ].map(([label, content]) => (
+                <AdvancedPanel label={String(label)} key={String(label)}>
+                  {content}
+                </AdvancedPanel>
+              ))}
+            </div>
+          ),
+        },
+      ]}
+    />
+  )
 }

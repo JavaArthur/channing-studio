@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getSiteHeaderData } from '@/lib/site'
 import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
@@ -16,7 +17,7 @@ export const metadata = {
 export default async function AboutPage() {
   let content = DEFAULT_STUDIO_CONTENT
   let navLinks: SiteNavLink[] = []
-  let defaultTheme: Theme = 'default'
+  let defaultTheme: Theme = 'light'
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {

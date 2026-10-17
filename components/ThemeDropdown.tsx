@@ -1,158 +1,30 @@
 'use client'
 
-import { useState, useRef, useEffect, useSyncExternalStore } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { useSyncExternalStore } from 'react'
+import { Moon, Sun } from 'lucide-react'
 import {
-  setClientThemePreference,
   getClientThemePreference,
+  setClientThemePreference,
   subscribeToThemeChange,
-  THEME_OPTIONS,
   type Theme,
 } from '@/lib/appearance'
 
-export type { Theme }
-
-export function dispatchThemeChange(theme: Theme) {
-  if (typeof window === 'undefined') return
-  setClientThemePreference(theme)
-}
-
-interface ThemeDropdownProps {
-  // Optional style overrides for themed headers (B/C custom headers)
-  buttonStyle?: React.CSSProperties
-  dropdownStyle?: React.CSSProperties
-  itemStyle?: React.CSSProperties
-  activeItemStyle?: React.CSSProperties
-  inlineMenu?: boolean
-  fullWidth?: boolean
-  initialTheme?: Theme
-  onThemeChange?: (theme: Theme) => void
-}
-
-export function ThemeDropdown({
-  buttonStyle,
-  dropdownStyle,
-  itemStyle,
-  activeItemStyle,
-  inlineMenu = false,
-  fullWidth = false,
-  initialTheme = 'default',
-  onThemeChange,
-}: ThemeDropdownProps = {}) {
+export function ThemeDropdown({ initialTheme = 'light' }: { initialTheme?: Theme }) {
   const theme = useSyncExternalStore(
     subscribeToThemeChange,
-    () => getClientThemePreference(initialTheme),
+    getClientThemePreference,
     () => initialTheme,
   )
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  // Click outside to close
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
-
-  const handleChange = (t: Theme) => {
-    setOpen(false)
-    setClientThemePreference(t)
-    onThemeChange?.(t)
-  }
-
+  const next = theme === 'dark' ? 'light' : 'dark'
   return (
-    <div
-      ref={ref}
-      style={{
-        position: 'relative',
-        width: fullWidth ? '100%' : undefined,
-      }}
+    <button
+      type="button"
+      className="color-mode-toggle"
+      onClick={() => setClientThemePreference(next)}
+      aria-label={`切换到${next === 'light' ? '白天' : '晚上'}模式`}
+      title={`切换到${next === 'light' ? '白天' : '晚上'}模式`}
     >
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: fullWidth ? 'space-between' : undefined,
-          gap: 3,
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          padding: 0,
-          font: 'inherit',
-          fontSize: 'inherit',
-          color: 'inherit',
-          width: fullWidth ? '100%' : undefined,
-          ...buttonStyle,
-        }}
-      >
-        主题
-        <ChevronDown
-          style={{
-            width: 13,
-            height: 13,
-            transition: 'transform .15s',
-            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-          }}
-        />
-      </button>
-
-      {open && (
-        <div
-          style={{
-            position: inlineMenu ? 'static' : 'absolute',
-            top: inlineMenu ? undefined : 'calc(100% + 8px)',
-            left: inlineMenu ? undefined : 0,
-            minWidth: inlineMenu ? '100%' : 120,
-            width: inlineMenu ? '100%' : undefined,
-            marginTop: inlineMenu ? 10 : undefined,
-            borderRadius: 8,
-            border: '1px solid var(--editor-line)',
-            background: 'var(--background)',
-            boxShadow: inlineMenu ? 'none' : '0 8px 24px rgba(0,0,0,0.12)',
-            padding: '4px',
-            zIndex: 50,
-            ...dropdownStyle,
-          }}
-        >
-          {THEME_OPTIONS.map(t => {
-            const active = theme === t.id
-            return (
-              <button
-                key={t.id}
-                onClick={() => handleChange(t.id)}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '7px 12px',
-                  borderRadius: 5,
-                  border: 'none',
-                  background: active ? 'var(--editor-accent)' : 'transparent',
-                  color: active ? 'var(--editor-accent-ink)' : 'var(--editor-ink)',
-                  cursor: 'pointer',
-                  font: 'inherit',
-                  fontSize: 13,
-                  fontWeight: active ? 600 : 400,
-                  transition: 'background .12s',
-                  ...itemStyle,
-                  ...(active ? activeItemStyle : {}),
-                }}
-                onMouseEnter={e => {
-                  if (!active) (e.currentTarget as HTMLButtonElement).style.background = 'var(--editor-panel)'
-                }}
-                onMouseLeave={e => {
-                  if (!active) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'
-                }}
-              >
-                {t.label}
-              </button>
-            )
-          })}
-        </div>
-      )}
-    </div>
+      {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+    </button>
   )
 }

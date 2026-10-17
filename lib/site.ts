@@ -1,4 +1,5 @@
-import { normalizeTheme, type Theme } from '@/lib/appearance'
+import { isSafeLink } from '@/lib/url'
+import { type Theme } from '@/lib/appearance'
 import { getPublicCategories, getSetting } from '@/lib/db'
 
 export interface SiteNavLink {
@@ -19,20 +20,19 @@ export async function getSiteHeaderData(db: D1Database): Promise<{
 }> {
   let navLinks: SiteNavLink[] = []
   let categories: SiteCategoryLink[] = []
-  let defaultTheme: Theme = 'default'
+  const defaultTheme: Theme = 'light'
 
   try {
-    const [navJson, categoryRows, themeValue] = await Promise.all([
+    const [navJson, categoryRows] = await Promise.all([
       getSetting(db, 'nav_links'),
       getPublicCategories(db),
-      getSetting(db, 'default_theme'),
     ])
 
     if (navJson) {
       try {
         const parsed = JSON.parse(navJson)
         if (Array.isArray(parsed)) {
-          navLinks = parsed
+          navLinks = parsed.filter((link): link is SiteNavLink => Boolean(link && typeof link.label === 'string' && isSafeLink(link.url)))
         }
       } catch {}
     }
@@ -44,7 +44,6 @@ export async function getSiteHeaderData(db: D1Database): Promise<{
         slug: category.slug,
       }))
 
-    defaultTheme = normalizeTheme(themeValue)
   } catch {
     // Keep graceful fallback behavior for public pages
   }

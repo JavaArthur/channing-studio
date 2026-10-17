@@ -1,5 +1,6 @@
 'use client'
 
+import { ResourceWithdrawal } from '@/components/ResourceWithdrawal'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/Toast'
@@ -81,7 +82,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
     }
   }
 
-  async function save() {
+  async function save(publish = false) {
     if (!form.name.trim()) {
       toast.warning('名称不能为空')
       return
@@ -107,16 +108,21 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      const json = (await resp.json()) as { success?: boolean; error?: string }
+      const json = (await resp.json()) as { success?: boolean; error?: string; id?: number }
       if (!resp.ok || !json.success) {
         toast.error(json.error || '保存失败')
         return
       }
-      toast.success(isEditing ? '已更新' : '已添加')
+      if (!form.id && json.id) setForm(current => ({...current,id:json.id!}))
+      if (publish) {
+        const publication = await fetch(`/api/admin/resources/tools/${form.id ?? json.id}/publication`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ publish: true }) })
+        if (!publication.ok) throw new Error('内容已保存，但发布失败，请重试')
+      }
+      toast.success(publish ? '已公开发布' : '已保存工作版本')
       setForm(EMPTY)
       router.refresh()
     } catch {
-      toast.error('保存失败')
+      toast.error('保存或发布失败，请重试')
     } finally {
       setSaving(false)
     }
@@ -158,6 +164,8 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
 
   return (
     <div className="space-y-8">
+      <p className="text-sm text-[var(--editor-muted)]">新收藏默认私密。保存只修改工作版本，点击“保存并公开”才更新公开内容。</p>
+      <button className="brain-button" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
       {/* 录入表单 */}
       <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-5 space-y-4">
         <div className="flex items-center justify-between">
@@ -243,7 +251,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
             置顶
           </label>
           <button
-            onClick={save}
+            onClick={() => void save()}
             disabled={saving}
             className="px-5 py-2 rounded-lg bg-[var(--editor-accent)] text-white text-sm font-medium hover:brightness-105 transition-all disabled:opacity-50"
           >
@@ -260,7 +268,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
       ) : (
         <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] divide-y divide-[var(--editor-line)] overflow-hidden">
           {initialTools.map((tool) => (
-            <div key={tool.id} className="flex items-center gap-3 px-4 py-3">
+            <div id={String(tool.id)} key={tool.id} className="flex items-center gap-3 px-4 py-3">
               {tool.icon ? (
                 <img src={tool.icon} alt="" className="w-8 h-8 rounded border border-[var(--editor-line)] object-cover bg-white flex-shrink-0" />
               ) : (
@@ -270,7 +278,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-[var(--editor-ink)] truncate">{tool.name}</span>
+                  <span className="font-medium text-[var(--editor-ink)] truncate">{tool.name}</span><span className="shrink-0 text-xs text-[var(--editor-muted)]">{tool.is_hidden ? '私密' : '已公开'}</span>
                   {tool.is_pinned === 1 && <span className="text-[var(--editor-accent)] text-xs">★</span>}
                 </div>
                 {tool.description && (
@@ -278,6 +286,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
                 )}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
+                {tool.is_hidden === 0 && <ResourceWithdrawal kind="tools" id={tool.id}/>}
                 <button
                   onClick={() => edit(tool)}
                   className="text-xs px-2 py-1 rounded text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"

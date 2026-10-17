@@ -42,7 +42,7 @@ export function Tooltip({
       <span
         role="tooltip"
         aria-hidden="true"
-        className={`absolute ${placementStyles[placement]} z-[60] pointer-events-none whitespace-nowrap rounded-md bg-[var(--editor-ink)] px-2 py-1 text-xs text-[var(--editor-panel)] shadow-sm transition-opacity duration-150 ${visible ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute ${placementStyles[placement]} z-[60] pointer-events-none whitespace-nowrap rounded-md bg-[var(--editor-ink)] px-2 py-1 text-xs text-[var(--editor-panel)] shadow-sm transition-opacity duration-150 ${visible ? 'opacity-100' : 'hidden'}`}
       >
         {label}
       </span>

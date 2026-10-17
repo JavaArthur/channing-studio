@@ -1,0 +1,2614 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Channing Studio — gorkbot workspace and Hermes",
+    "version": "2026-10-17-brain-v1",
+    "description": "通用私人笔记、收集箱和项目 API，以及兼容的原 Flomo 同步 API。共享现有 Hermes Bearer 凭据；无公开发布、永久删除或后台凭据权限。"
+  },
+  "servers": [
+    {
+      "url": "https://note.aichanning.cn"
+    }
+  ],
+  "security": [
+    {
+      "HermesBearer": []
+    }
+  ],
+  "paths": {
+    "/api/agent/v1/state": {
+      "get": {
+        "operationId": "getHermesSyncState",
+        "summary": "只读查询 Flomo 同步去重状态；不返回原文或成果列表。",
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "去重状态，来源按 UTC 日期包含首尾查询。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求字段或格式错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Hermes Token 无效或缺失",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "数据库或内部服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "服务绑定不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/v1/runs": {
+      "post": {
+        "operationId": "startHermesSyncRun",
+        "summary": "记录真实 Flomo 同步开始。每次都会新建记录，超时不盲目重试。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRun"
+              },
+              "example": {
+                "source": "flomo",
+                "mode": "reconcile",
+                "windowStart": "2026-10-17",
+                "windowEnd": "2026-10-17"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Started"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求字段或格式错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Hermes Token 无效或缺失",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "数据库或内部服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "服务绑定不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/v1/runs/{id}/complete": {
+      "post": {
+        "operationId": "completeHermesSyncRun",
+        "summary": "完成运行并保存脱敏投影；不创建/发布网站文章。同一成功 runId 的重试不修改成果。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteRun"
+              },
+              "example": {
+                "discoveredCount": 1,
+                "sourceItems": [
+                  {
+                    "sourceId": "flomo-example-replace-with-real-id",
+                    "sourceUpdatedAt": "2026-10-17T08:30:00Z",
+                    "contentHash": "example-replace-with-source-content-sha256",
+                    "decision": "processed",
+                    "domain": "knowledge",
+                    "decisionReason": "已整理为可复用的知识摘要"
+                  }
+                ],
+                "artifacts": [
+                  {
+                    "artifactKey": "gorkbot:knowledge:example-replace-with-stable-key",
+                    "type": "knowledge",
+                    "domain": "knowledge",
+                    "stage": "已整理",
+                    "title": "如何把零散记录整理成可复用知识",
+                    "summary": "先识别问题和结论，再补充适用条件与后续行动，形成可复用的简短摘要。",
+                    "sourceIds": [
+                      "flomo-example-replace-with-real-id"
+                    ],
+                    "targetPath": null,
+                    "publicUrl": null,
+                    "status": "active"
+                  }
+                ],
+                "snapshot": {
+                  "periodLabel": "本次整理",
+                  "narrative": "完成一条来源的整理，形成一项知识成果。",
+                  "domains": {
+                    "knowledge": {
+                      "label": "知识整理",
+                      "detail": "已完成摘要整理",
+                      "status": "done"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Completed"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求字段或格式错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Hermes Token 无效或缺失",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "运行记录不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "任务已结束或来源/成果版本冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "数据库或内部服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "服务绑定不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "start 返回的 runId；不是来源 ID。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/agent/v1/runs/{id}/fail": {
+      "post": {
+        "operationId": "failHermesSyncRun",
+        "summary": "将 running 任务标记失败或阻塞；终态重复提交返回 409。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FailRun"
+              },
+              "example": {
+                "code": "FLOMO_MCP_UNAVAILABLE",
+                "message": "来源连接暂时不可用，本次任务未完成",
+                "retryable": true,
+                "nextAction": "恢复来源连接后重新创建任务处理相同窗口"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求字段或格式错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Hermes Token 无效或缺失",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "运行记录不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "任务已结束或来源/成果版本冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "数据库或内部服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "服务绑定不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "start 返回的 runId；不是来源 ID。",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/agent/v1/brain/{kind}": {
+      "get": {
+        "operationId": "listWorkspaceItems",
+        "summary": "分页查询私人工作台条目，返回摘要而非全文。",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "notes",
+                "inbox",
+                "projects"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "标题和正文搜索；项目还查 next_action。"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 30
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "exclude",
+                "only",
+                "all"
+              ],
+              "default": "exclude"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspacePage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、字段或 Key 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺失/错误 Hermes Bearer Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "幂等 Key 冲突或业务状态冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "版本已变，请先 GET 并比较",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body 超过256 KiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "需要 application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "缺少 If-Match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "数据库不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createWorkspaceItem",
+        "summary": "幂等创建私人条目；重试保留相同 Key 和 Body。",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "notes",
+                "inbox",
+                "projects"
+              ]
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 16,
+              "pattern": "^[A-Za-z0-9_.:-]+$",
+              "maxLength": 128
+            },
+            "description": "每次逻辑创建一个 Key；重试沿用原 Key/Body。建议 UUID，不放凭据。"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceCreated"
+                }
+              }
+            },
+            "headers": {
+              "ETag": {
+                "description": "当前资源版本，含双引号。",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、字段或 Key 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺失/错误 Hermes Bearer Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "幂等 Key 冲突或业务状态冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "版本已变，请先 GET 并比较",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body 超过256 KiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "需要 application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "缺少 If-Match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "数据库不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "首次创建；200 表示幂等重放，返回当前条目。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceCreated"
+                }
+              }
+            },
+            "headers": {
+              "ETag": {
+                "description": "当前资源版本，含双引号。",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWorkspaceBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/v1/brain/{kind}/{id}": {
+      "get": {
+        "operationId": "getWorkspaceItem",
+        "summary": "读取私人条目正文和 ETag。",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "notes",
+                "inbox",
+                "projects"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "maxLength": 180
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceItemResponse"
+                }
+              }
+            },
+            "headers": {
+              "ETag": {
+                "description": "当前资源版本，含双引号。",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、字段或 Key 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺失/错误 Hermes Bearer Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "幂等 Key 冲突或业务状态冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "版本已变，请先 GET 并比较",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body 超过256 KiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "需要 application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "缺少 If-Match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "数据库不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateWorkspaceItem",
+        "summary": "部分字段修改、归档/恢复；不改变已发布项目快照。",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "notes",
+                "inbox",
+                "projects"
+              ]
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "maxLength": 180
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]*\"$"
+            },
+            "description": "上次 GET 的 ETag，包括双引号。关联操作使用项目版本。412 后重新读取并比较，不强制覆盖。"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceItemResponse"
+                }
+              }
+            },
+            "headers": {
+              "ETag": {
+                "description": "当前资源版本，含双引号。",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、字段或 Key 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺失/错误 Hermes Bearer Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "幂等 Key 冲突或业务状态冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "版本已变，请先 GET 并比较",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body 超过256 KiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "需要 application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "缺少 If-Match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "数据库不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchWorkspaceBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/v1/brain/inbox/{id}/convert": {
+      "post": {
+        "operationId": "convertInboxToNote",
+        "summary": "事务性整理收集条目为笔记，不创建或发布文章。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "maxLength": 180
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]*\"$"
+            },
+            "description": "上次 GET 的 ETag，包括双引号。关联操作使用项目版本。412 后重新读取并比较，不强制覆盖。"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConvertedInbox"
+                }
+              }
+            },
+            "headers": {
+              "ETag": {
+                "description": "当前资源版本，含双引号。",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、字段或 Key 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺失/错误 Hermes Bearer Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "幂等 Key 冲突或业务状态冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "版本已变，请先 GET 并比较",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body 超过256 KiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "需要 application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "缺少 If-Match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "数据库不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertInboxBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/v1/brain/projects/{id}/notes": {
+      "get": {
+        "operationId": "listProjectNotes",
+        "summary": "分页查询已关联笔记。需要改项目时重新 GET 项目。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "maxLength": 180
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "description": "标题和正文搜索；项目还查 next_action。"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 30
+            }
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "exclude",
+                "only",
+                "all"
+              ],
+              "default": "exclude"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectNotesPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、字段或 Key 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺失/错误 Hermes Bearer Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "幂等 Key 冲突或业务状态冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "版本已变，请先 GET 并比较",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body 超过256 KiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "需要 application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "缺少 If-Match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "数据库不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/v1/brain/projects/{id}/notes/{noteId}": {
+      "put": {
+        "operationId": "linkProjectNote",
+        "summary": "关联现有未归档笔记；If-Match 必须是项目版本，无需 Body。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "maxLength": 180
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "maxLength": 180
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]*\"$"
+            },
+            "description": "上次 GET 的 ETag，包括双引号。关联操作使用项目版本。412 后重新读取并比较，不强制覆盖。"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceItemResponse"
+                }
+              }
+            },
+            "headers": {
+              "ETag": {
+                "description": "当前资源版本，含双引号。",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、字段或 Key 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺失/错误 Hermes Bearer Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "幂等 Key 冲突或业务状态冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "版本已变，请先 GET 并比较",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body 超过256 KiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "需要 application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "缺少 If-Match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "数据库不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "unlinkProjectNote",
+        "summary": "移除关联而不删除笔记；If-Match 是项目版本，无需 Body。",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "maxLength": 180
+            }
+          },
+          {
+            "name": "noteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "maxLength": 180
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\"[1-9][0-9]*\"$"
+            },
+            "description": "上次 GET 的 ETag，包括双引号。关联操作使用项目版本。412 后重新读取并比较，不强制覆盖。"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceItemResponse"
+                }
+              }
+            },
+            "headers": {
+              "ETag": {
+                "description": "当前资源版本，含双引号。",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、字段或 Key 无效",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "缺失/错误 Hermes Bearer Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "资源不存在",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "幂等 Key 冲突或业务状态冲突",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "版本已变，请先 GET 并比较",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Body 超过256 KiB",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "需要 application/json",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "428": {
+            "description": "缺少 If-Match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "服务错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "数据库不可用",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "HermesBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "现有 HERMES_SYNC_TOKEN，同时授权通用工作台读写和原 Hermes 同步。只在客户端凭据管理中设置。"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "StartRun": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "flomo"
+            ]
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "hourly",
+              "nightly",
+              "reconcile"
+            ]
+          },
+          "windowStart": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "format": "date"
+          },
+          "windowEnd": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "format": "date"
+          }
+        },
+        "required": [
+          "source",
+          "mode",
+          "windowStart",
+          "windowEnd"
+        ],
+        "additionalProperties": false
+      },
+      "SourceItem": {
+        "type": "object",
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "sourceUpdatedAt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40,
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,3})?Z$",
+            "format": "date-time"
+          },
+          "contentHash": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "来源侧按一致规则计算的哈希，不传原文。"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "ignored",
+              "candidate",
+              "processed",
+              "blocked"
+            ]
+          },
+          "domain": {
+            "type": "string",
+            "enum": [
+              "work",
+              "investing",
+              "knowledge",
+              "content"
+            ]
+          },
+          "decisionReason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "脱敏文本，不含 URL、凭据或来源原文。"
+          }
+        },
+        "required": [
+          "sourceId",
+          "sourceUpdatedAt",
+          "contentHash",
+          "decision",
+          "domain",
+          "decisionReason"
+        ],
+        "additionalProperties": false
+      },
+      "Artifact": {
+        "type": "object",
+        "properties": {
+          "artifactKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "knowledge",
+              "topic",
+              "draft",
+              "published"
+            ]
+          },
+          "domain": {
+            "type": "string",
+            "enum": [
+              "work",
+              "investing",
+              "knowledge",
+              "content"
+            ]
+          },
+          "stage": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "脱敏文本，不含 URL、凭据或来源原文。"
+          },
+          "sourceIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "minItems": 1,
+            "maxItems": 20,
+            "description": "每一个 ID 必须出现在本次 sourceItems 中。"
+          },
+          "targetPath": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "脱敏仓库相对路径；不用 URL、本机绝对路径或凭据。",
+            "nullable": true
+          },
+          "publicUrl": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "format": "uri",
+            "description": "仅公开 HTTP(S) 地址，无账号密码、Token 或签名参数。",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "archived",
+              "blocked"
+            ],
+            "default": "active"
+          }
+        },
+        "required": [
+          "artifactKey",
+          "type",
+          "domain",
+          "stage",
+          "title",
+          "summary",
+          "sourceIds"
+        ],
+        "additionalProperties": false
+      },
+      "DomainSnapshot": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "脱敏文本，不含 URL、凭据或来源原文。"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "done",
+              "blocked",
+              "quiet"
+            ]
+          }
+        },
+        "required": [
+          "label",
+          "detail",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "Snapshot": {
+        "type": "object",
+        "properties": {
+          "periodLabel": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "narrative": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "脱敏文本，不含 URL、凭据或来源原文。"
+          },
+          "domains": {
+            "type": "object",
+            "properties": {
+              "work": {
+                "$ref": "#/components/schemas/DomainSnapshot"
+              },
+              "investing": {
+                "$ref": "#/components/schemas/DomainSnapshot"
+              },
+              "knowledge": {
+                "$ref": "#/components/schemas/DomainSnapshot"
+              },
+              "content": {
+                "$ref": "#/components/schemas/DomainSnapshot"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "periodLabel",
+          "narrative",
+          "domains"
+        ],
+        "additionalProperties": false,
+        "nullable": true
+      },
+      "CompleteRun": {
+        "type": "object",
+        "properties": {
+          "discoveredCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "不得小于 sourceItems 数量。"
+          },
+          "sourceItems": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SourceItem"
+            },
+            "maxItems": 50,
+            "description": "sourceId 在同批唯一；接入初期建议 1–5 条。"
+          },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Artifact"
+            },
+            "maxItems": 50,
+            "description": "artifactKey 在同批唯一；来源必须属于同批。"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/Snapshot"
+          }
+        },
+        "required": [
+          "discoveredCount",
+          "sourceItems",
+          "artifacts"
+        ],
+        "additionalProperties": false
+      },
+      "FailRun": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "FLOMO_AUTH_FAILED",
+              "FLOMO_MCP_UNAVAILABLE",
+              "FLOMO_WINDOW_SATURATED",
+              "CHEN_NOTES_DIRTY",
+              "CHEN_NOTES_PULL_FAILED",
+              "CHEN_NOTES_PUSH_FAILED",
+              "DASHBOARD_API_REJECTED"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "脱敏文本，不含 URL、凭据或来源原文。"
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "nextAction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "脱敏文本，不含 URL、凭据或来源原文。"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "retryable",
+          "nextAction"
+        ],
+        "additionalProperties": false
+      },
+      "StateItem": {
+        "type": "object",
+        "properties": {
+          "sourceId": {
+            "type": "string"
+          },
+          "sourceUpdatedAt": {
+            "type": "string"
+          },
+          "contentHash": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sourceId",
+          "sourceUpdatedAt",
+          "contentHash"
+        ],
+        "additionalProperties": false
+      },
+      "BlockedRun": {
+        "type": "object",
+        "nullable": true,
+        "description": "最近一次历史失败/阻塞，非日期窗口内的实时健康状态。",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "hourly",
+              "nightly",
+              "reconcile"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "blocked",
+              "failed"
+            ]
+          },
+          "errorCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "errorMessage": {
+            "type": "string",
+            "nullable": true
+          },
+          "finishedAt": {
+            "type": "integer",
+            "nullable": true
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "nextAction": {
+            "type": "string"
+          }
+        }
+      },
+      "SyncState": {
+        "type": "object",
+        "properties": {
+          "lastSuccessfulAt": {
+            "type": "integer",
+            "nullable": true,
+            "description": "全局最后成功时间，Unix 秒。"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StateItem"
+            }
+          },
+          "pendingSourceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "blocked": {
+            "$ref": "#/components/schemas/BlockedRun"
+          }
+        },
+        "required": [
+          "lastSuccessfulAt",
+          "items",
+          "pendingSourceIds",
+          "blocked"
+        ],
+        "additionalProperties": false
+      },
+      "Started": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "runId"
+        ],
+        "additionalProperties": false
+      },
+      "Completed": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "idempotent": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success",
+          "idempotent"
+        ],
+        "additionalProperties": false
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ],
+        "additionalProperties": false
+      },
+      "CreateWorkspaceNote": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 50000
+          },
+          "source_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "null、空字符串或无用户名密码的 HTTP(S) URL。",
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "additionalProperties": false
+      },
+      "CreateWorkspaceProject": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 50000
+          },
+          "next_action": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "done",
+              "archived"
+            ]
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "additionalProperties": false
+      },
+      "PatchWorkspaceNote": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 50000
+          },
+          "source_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "null、空字符串或无用户名密码的 HTTP(S) URL。",
+            "maxLength": 2000
+          },
+          "archived": {
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "PatchWorkspaceProject": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 50000
+          },
+          "next_action": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "done",
+              "archived"
+            ]
+          }
+        },
+        "required": [],
+        "additionalProperties": false,
+        "minProperties": 1
+      },
+      "CreateWorkspaceBody": {
+        "description": "kind=notes/inbox 使用 CreateWorkspaceNote，kind=projects 使用 CreateWorkspaceProject。不可写额外字段。",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/CreateWorkspaceNote"
+          },
+          {
+            "$ref": "#/components/schemas/CreateWorkspaceProject"
+          }
+        ]
+      },
+      "PatchWorkspaceBody": {
+        "description": "仅更新提供的字段；必须匹配 kind。notes/inbox 使用 archived 布尔值，projects 使用 status。",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/PatchWorkspaceNote"
+          },
+          {
+            "$ref": "#/components/schemas/PatchWorkspaceProject"
+          }
+        ]
+      },
+      "WorkspaceItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "maxLength": 180
+          },
+          "title": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "created_at": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "null、空字符串或无用户名密码的 HTTP(S) URL。",
+            "maxLength": 2000
+          },
+          "archived": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "next_action": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "inbox",
+              "organized",
+              "active",
+              "paused",
+              "done",
+              "archived"
+            ]
+          },
+          "target_type": {
+            "type": "string",
+            "nullable": true
+          },
+          "target_id": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "revision",
+          "created_at",
+          "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "WorkspaceSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "maxLength": 180
+          },
+          "title": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "created_at": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "type": "integer"
+          },
+          "preview": {
+            "type": "string"
+          },
+          "archived": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ]
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "revision",
+          "created_at",
+          "updated_at",
+          "preview"
+        ],
+        "additionalProperties": false
+      },
+      "WorkspacePage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceSummary"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit",
+          "has_more"
+        ],
+        "additionalProperties": false
+      },
+      "ProjectNotesPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceSummary"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "has_more": {
+            "type": "boolean"
+          },
+          "project_revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit",
+          "has_more",
+          "project_revision"
+        ],
+        "additionalProperties": false
+      },
+      "WorkspaceItemResponse": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/WorkspaceItem"
+          }
+        },
+        "required": [
+          "item"
+        ],
+        "additionalProperties": false
+      },
+      "WorkspaceCreated": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/WorkspaceItem"
+          },
+          "replayed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "item",
+          "replayed"
+        ],
+        "additionalProperties": false
+      },
+      "ConvertInboxBody": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "note"
+            ]
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "additionalProperties": false
+      },
+      "ConvertedInbox": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/WorkspaceItem"
+          },
+          "note": {
+            "$ref": "#/components/schemas/WorkspaceItem"
+          },
+          "created": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "item",
+          "note",
+          "created"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

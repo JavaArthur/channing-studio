@@ -1,68 +1,54 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { isAdminAuthenticated, COOKIE_NAME } from '@/lib/admin-auth'
 import Link from 'next/link'
+import { isAdminAuthenticated, COOKIE_NAME } from '@/lib/admin-auth'
 import { LogoutButton } from './LogoutButton'
-import { ExternalLink } from 'lucide-react'
-import { AdminFooter } from '@/components/AdminFooter'
-import { Tooltip } from '@/components/Tooltip'
-
-export default async function AdminProtectedLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_NAME)?.value
-
-  if (!(await isAdminAuthenticated(token))) {
-    redirect('/admin/login')
-  }
-
-  const navCls = 'px-3 py-2 rounded-lg text-sm text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-all duration-150 whitespace-nowrap'
-
+import { BrainNav } from '@/components/brain/BrainNav'
+import { ThemeDropdown } from '@/components/ThemeDropdown'
+export const metadata = { robots: { index: false, follow: false } }
+export default async function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
+  const token = (await cookies()).get(COOKIE_NAME)?.value
+  if (!(await isAdminAuthenticated(token))) redirect('/admin/login')
   return (
-    <div className="min-h-screen bg-[var(--background)] flex flex-col">
-      <header className="sticky top-0 z-40 bg-[var(--editor-panel)] border-b border-[var(--editor-line)]">
-        <div className="mx-auto flex min-h-14 max-w-6xl flex-col justify-center gap-1 px-4 py-2 sm:h-14 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-0">
-          <div className="flex shrink-0 items-center gap-3 whitespace-nowrap text-sm">
-            <Link
-              href="/"
-              className="text-lg tracking-tight text-[var(--editor-ink)] hover:text-[var(--editor-accent)] transition-colors duration-200"
-              style={{ fontFamily: 'Georgia, "Noto Serif SC", serif', fontWeight: 500 }}
-            >
-              晨启AI博客
-            </Link>
-            <span className="text-[var(--editor-line)] hidden sm:inline">/</span>
-            <span className="text-[var(--stone-gray)] hidden sm:inline">管理后台</span>
-          </div>
-
-          <nav className="flex w-full shrink-0 items-center gap-0 overflow-x-auto scrollbar-hide sm:w-auto sm:gap-1">
-            <Link href="/admin" className={navCls}>工作台</Link>
-            <Link href="/admin/posts" className={navCls}>文章</Link>
-            <Link href="/admin/studio" className={navCls}>工作室</Link>
-            <Link href="/admin/categories" className={navCls}>分类</Link>
-            <Link href="/admin/tools" className={navCls}>工具</Link>
-            <Link href="/admin/prompts" className={navCls}>提示词</Link>
-            <Link href="/admin/settings" className={navCls}>设置</Link>
-            <div className="w-px h-4 bg-[var(--editor-line)] mx-2 hidden md:block" />
-            <Tooltip label="查看博客">
-              <Link
-                href="/"
-                className={`${navCls} hidden md:inline-flex items-center gap-1`}
-                aria-label="查看博客"
-              >
-                <ExternalLink className="w-4 h-4" />
-              </Link>
-            </Tooltip>
-            <LogoutButton />
-          </nav>
+    <div className="min-h-screen bg-[var(--background)] text-[var(--editor-ink)]">
+      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-[var(--editor-line)] bg-[var(--editor-panel)] px-4 py-7 lg:flex">
+        <Link href="/admin" className="brand mb-9 px-2">
+          <span className="brand-mark">C.</span>我的大脑
+        </Link>
+        <div className="flex-1 overflow-y-auto">
+          <BrainNav />
         </div>
-      </header>
-
-      <main className="mx-auto max-w-6xl w-full px-4 sm:px-6 py-8 flex-1">{children}</main>
-
-      <AdminFooter />
+        <div className="mt-6 flex items-center justify-between border-t border-[var(--editor-line)] pt-5">
+          <Link href="/" className="text-xs text-[var(--editor-muted)]">
+            公开网站 ↗
+          </Link>
+          <LogoutButton />
+        </div>
+      </aside>
+      <div className="lg:pl-60">
+        <header className="flex h-16 items-center justify-between border-b border-[var(--editor-line)] px-5 sm:px-8">
+          <Link href="/admin" className="text-sm font-medium lg:hidden">
+            Channing / 我的大脑
+          </Link>
+          <span className="hidden text-xs text-[var(--editor-muted)] lg:block">
+            PRIVATE WORKSPACE · 仅自己可见
+          </span>
+          <div className="flex items-center gap-5">
+            <Link href="/editor?new=1" className="text-sm text-[var(--editor-accent)]">
+              写文章 +
+            </Link>
+            <ThemeDropdown />
+          </div>
+        </header>
+        <details className="border-b border-[var(--editor-line)] bg-[var(--editor-panel)] px-5 py-3 lg:hidden">
+          <summary className="cursor-pointer text-sm">工作空间导航</summary>
+          <div className="py-5">
+            <BrainNav />
+            <LogoutButton />
+          </div>
+        </details>
+        <main className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-10">{children}</main>
+      </div>
     </div>
   )
 }

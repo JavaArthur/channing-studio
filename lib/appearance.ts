@@ -1,144 +1,74 @@
 export const THEME_COOKIE_NAME = 'qm_site_theme'
-export const THEME_STORAGE_KEY = THEME_COOKIE_NAME
-export const THEME_CHANGE_EVENT = 'qm-theme-change'
-const THEME_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
-
+export const THEME_STORAGE_KEY = 'channing-color-mode-v1'
+export const THEME_CHANGE_EVENT = 'channing-color-mode-change'
 export const THEME_OPTIONS = [
-  {
-    id: 'default',
-    label: '默认',
-    description: '温暖、克制的阅读首页',
-  },
-  {
-    id: 'refined',
-    label: '精致极简',
-    description: '更轻、更专注的杂志式列表',
-  },
-  {
-    id: 'editorial',
-    label: '杂志编辑',
-    description: '更强视觉层次的刊物风格',
-  },
-  {
-    id: 'warm-editorial',
-    label: '暖调编辑',
-    description: 'Claude 暖调与 Wired 刊物感融合的独立内容首页',
-  },
-  {
-    id: 'terminal',
-    label: 'AI 终端',
-    description: '偏技术感的深色终端界面',
-  },
-  {
-    id: 'clarity',
-    label: '清透',
-    description: '苹果风蓝白极简，产品感十足',
-  },
+  { id: 'light', label: '白天', description: '清晰、轻盈的日间配色' },
+  { id: 'dark', label: '晚上', description: '柔和、低亮度的夜间配色' },
 ] as const
-
-export type Theme = (typeof THEME_OPTIONS)[number]['id']
-
-export const FONT_PRESETS = [
-  {
-    id: 'default',
-    name: '系统默认',
-    desc: '本地 Geist + 系统字体',
-    family: '',
-    needsLoad: false,
-  },
-  {
-    id: 'kaiti',
-    name: '楷体（tw93风格）',
-    desc: '仓耳今楷02，典雅文艺，自托管分片加载',
-    family: 'TsangerJinKai02, STKaiti, KaiTi, serif',
-    needsLoad: true,
-  },
-  {
-    id: 'serif',
-    name: '衬线体',
-    desc: 'Georgia + Noto Serif SC',
-    family: 'Georgia, "Noto Serif SC", "Source Han Serif SC", serif',
-    needsLoad: false,
-  },
-  {
-    id: 'heiti',
-    name: '黑体',
-    desc: '苹方 / 微软雅黑',
-    family: '"PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
-    needsLoad: false,
-  },
-] as const
-
-export type BodyFont = (typeof FONT_PRESETS)[number]['id']
-
-export const FONT_CONFIG: Record<string, { family: string; link?: string }> = {
-  kaiti: {
-    family: 'TsangerJinKai02, STKaiti, KaiTi, serif',
-    link: '/fonts/jinkai/jinkai.css',
-  },
-  serif: { family: 'Georgia, "Noto Serif SC", "Source Han Serif SC", serif' },
-  heiti: { family: '"PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif' },
-}
+export type Theme = 'light' | 'dark'
 
 export function isTheme(value: string | null | undefined): value is Theme {
-  return THEME_OPTIONS.some((option) => option.id === value)
+  return value === 'light' || value === 'dark'
 }
-
-export function normalizeTheme(value: string | null | undefined, fallback: Theme = 'default'): Theme {
-  return isTheme(value) ? value : fallback
+export function normalizeTheme(value: string | null | undefined, fallback: Theme = 'light'): Theme {
+  if (isTheme(value)) return value
+  return value === 'terminal' ? 'dark' : fallback
 }
-
-function readCookie(name: string): string | null {
-  if (typeof document === 'undefined') return null
-
-  const match = document.cookie
-    .split('; ')
-    .find((item) => item.startsWith(`${name}=`))
-
-  return match ? decodeURIComponent(match.slice(name.length + 1)) : null
+function legacyPreference(): Theme | null {
+  try {
+    const cookie = document.cookie.split('; ').find((v) => v.startsWith(THEME_COOKIE_NAME + '='))
+    const old = cookie
+      ? decodeURIComponent(cookie.slice(THEME_COOKIE_NAME.length + 1))
+      : window.localStorage.getItem(THEME_COOKIE_NAME)
+    if (old === 'terminal') return 'dark'
+    if (['refined', 'editorial', 'warm-editorial', 'clarity'].includes(old || '')) return 'light'
+  } catch {}
+  return null
 }
-
+export function getClientThemePreference(fallback: Theme = 'light'): Theme {
+  if (typeof window === 'undefined') return fallback
+  try {
+    const saved = window.localStorage.getItem(THEME_STORAGE_KEY)
+    if (isTheme(saved)) return saved
+  } catch {}
+  return (
+    legacyPreference() ??
+    (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  )
+}
 export function applyClientTheme(theme: Theme) {
   if (typeof document === 'undefined') return
-
-  if (theme === 'default') {
-    document.documentElement.removeAttribute('data-theme')
-  } else {
-    document.documentElement.setAttribute('data-theme', theme)
-  }
-  document.documentElement.removeAttribute('data-theme-pending')
+  document.documentElement.setAttribute('data-color-mode', theme)
+  document.documentElement.style.colorScheme = theme
 }
-
 export function setClientThemePreference(theme: Theme) {
-  if (typeof document === 'undefined') return
-
-  document.cookie = `${THEME_COOKIE_NAME}=${encodeURIComponent(theme)}; Path=/; Max-Age=${THEME_COOKIE_MAX_AGE}; SameSite=Lax`
+  if (typeof window === 'undefined') return
   try {
-    window.localStorage.removeItem(THEME_STORAGE_KEY)
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme)
   } catch {}
-
+  document.cookie = `${THEME_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax`
+  try {
+    window.localStorage.removeItem(THEME_COOKIE_NAME)
+  } catch {}
   applyClientTheme(theme)
-  window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT, { detail: { theme } }))
+  window.dispatchEvent(new Event(THEME_CHANGE_EVENT))
 }
-
-export function getClientThemePreference(fallback: Theme = 'default'): Theme {
-  if (typeof window === 'undefined') return fallback
-
-  const saved = readCookie(THEME_COOKIE_NAME)
-  if (isTheme(saved)) return saved
-
-  return fallback
-}
-
-export function subscribeToThemeChange(onStoreChange: () => void): () => void {
-  if (typeof window === 'undefined') {
-    return () => {}
+export function subscribeToThemeChange(onChange: () => void): () => void {
+  if (typeof window === 'undefined') return () => {}
+  const sync = () => {
+    applyClientTheme(getClientThemePreference())
+    onChange()
   }
-
-  const handler = () => onStoreChange()
-  window.addEventListener(THEME_CHANGE_EVENT, handler)
-
+  const media = window.matchMedia?.('(prefers-color-scheme: dark)')
+  window.addEventListener(THEME_CHANGE_EVENT, sync)
+  window.addEventListener('storage', sync)
+  media?.addEventListener('change', sync)
   return () => {
-    window.removeEventListener(THEME_CHANGE_EVENT, handler)
+    window.removeEventListener(THEME_CHANGE_EVENT, sync)
+    window.removeEventListener('storage', sync)
+    media?.removeEventListener('change', sync)
   }
 }
+
+// Runs before paint; only colors change, never the rendered page structure.
+export const COLOR_MODE_SCRIPT = `(()=>{try{let k='channing-color-mode-v1',v=localStorage.getItem(k);if(v!=='light'&&v!=='dark'){let c=document.cookie.split('; ').find(x=>x.startsWith('qm_site_theme='));let o=c?decodeURIComponent(c.split('=')[1]):localStorage.getItem('qm_site_theme');v=o==='terminal'?'dark':['refined','editorial','warm-editorial','clarity'].includes(o)?'light':null;if(v)localStorage.setItem(k,v);localStorage.removeItem('qm_site_theme');document.cookie='qm_site_theme=; Path=/; Max-Age=0; SameSite=Lax'}v=v||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.colorMode=v;document.documentElement.style.colorScheme=v}catch{}})()`

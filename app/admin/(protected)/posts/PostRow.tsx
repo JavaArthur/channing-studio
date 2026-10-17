@@ -604,7 +604,7 @@ export function PostRow({ post, categories }: PostRowProps) {
         description={
           post.is_hidden === 1
             ? '取消隐藏后，文章将重新出现在首页、RSS 和搜索结果中。'
-            : '隐藏后，文章不会在首页、RSS 和搜索中显示，但可以通过直接链接访问。'
+            : '隐藏后，文章不会在首页、RSS 和搜索中显示，但可以通过直接私密。'
         }
         confirmText="确认"
         type="info"

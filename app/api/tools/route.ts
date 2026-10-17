@@ -1,3 +1,4 @@
+import { isHttpUrl, isSafeLink } from '@/lib/url'
 import {
   createTool,
   deleteTool,
@@ -65,6 +66,8 @@ export async function POST(req: NextRequest) {
         : null
     const icon = typeof payload.icon === 'string' && payload.icon.trim() ? payload.icon.trim() : null
 
+    if (url && !isHttpUrl(url)) return jsonError('链接必须是 http 或 https 地址', 400)
+    if (icon && !isSafeLink(icon)) return jsonError('图标地址不正确', 400)
     const id = await createTool(db, {
       name,
       url,
@@ -116,6 +119,8 @@ export async function PATCH(req: NextRequest) {
     if (payload.is_pinned !== undefined) updates.is_pinned = payload.is_pinned === 1 ? 1 : 0
     if (typeof payload.sort_order === 'number') updates.sort_order = payload.sort_order
 
+    if (updates.url && !isHttpUrl(updates.url)) return jsonError('链接必须是 http 或 https 地址', 400)
+    if (updates.icon && !isSafeLink(updates.icon)) return jsonError('图标地址不正确', 400)
     await updateTool(db, id, updates)
     await invalidatePublicContentCache(env)
     return jsonOk({ success: true })

@@ -40,6 +40,7 @@ export function FilterBar({
 
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
+    params.delete('page')
     if (value === 'all') {
       params.delete(key)
     } else {
@@ -53,6 +54,7 @@ export function FilterBar({
     e.preventDefault()
     const trimmed = query.trim()
     const params = new URLSearchParams(searchParams.toString())
+    params.delete('page')
     if (trimmed) {
       params.set('q', trimmed)
     } else {
@@ -65,6 +67,7 @@ export function FilterBar({
   const handleClear = () => {
     setQuery('')
     const params = new URLSearchParams(searchParams.toString())
+    params.delete('page')
     params.delete('q')
     const qs = params.toString()
     router.push(`/admin/posts${qs ? `?${qs}` : ''}`)
@@ -85,7 +88,7 @@ export function FilterBar({
     { value: 'draft', label: '草稿', count: counts.draft },
     { value: 'deleted', label: '已删除', count: counts.deleted },
     { value: 'encrypted', label: '加密', count: counts.encrypted },
-    { value: 'unlisted', label: '隐藏', count: counts.unlisted },
+    { value: 'unlisted', label: '私密', count: counts.unlisted },
     { value: 'pinned', label: '置顶', count: counts.pinned },
   ] as const
 

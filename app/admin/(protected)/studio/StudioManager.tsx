@@ -1,8 +1,8 @@
 'use client'
 
+import { FeaturedPostPicker } from '@/components/FeaturedPostPicker'
 import { useState } from 'react'
 import {
-  serializeStudioSettings,
   type StudioCapability,
   type StudioContent,
   type StudioLab,
@@ -10,6 +10,7 @@ import {
 } from '@/lib/studio-content'
 
 interface StudioManagerProps {
+  initialRevision: number
   initialContent: StudioContent
 }
 
@@ -28,8 +29,9 @@ function moveAt<T>(items: T[], index: number, offset: -1 | 1): T[] {
   return next
 }
 
-export function StudioManager({ initialContent }: StudioManagerProps) {
+export function StudioManager({ initialContent, initialRevision }: StudioManagerProps) {
   const [draft, setDraft] = useState<StudioContent>(initialContent)
+  const [revision, setRevision] = useState(initialRevision)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -59,22 +61,10 @@ export function StudioManager({ initialContent }: StudioManagerProps) {
     setMessage('')
     setError('')
     try {
-      const settings = serializeStudioSettings(draft)
-      const responses = await Promise.all(
-        Object.entries(settings).map(([key, value]) => fetch('/api/admin/settings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key, value }),
-        })),
-      )
-      const results = await Promise.all(
-        responses.map(async (response) => ({
-          ok: response.ok,
-          body: await response.json().catch(() => null) as { success?: boolean; error?: string } | null,
-        })),
-      )
-      const failed = results.find((result) => !result.ok || result.body?.success !== true)
-      if (failed) throw new Error(failed.body?.error || '保存失败')
+      const response = await fetch('/api/admin/studio', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: draft, revision }) })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || '保存失败')
+      setRevision(result.revision)
       setMessage('已保存，公开页面刷新后生效。')
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : '保存失败，请稍后重试')
@@ -88,7 +78,7 @@ export function StudioManager({ initialContent }: StudioManagerProps) {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-[var(--editor-ink)]">工作室内容</h1>
-          <p className="mt-1 text-sm text-[var(--editor-muted)]">这里的内容会同步到首页、作品、实验室和关于我。</p>
+          <p className="mt-1 text-sm text-[var(--editor-muted)]">在这里编辑公开页面的内容。私人项目的展示摘要在“项目”中单独管理。</p>
         </div>
         <button onClick={save} disabled={saving} className="rounded-lg bg-[var(--editor-accent)] px-4 py-2.5 text-sm font-semibold text-white transition hover:brightness-105 disabled:opacity-50">
           {saving ? '保存中…' : '保存工作室内容'}
@@ -112,7 +102,7 @@ export function StudioManager({ initialContent }: StudioManagerProps) {
         <div className="flex items-end justify-between gap-3"><div><h2 className="text-base font-semibold text-[var(--editor-ink)]">能力卡</h2><p className="mt-1 text-xs text-[var(--editor-muted)]">首页展示三张，关于我页面也会使用。</p></div><button type="button" onClick={() => setDraft((current) => ({ ...current, profile: { ...current.profile, capabilities: [...current.profile.capabilities, { title: '', description: '' }] } }))} className="rounded-lg bg-[var(--editor-soft)] px-3 py-2 text-xs font-medium text-[var(--editor-ink)]">+ 添加能力</button></div>
         <div className="space-y-3">
           {draft.profile.capabilities.map((capability, index) => (
-            <div key={`${index}-${capability.title}`} className={`${cardClass} grid gap-3 sm:grid-cols-[1fr_2fr_auto] sm:items-start`}>
+            <div key={index} className={`${cardClass} grid gap-3 sm:grid-cols-[1fr_2fr_auto] sm:items-start`}>
               <input className={inputClass} placeholder="能力名称" value={capability.title} onChange={(event) => updateCapability(index, { title: event.target.value })} />
               <textarea className={`${inputClass} min-h-16 resize-y`} placeholder="能力说明" value={capability.description} onChange={(event) => updateCapability(index, { description: event.target.value })} />
               <button type="button" onClick={() => removeCapability(index)} className="text-xs text-rose-500 hover:underline">删除</button>
@@ -122,7 +112,7 @@ export function StudioManager({ initialContent }: StudioManagerProps) {
       </section>
 
       <section className="space-y-4">
-        <div className="flex items-end justify-between gap-3"><div><h2 className="text-base font-semibold text-[var(--editor-ink)]">作品</h2><p className="mt-1 text-xs text-[var(--editor-muted)]">数组顺序就是首页和作品页的展示顺序。</p></div><button type="button" onClick={() => setDraft((current) => ({ ...current, projects: [...current.projects, { id: `project-${current.projects.length + 1}`, title: '', description: '', href: '/', tags: [], visible: true }] }))} className="rounded-lg bg-[var(--editor-soft)] px-3 py-2 text-xs font-medium text-[var(--editor-ink)]">+ 添加作品</button></div>
+        <div className="flex items-end justify-between gap-3"><div><h2 className="text-base font-semibold text-[var(--editor-ink)]">作品</h2><p className="mt-1 text-xs text-[var(--editor-muted)]">数组顺序就是首页和作品页的展示顺序。</p></div><button type="button" onClick={() => setDraft((current) => ({ ...current, projects: [...current.projects, { id: crypto.randomUUID(), title: '', description: '', href: '/', tags: [], visible: true }] }))} className="rounded-lg bg-[var(--editor-soft)] px-3 py-2 text-xs font-medium text-[var(--editor-ink)]">+ 添加作品</button></div>
         <div className="space-y-3">
           {draft.projects.map((project, index) => (
             <div key={`${index}-${project.id}`} className={cardClass}>
@@ -145,7 +135,7 @@ export function StudioManager({ initialContent }: StudioManagerProps) {
       </section>
 
       <section className="space-y-4">
-        <div className="flex items-end justify-between gap-3"><div><h2 className="text-base font-semibold text-[var(--editor-ink)]">实验室</h2><p className="mt-1 text-xs text-[var(--editor-muted)]">工具链、Skill 和正在验证的工作流。</p></div><button type="button" onClick={() => setDraft((current) => ({ ...current, labs: [...current.labs, { id: `lab-${current.labs.length + 1}`, title: '', description: '', href: '/', type: 'tool', visible: true }] }))} className="rounded-lg bg-[var(--editor-soft)] px-3 py-2 text-xs font-medium text-[var(--editor-ink)]">+ 添加实验</button></div>
+        <div className="flex items-end justify-between gap-3"><div><h2 className="text-base font-semibold text-[var(--editor-ink)]">实验室</h2><p className="mt-1 text-xs text-[var(--editor-muted)]">工具链、Skill 和正在验证的工作流。</p></div><button type="button" onClick={() => setDraft((current) => ({ ...current, labs: [...current.labs, { id: crypto.randomUUID(), title: '', description: '', href: '/', type: 'tool', visible: true }] }))} className="rounded-lg bg-[var(--editor-soft)] px-3 py-2 text-xs font-medium text-[var(--editor-ink)]">+ 添加实验</button></div>
         <div className="space-y-3">
           {draft.labs.map((lab, index) => (
             <div key={`${index}-${lab.id}`} className={cardClass}>
@@ -167,10 +157,11 @@ export function StudioManager({ initialContent }: StudioManagerProps) {
         </div>
       </section>
 
+      <section className="space-y-3"><h2 className="font-semibold">联系链接</h2>{draft.profile.contactLinks.map((link,index) => <div key={index} className="flex gap-3"><input aria-label="链接名称" className={inputClass} value={link.label} onChange={e=>setDraft(c=>({...c,profile:{...c.profile,contactLinks:updateAt(c.profile.contactLinks,index,{label:e.target.value})}}))}/><input aria-label="链接地址" className={inputClass} value={link.url} onChange={e=>setDraft(c=>({...c,profile:{...c.profile,contactLinks:updateAt(c.profile.contactLinks,index,{url:e.target.value})}}))}/><button onClick={()=>setDraft(c=>({...c,profile:{...c.profile,contactLinks:c.profile.contactLinks.filter((_,i)=>i!==index)}}))}>移除</button></div>)}<button className="brain-secondary" onClick={()=>setDraft(c=>({...c,profile:{...c.profile,contactLinks:[...c.profile.contactLinks,{label:'',url:'',openInNewTab:true}]}}))}>添加链接</button></section>
+
       <section className="space-y-3">
         <h2 className="text-base font-semibold text-[var(--editor-ink)]">精选文章</h2>
-        <p className="text-xs leading-6 text-[var(--editor-muted)]">每行写一个文章 slug；留空时首页自动展示最新 3 篇原创文章。</p>
-        <textarea className={`${inputClass} min-h-28 resize-y`} value={draft.featuredPostSlugs.join('\n')} onChange={(event) => setDraft((current) => ({ ...current, featuredPostSlugs: event.target.value.split('\n').map((slug) => slug.trim()).filter(Boolean) }))} placeholder="例如：2026-05-27-ai-xiede-yue-xiangren-ren-yue-yao-liuxia-maobian" />
+        <FeaturedPostPicker selected={draft.featuredPostSlugs} onChange={slugs=>setDraft(current=>({...current,featuredPostSlugs:slugs}))} />
       </section>
     </div>
   )

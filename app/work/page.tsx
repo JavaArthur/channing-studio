@@ -1,7 +1,8 @@
+export const dynamic = 'force-dynamic'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getSiteHeaderData } from '@/lib/site'
 import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
-import { getStudioContent } from '@/lib/studio-settings'
+import { getPublicStudioContent } from '@/lib/public-studio'
 import { StudioCardLabel, StudioLink, StudioShell } from '@/components/StudioSection'
 import { getSiteUrl } from '@/lib/site-config'
 import type { Theme } from '@/lib/appearance'
@@ -16,11 +17,11 @@ export const metadata = {
 export default async function WorkPage() {
   let content = DEFAULT_STUDIO_CONTENT
   let navLinks: SiteNavLink[] = []
-  let defaultTheme: Theme = 'default'
+  let defaultTheme: Theme = 'light'
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, studioContent] = await Promise.all([getSiteHeaderData(env.DB), getStudioContent(env.DB)])
+      const [headerData, studioContent] = await Promise.all([getSiteHeaderData(env.DB), getPublicStudioContent(env.DB)])
       navLinks = headerData.navLinks
       defaultTheme = headerData.defaultTheme
       content = studioContent
@@ -39,7 +40,7 @@ export default async function WorkPage() {
     >
       <div className="grid gap-5 md:grid-cols-2">
         {content.projects.filter((project) => project.visible).map((project) => (
-          <StudioLink key={project.id} href={project.href}>
+          <StudioLink className="block" key={project.id} href={project.href}>
             <article className="studio-card h-full">
               <StudioCardLabel>PROJECT / {project.id}</StudioCardLabel>
               <h2 className="studio-card-title mt-8">{project.title}</h2>

@@ -47,6 +47,7 @@ next-env.d.ts
 .wrangler/
 skills/
 wrangler.local.toml
+wrangler.*.local.toml
 worker-configuration.d.ts
 .env.local.secrets.bak
 
@@ -62,3 +63,6 @@ clarity-detail-page.png
 
 # 数据库备份导出，含线上数据，不进 git
 backup-*.sql
+
+/playwright-report/
+/test-results/

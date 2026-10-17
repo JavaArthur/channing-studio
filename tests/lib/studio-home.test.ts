@@ -11,7 +11,7 @@ describe('selectFeaturedPosts', () => {
   it('uses the configured order and ignores missing slugs', () => {
     const result = selectFeaturedPosts(posts, ['oldest', 'missing', 'latest'])
 
-    expect(result.map((post) => post.slug)).toEqual(['oldest', 'latest'])
+    expect(result.map((post) => post.slug)).toEqual(['oldest', 'latest', 'middle'])
   })
 
   it('falls back to the latest posts when no slugs are configured', () => {

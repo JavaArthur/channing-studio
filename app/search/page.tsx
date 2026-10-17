@@ -25,7 +25,7 @@ export default async function SearchPage({
   let posts: Awaited<ReturnType<typeof searchPosts>> = []
   let navLinks: SiteNavLink[] = []
   let categories: SiteCategoryLink[] = []
-  let defaultTheme: Theme = 'default'
+  let defaultTheme: Theme = 'light'
 
   try {
     const env = await getAppCloudflareEnv()

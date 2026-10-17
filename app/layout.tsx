@@ -3,11 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { GlobalShortcuts } from "@/components/GlobalShortcuts";
 import { ToastProvider } from "@/components/Toast";
-import { CustomJsInjector } from "@/components/CustomJsInjector";
-import { FONT_CONFIG, normalizeTheme, THEME_COOKIE_NAME, THEME_OPTIONS, THEME_STORAGE_KEY, type Theme } from "@/lib/appearance";
-import { getAppCloudflareEnv } from "@/lib/cloudflare";
-import { getSetting } from "@/lib/db";
-import { resolveRequestTheme } from "@/lib/server-appearance";
+import { COLOR_MODE_SCRIPT } from "@/lib/appearance";
 import { getSiteUrl, getSiteUrlObject } from "@/lib/site-config";
 
 const geistSans = localFont({
@@ -83,110 +79,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  let customJs = ''
-  let bodyFont = ''
-  let defaultTheme: Theme = 'default'
-  try {
-    const env = await getAppCloudflareEnv()
-    if (env?.DB) {
-      const [customJsValue, bodyFontValue, defaultThemeValue] = await Promise.all([
-        getSetting(env.DB, 'custom_js'),
-        getSetting(env.DB, 'body_font'),
-        getSetting(env.DB, 'default_theme'),
-      ])
-      customJs = customJsValue || ''
-      bodyFont = bodyFontValue || ''
-      defaultTheme = normalizeTheme(defaultThemeValue)
-    }
-  } catch {}
-
-  const font = FONT_CONFIG[bodyFont]
-  const requestTheme = await resolveRequestTheme(defaultTheme)
-  const validThemes = THEME_OPTIONS.map((theme) => theme.id)
-
-  const appearanceApplyScript = `
-(function(){
-  var f = ${JSON.stringify(FONT_CONFIG)};
-  var k = "${bodyFont || ''}";
-  var initialTheme = "${requestTheme}";
-  var themeCookieName = "${THEME_COOKIE_NAME}";
-  var legacyThemeStorageKey = "${THEME_STORAGE_KEY}";
-  var validThemes = ${JSON.stringify(validThemes)};
-  function isTheme(value) {
-    return validThemes.indexOf(value) !== -1;
-  }
-  function readCookie(name) {
-    var parts = document.cookie ? document.cookie.split('; ') : [];
-    for (var i = 0; i < parts.length; i++) {
-      if (parts[i].indexOf(name + '=') === 0) {
-        return decodeURIComponent(parts[i].slice(name.length + 1));
-      }
-    }
-    return null;
-  }
-  function applyFont(key) {
-    var c = f[key];
-    document.documentElement.setAttribute('data-font', key || 'default');
-    if (c) {
-      document.documentElement.style.setProperty('--body-font', c.family);
-      if (c.link && !document.getElementById('qm-font-link')) {
-        var l = document.createElement('link');
-        l.id = 'qm-font-link';
-        l.rel = 'stylesheet';
-        l.href = c.link;
-        document.head.appendChild(l);
-      }
-    } else {
-      document.documentElement.style.removeProperty('--body-font');
-    }
-  }
-  function applyTheme(theme) {
-    if (isTheme(theme) && theme !== 'default') {
-      document.documentElement.setAttribute('data-theme', theme);
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-  }
-  applyFont(k);
-  try {
-    window.localStorage.removeItem(legacyThemeStorageKey);
-    var savedTheme = readCookie(themeCookieName);
-    var nextTheme = isTheme(savedTheme) ? savedTheme : initialTheme;
-    applyTheme(nextTheme);
-    if (isTheme(savedTheme) && savedTheme !== initialTheme) {
-      document.documentElement.setAttribute('data-theme-pending', savedTheme);
-    }
-  } catch (e) {}
-})();
-`
-
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="zh-CN"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      data-font={bodyFont || 'default'}
-      data-theme={requestTheme === 'default' ? undefined : requestTheme}
-      suppressHydrationWarning
-    >
-      <head>
-        {font?.link && <link rel="stylesheet" href={font.link} />}
-        {font && (
-          <style dangerouslySetInnerHTML={{ __html: `:root { --body-font: ${font.family}; }` }} />
-        )}
-        <script dangerouslySetInnerHTML={{ __html: appearanceApplyScript }} />
-      </head>
-      <body className="min-h-full flex flex-col">
-        <ToastProvider>
-          <GlobalShortcuts />
-          {children}
-        </ToastProvider>
-        {customJs && <CustomJsInjector code={customJs} />}
-      </body>
+    <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: COLOR_MODE_SCRIPT }} /></head>
+      <body className="min-h-full flex flex-col"><ToastProvider><GlobalShortcuts />{children}</ToastProvider></body>
     </html>
-  );
+  )
 }

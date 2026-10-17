@@ -1,3 +1,5 @@
+import { renderPostMarkdownToHtml } from '@/lib/post-render'
+import { getWorkingCopy } from '@/lib/repositories/drafts'
 import { getPostBySlug } from '@/lib/db'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { isAdminAuthenticated, COOKIE_NAME } from '@/lib/admin-auth'
@@ -27,6 +29,9 @@ export default async function EditorPage({
   const isNew = params.new === '1'
 
   let initialData: {
+    revision?: number
+    draft_revision?: number
+    next_slug?: string
     slug: string
     title: string
     html: string
@@ -44,10 +49,13 @@ export default async function EditorPage({
     if (env?.DB) {
       const post = await getPostBySlug(env.DB, edit, undefined, { includeUnpublished: true })
       if (post) {
+        const working = await getWorkingCopy(env.DB, post.id)
+        const draft = working ? JSON.parse(working.payload) : {}
         initialData = {
-          slug: post.slug,
+          revision: working?.base_revision ?? post.revision ?? 0,
+          draft_revision: working?.revision ?? 0,
           title: post.title,
-          html: post.html,
+          html: post.html || await renderPostMarkdownToHtml(post.content),
           category: post.category || undefined,
           status: post.status,
           password: post.password,
@@ -55,6 +63,9 @@ export default async function EditorPage({
           tags: post.tags,
           description: post.description,
           cover_image: post.cover_image,
+          ...draft,
+          slug: post.slug,
+          next_slug: typeof draft.new_slug === 'string' ? draft.new_slug : undefined,
         }
       }
     }

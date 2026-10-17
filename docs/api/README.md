@@ -2,6 +2,8 @@
 
 晨启博客系统对外提供的 REST API 接口文档。
 
+如果使用的是 **Hermes Token**：管理笔记、收集箱和项目请阅读 [gorkbot 通用工作台指南](gorkbot-workspace-integration.md)，并导入 [完整 OpenAPI 描述](gorkbot-workspace.openapi.json)。原 Flomo 同步流程见 [Hermes 指南](gorkbot-hermes-integration.md)。这套 Token 与本文的 `qm_` 博客 Token 不通用，`/api/admin/*` 工作台管理路由仍使用管理员会话。
+
 ## 📋 目录
 
 - [认证方式](#认证方式)
@@ -18,7 +20,7 @@
 
 ### Bearer Token 认证
 
-大部分 API 接口支持 Bearer Token 认证，适用于外部系统调用。
+部分文章、资源与转换接口支持后台生成的 `qm_` Bearer Token。`/api/agent/v1/brain/*` 和原 Hermes Agent API 使用另一套专用 Token；原后台工作台、工作稿和公开快照发布接口继续使用管理员 Cookie 会话。
 
 **获取 Token：**
 1. 登录管理后台：`https://your-domain.com/admin`

@@ -16,6 +16,9 @@ const NovelEditor = dynamic(
 
 export function NovelEditorClient(props: {
   initialData?: {
+    revision?: number
+    draft_revision?: number
+    next_slug?: string
     slug: string
     title: string
     html: string
