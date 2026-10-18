@@ -11,7 +11,7 @@ export function FrontPostAdminBoundary({ slug, children }: { slug: string; child
     <>
       {authenticated && (
         <div className="mb-6 flex justify-end">
-          <Link className="brain-secondary" href={`/editor?edit=${encodeURIComponent(slug)}`}>
+          <Link className="min-h-11 min-w-11 brain-secondary" href={`/editor?edit=${encodeURIComponent(slug)}`}>
             编辑文章
           </Link>
         </div>

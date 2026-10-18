@@ -8,7 +8,7 @@ const NovelEditor = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-sm text-gray-500">加载编辑器...</div>
+        <div className="text-sm text-[var(--editor-muted)]">加载编辑器...</div>
       </div>
     ),
   }

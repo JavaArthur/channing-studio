@@ -64,7 +64,7 @@ export default async function ClippingsPage({
           <div className="text-xs uppercase tracking-[0.18em] text-[var(--stone-gray)] mb-3">
             剪报
           </div>
-          <h1 className="article-display-title text-3xl sm:text-4xl font-bold text-[var(--editor-ink)] leading-tight">
+          <h1 className="font-serif font-medium article-display-title text-3xl sm:text-4xl text-[var(--editor-ink)] leading-tight">
             收藏的好东西
           </h1>
           <p className="mt-3 text-sm text-[var(--editor-muted)]">
@@ -77,7 +77,7 @@ export default async function ClippingsPage({
             <p className="text-[var(--editor-muted)] mb-2">剪报区还是空的</p>
             <Link
               href="/"
-              className="text-sm text-[var(--editor-accent)] hover:underline underline-offset-2"
+              className="min-h-11 min-w-11 inline-flex items-center text-sm text-[var(--editor-accent)] hover:underline underline-offset-2"
             >
               返回首页
             </Link>
@@ -94,8 +94,8 @@ export default async function ClippingsPage({
                     style={{ animation: `fadeInUp 0.4s ease-out ${index * 0.05}s both` }}
                   >
                     <div className="py-6 sm:py-7 pl-4 border-l-2 border-l-transparent hover:border-l-[var(--editor-accent)] transition-all duration-200">
-                      <Link href={`/${post.slug}`} className="block group/title">
-                        <h2 className="text-xl sm:text-2xl font-bold text-[var(--editor-ink)] leading-snug mb-2 group-hover/title:text-[var(--editor-accent)] transition-colors duration-200">
+                      <Link href={`/${post.slug}`} className="min-h-11 min-w-11 block group/title">
+                        <h2 className="font-serif font-medium text-xl sm:text-2xl text-[var(--editor-ink)] leading-snug mb-2 group-hover/title:text-[var(--editor-accent)] transition-colors duration-200">
                           {post.title}
                         </h2>
                       </Link>
@@ -113,7 +113,7 @@ export default async function ClippingsPage({
                               href={post.source_url ?? '#'}
                               target="_blank"
                               rel="noopener noreferrer nofollow"
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors"
+                              className="min-h-11 min-w-11 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors"
                             >
                               原文 · {host}
                               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

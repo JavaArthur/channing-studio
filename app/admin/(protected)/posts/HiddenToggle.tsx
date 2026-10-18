@@ -49,7 +49,7 @@ export function HiddenToggle({ slug, isHidden }: HiddenToggleProps) {
       <button
         onClick={() => setShowModal(true)}
         disabled={loading}
-        className={`p-1.5 rounded transition-colors disabled:opacity-50 ${
+        className={`min-h-11 min-w-11 p-1.5 rounded-md transition-colors disabled:opacity-50 ${
           hidden === 1
             ? 'text-[var(--stone-gray)] hover:bg-[var(--editor-soft)]'
             : 'text-[var(--stone-gray)] hover:bg-[var(--editor-soft)]'

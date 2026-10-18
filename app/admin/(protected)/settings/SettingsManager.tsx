@@ -24,7 +24,7 @@ function AdvancedPanel({ label, children }: { label: string; children: ReactNode
   const [open, setOpen] = useState(false)
   return (
     <details className="brain-panel" onToggle={(event) => setOpen(event.currentTarget.open)}>
-      <summary className="cursor-pointer font-medium">{label}</summary>
+      <summary className="font-serif min-h-11 min-w-11 cursor-pointer font-medium">{label}</summary>
       {open && <div className="mt-6">{children}</div>}
     </details>
   )
@@ -63,7 +63,7 @@ export function SettingsManager({ initialNavLinks, initialRuntimeCapabilities }:
           content: (
             <div className="space-y-7">
               <section className="brain-panel">
-                <h2 className="font-medium">白天与晚上</h2>
+                <h2 className="font-serif font-medium">白天与晚上</h2>
                 <div className="mt-4 flex items-center justify-between gap-5">
                   <p className="text-sm text-[var(--editor-muted)]">
                     全站共用日夜配色，首次跟随系统。手动选择只保存在当前浏览器。
@@ -72,7 +72,7 @@ export function SettingsManager({ initialNavLinks, initialRuntimeCapabilities }:
                 </div>
               </section>
               <section className="brain-panel">
-                <h2 className="mb-5 font-medium">公开导航</h2>
+                <h2 className="font-serif font-medium mb-5">公开导航</h2>
                 <NavLinksEditor initialValue={initialNavLinks} onSave={save} saving={saving} />
                 {message && (
                   <p role="status" className="mt-3 text-sm">

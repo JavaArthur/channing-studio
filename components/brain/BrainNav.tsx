@@ -49,7 +49,7 @@ export function BrainNav() {
   const path = usePathname()
   return (
     <nav aria-label="个人工作空间" className="space-y-7">
-      <Link href="/admin/search" className="brain-secondary w-full justify-start">
+      <Link href="/admin/search" className="min-h-11 min-w-11 brain-secondary w-full justify-start">
         <Search size={16} />
         搜索我的内容
       </Link>
@@ -62,7 +62,7 @@ export function BrainNav() {
                 href={href}
                 key={href}
                 aria-current={path === href ? 'page' : undefined}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm ${path === href ? 'bg-[var(--editor-soft)] font-medium text-[var(--editor-accent)]' : 'text-[var(--editor-muted)] hover:bg-[var(--editor-soft)]'}`}
+                className={`min-h-11 min-w-11 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm ${path === href ? 'bg-[var(--editor-soft)] font-medium text-[var(--editor-accent)]' : 'text-[var(--editor-muted)] hover:bg-[var(--editor-soft)]'}`}
               >
                 <Icon size={17} />
                 {label}

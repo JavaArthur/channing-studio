@@ -57,9 +57,9 @@ export function EncryptionControl({ initialPassword, onChange, articleUrl }: Enc
       <button
         type="button"
         onClick={handleToggle}
-        className={`p-2 rounded-md transition-colors ${
+        className={`min-h-11 min-w-11 p-2 rounded-md transition-colors ${
           isEncrypted
-            ? 'bg-[var(--editor-accent)] text-white'
+            ? 'bg-[var(--editor-accent)] text-[var(--editor-accent-ink)]'
             : 'bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:bg-[var(--editor-line)]'
         }`}
         title={isEncrypted ? '取消加密' : '加密文章'}
@@ -85,7 +85,7 @@ export function EncryptionControl({ initialPassword, onChange, articleUrl }: Enc
           <button
             type="button"
             onClick={() => setShowPanel(!showPanel)}
-            className="ml-1 p-2 rounded-md bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:bg-[var(--editor-line)] transition-colors"
+            className="min-h-11 min-w-11 ml-1 p-2 rounded-md bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:bg-[var(--editor-line)] transition-colors"
             aria-label="查看密码"
           >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -99,12 +99,12 @@ export function EncryptionControl({ initialPassword, onChange, articleUrl }: Enc
       {showPanel && isEncrypted && (
         <div className="absolute top-full right-0 mt-2 w-80 bg-[var(--editor-panel)] rounded-lg border border-[var(--editor-line)] shadow-lg p-4 z-50">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-[var(--editor-ink)]">文章加密</h3>
+            <h3 className="font-serif font-medium text-sm text-[var(--editor-ink)]">文章加密</h3>
             <Tooltip label="关闭面板">
               <button
                 type="button"
                 onClick={() => setShowPanel(false)}
-                className="text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
+                className="min-h-11 min-w-11 text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
                 aria-label="关闭面板"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -125,14 +125,14 @@ export function EncryptionControl({ initialPassword, onChange, articleUrl }: Enc
                   type="text"
                   value={password}
                   onChange={(e) => handlePasswordChange(e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--editor-accent)] focus:border-transparent"
+                  className="min-h-11 min-w-11 flex-1 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:border-transparent"
                   placeholder="输入密码"
                 />
                 <Tooltip label="复制密码">
                   <button
                     type="button"
                     onClick={() => copyToClipboard(password, 'password')}
-                    className="px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
+                    className="min-h-11 min-w-11 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
                   >
                     {copied === 'password' ? '✓' : '复制'}
                   </button>
@@ -150,13 +150,13 @@ export function EncryptionControl({ initialPassword, onChange, articleUrl }: Enc
                     type="text"
                     value={fullUrl}
                     readOnly
-                    className="flex-1 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--editor-soft)] text-[var(--editor-muted)] text-xs"
+                    className="min-h-11 min-w-11 flex-1 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--editor-soft)] text-[var(--editor-muted)] text-xs"
                   />
                   <Tooltip label="复制链接">
                     <button
                       type="button"
                       onClick={() => copyToClipboard(fullUrl, 'url')}
-                      className="px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
+                      className="min-h-11 min-w-11 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
                     >
                       {copied === 'url' ? '✓' : '复制'}
                     </button>

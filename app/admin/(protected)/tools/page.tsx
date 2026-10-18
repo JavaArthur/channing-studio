@@ -12,7 +12,7 @@ export default async function AdminToolsPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-[var(--editor-ink)]">工具管理</h1>
+        <h1 className="font-serif font-medium text-xl text-[var(--editor-ink)]">工具管理</h1>
         <p className="text-sm text-[var(--editor-muted)] mt-0.5">
           收藏的工具、仓库、Mac 软件 · 共 {tools.length} 件
         </p>

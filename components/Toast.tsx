@@ -74,10 +74,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
 function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   const bgColor = {
-    success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-    error: 'bg-rose-50 border-rose-200 text-rose-800',
-    warning: 'bg-amber-50 border-amber-200 text-amber-800',
-    info: 'bg-blue-50 border-blue-200 text-blue-800',
+    success: 'bg-[var(--success-soft-bg)] border-[var(--success-line)] text-[var(--success)]',
+    error: 'bg-[var(--danger-soft-bg)] border-[var(--danger-line)] text-[var(--danger)]',
+    warning: 'bg-[var(--warning-soft-bg)] border-[var(--warning-line)] text-[var(--warning)]',
+    info: 'bg-[var(--editor-soft)] border-[var(--editor-line)] text-[var(--editor-ink)]',
   }[toast.type]
 
   const icon = {
@@ -108,7 +108,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
       >{toast.action.label}</button>}
       <button
         onClick={onClose}
-        className="flex-shrink-0 opacity-50 hover:opacity-100 transition-opacity"
+        className="min-h-11 min-w-11 flex-shrink-0 opacity-50 hover:opacity-100 transition-opacity"
         aria-label="关闭"
       >
         <X className="w-4 h-4" />

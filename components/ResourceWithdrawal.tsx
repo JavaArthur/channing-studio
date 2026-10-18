@@ -27,7 +27,7 @@ export function ResourceWithdrawal({ kind, id }: { kind: 'tools' | 'prompts'; id
       <button
         disabled={busy}
         onClick={() => void withdraw()}
-        className="text-xs text-[var(--editor-accent)]"
+        className="min-h-11 min-w-11 text-xs text-[var(--editor-accent)]"
       >
         {busy ? '撤回中…' : '撤回公开'}
       </button>

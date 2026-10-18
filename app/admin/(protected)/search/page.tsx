@@ -11,23 +11,23 @@ export default async function SearchPage({
   const results = env.DB ? await searchBrain(env.DB, q) : []
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-semibold">搜索我的内容</h1>
+      <h1 className="font-serif font-medium text-3xl">搜索我的内容</h1>
       <form className="flex gap-3">
         <input
           name="q"
           aria-label="搜索我的内容"
           defaultValue={q}
-          className="brain-input"
+          className="min-h-11 min-w-11 brain-input"
           placeholder="笔记、想法、项目、文章、工具、提示词"
         />
-        <button className="brain-button">搜索</button>
+        <button className="min-h-11 min-w-11 brain-button">搜索</button>
       </form>
       <p className="text-sm text-[var(--editor-muted)]">
         仅你可见。{q && `找到 ${results.length} 项（最多显示 60 项）。`}
       </p>
       <div className="space-y-3">
         {results.map((item, i) => (
-          <Link key={i} href={item.href} className="brain-panel flex items-center justify-between">
+          <Link key={i} href={item.href} className="min-h-11 min-w-11 brain-panel flex items-center justify-between">
             <span>{item.title}</span>
             <span className="text-xs text-[var(--editor-muted)]">{item.kind}</span>
           </Link>

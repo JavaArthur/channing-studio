@@ -23,21 +23,21 @@ export default async function AdminPage() {
       <header className="flex flex-wrap items-end justify-between gap-6">
         <div>
           <p className="brain-kicker">Your personal space</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h1 className="font-serif font-medium mt-3 text-3xl tracking-tight sm:text-4xl">
             从这里，继续你的思考。
           </h1>
           <p className="mt-4 text-[var(--editor-muted)]">
             收集、整理、推进，把值得分享的部分带到外面。
           </p>
         </div>
-        <Link className="brain-button" href="/admin/inbox">
+        <Link className="min-h-11 min-w-11 brain-button" href="/admin/inbox">
           <Plus size={16} />
           收集想法
         </Link>
       </header>
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {cards.map(({ label, value, path, Icon }) => (
-          <Link href={path} key={path} className="brain-panel">
+          <Link href={path} key={path} className="min-h-11 min-w-11 brain-panel">
             <div className="flex justify-between text-[var(--editor-muted)]">
               <span className="text-sm">{label}</span>
               <Icon size={17} />
@@ -49,8 +49,8 @@ export default async function AdminPage() {
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
         <section className="brain-panel">
           <div className="flex justify-between">
-            <h2 className="font-semibold">继续写作</h2>
-            <Link href="/editor?new=1" className="text-sm text-[var(--editor-accent)]">
+            <h2 className="font-serif font-medium">继续写作</h2>
+            <Link href="/editor?new=1" className="min-h-11 min-w-11 inline-flex items-center text-sm text-[var(--editor-accent)]">
               新建文章 +
             </Link>
           </div>
@@ -59,7 +59,7 @@ export default async function AdminPage() {
               <Link
                 key={post.slug}
                 href={`/editor?edit=${encodeURIComponent(post.slug)}`}
-                className="flex items-center justify-between gap-4 py-4 text-sm"
+                className="min-h-11 min-w-11 flex items-center justify-between gap-4 py-4 text-sm"
               >
                 <span>{post.title}</span>
                 <ArrowUpRight size={16} />
@@ -74,15 +74,15 @@ export default async function AdminPage() {
         </section>
         <section className="brain-panel">
           <div className="flex justify-between">
-            <h2 className="font-semibold">项目下一步</h2>
-            <Link href="/admin/projects" className="text-sm text-[var(--editor-accent)]">
+            <h2 className="font-serif font-medium">项目下一步</h2>
+            <Link href="/admin/projects" className="min-h-11 min-w-11 inline-flex items-center text-sm text-[var(--editor-accent)]">
               全部项目 →
             </Link>
           </div>
           <div className="mt-5 space-y-5">
             {data.projects.map((project) => (
-              <Link key={project.id} href="/admin/projects" className="block">
-                <p className="text-sm font-medium">{project.title}</p>
+              <Link key={project.id} href="/admin/projects" className="min-h-11 min-w-11 block">
+                <p className="font-serif text-sm font-medium">{project.title}</p>
                 <p className="mt-2 text-sm text-[var(--editor-muted)]">
                   {project.next_action || '补充下一步行动'}
                 </p>
@@ -98,8 +98,8 @@ export default async function AdminPage() {
       </div>
       <section className="brain-panel">
         <div className="flex justify-between">
-          <h2 className="font-semibold">最近收集</h2>
-          <Link href="/admin/inbox" className="text-sm text-[var(--editor-accent)]">
+          <h2 className="font-serif font-medium">最近收集</h2>
+          <Link href="/admin/inbox" className="min-h-11 min-w-11 inline-flex items-center text-sm text-[var(--editor-accent)]">
             打开收件箱 →
           </Link>
         </div>
@@ -107,7 +107,7 @@ export default async function AdminPage() {
           {data.recent.map((item) => (
             <Link
               href="/admin/inbox"
-              className="flex justify-between gap-4 py-4 text-sm"
+              className="min-h-11 min-w-11 flex justify-between gap-4 py-4 text-sm"
               key={item.id}
             >
               <span>{item.title}</span>
@@ -128,9 +128,9 @@ export default async function AdminPage() {
         </div>
       </section>
       <footer className="flex flex-wrap gap-6 text-sm text-[var(--editor-muted)]">
-        <Link href="/admin/connections">Hermes 同步记录 →</Link>
-        <Link href="/admin/studio">管理公开首页 →</Link>
-        <Link href="/" target="_blank">
+        <Link href="/admin/connections" className="min-h-11 min-w-11 inline-flex items-center">Hermes 同步记录 →</Link>
+        <Link href="/admin/studio" className="min-h-11 min-w-11 inline-flex items-center">管理公开首页 →</Link>
+        <Link href="/" target="_blank" className="min-h-11 min-w-11 inline-flex items-center">
           查看公开网站 ↗
         </Link>
       </footer>

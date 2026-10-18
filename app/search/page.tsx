@@ -56,7 +56,7 @@ export default async function SearchPage({
 
       <main className="page-main flex-1 mx-auto max-w-3xl w-full px-4 sm:px-6 py-10 sm:py-14">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[var(--editor-ink)] mb-2">
+          <h1 className="font-serif font-medium text-2xl text-[var(--editor-ink)] mb-2">
             搜索结果
           </h1>
           {query ? (
@@ -93,14 +93,14 @@ export default async function SearchPage({
               >
                 <Link
                   href={`/${post.slug}`}
-                  className="block py-6 sm:py-7 relative transition-colors duration-200 hover:bg-[var(--editor-panel)]"
+                  className="min-h-11 min-w-11 block py-6 sm:py-7 relative transition-colors duration-200 hover:bg-[var(--editor-panel)]"
                 >
                   <div className="absolute left-0 top-6 bottom-6 w-1 bg-[var(--editor-accent)] opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
 
                   <div className="pl-0 group-hover:pl-5 transition-[padding] duration-200">
                     <h2
-                      className="text-lg sm:text-xl font-medium text-[var(--editor-ink)] leading-snug mb-2 group-hover:text-[var(--editor-accent)] transition-colors duration-200 flex items-center gap-2"
-                      style={{ fontFamily: 'Georgia, "Noto Serif SC", serif' }}
+                      className="font-serif font-medium text-lg sm:text-xl text-[var(--editor-ink)] leading-snug mb-2 group-hover:text-[var(--editor-accent)] transition-colors duration-200 flex items-center gap-2"
+                      style={{ fontFamily: 'var(--font-serif)' }}
                     >
                       {post.title}
                       {post.password && (
@@ -131,7 +131,7 @@ export default async function SearchPage({
                             return categorySlug ? (
                               <Link
                                 href={`/category/${categorySlug}`}
-                                className="px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors"
+                                className="min-h-11 min-w-11 inline-flex items-center px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors"
                               >
                                 {post.category}
                               </Link>

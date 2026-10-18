@@ -84,7 +84,7 @@ export function DownloadMarkdown({ title, html }: { title: string; html: string 
         <button
           onClick={handleDownload}
           aria-label="下载 Markdown"
-          className="inline-flex items-center justify-center rounded p-1 text-[var(--stone-gray)] hover:text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/8 transition-colors"
+          className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-md p-1 text-[var(--stone-gray)] hover:text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/8 transition-colors"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -97,7 +97,7 @@ export function DownloadMarkdown({ title, html }: { title: string; html: string 
         <button
           onClick={handleCopyWechat}
           aria-label="复制公众号格式"
-          className="inline-flex items-center justify-center rounded p-1 text-[var(--stone-gray)] hover:text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/8 transition-colors"
+          className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-md p-1 text-[var(--stone-gray)] hover:text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/8 transition-colors"
         >
           <Copy className="h-3.5 w-3.5" />
         </button>
@@ -106,7 +106,7 @@ export function DownloadMarkdown({ title, html }: { title: string; html: string 
         <button
           onClick={handleDownloadPdf}
           aria-label="下载 PDF"
-          className="inline-flex items-center justify-center rounded p-1 text-[var(--stone-gray)] hover:text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/8 transition-colors"
+          className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-md p-1 text-[var(--stone-gray)] hover:text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/8 transition-colors"
         >
           <FileDown className="h-3.5 w-3.5" />
         </button>

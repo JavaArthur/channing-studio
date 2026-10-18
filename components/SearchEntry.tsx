@@ -13,7 +13,7 @@ const SearchBar = dynamic(
       <Tooltip label="搜索">
         <Link
           href="/search"
-          className="inline-flex p-2 text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
+          className="min-h-11 min-w-11 inline-flex p-2 text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
           aria-label="搜索"
         >
           <Search className="w-[18px] h-[18px]" />

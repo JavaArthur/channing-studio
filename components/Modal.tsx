@@ -49,9 +49,9 @@ export function Modal({
   if (!isOpen) return null
 
   const buttonColor = {
-    danger: 'bg-rose-500 hover:bg-rose-600 text-white',
-    warning: 'bg-amber-500 hover:bg-amber-600 text-white',
-    info: 'bg-[var(--editor-accent)] hover:brightness-105 text-white',
+    danger: 'bg-[var(--danger-soft-bg)] text-[var(--danger)] ring-1 ring-[var(--danger-line)] hover:brightness-95',
+    warning: 'bg-[var(--warning-soft-bg)] text-[var(--warning)] ring-1 ring-[var(--warning-line)] hover:brightness-95',
+    info: 'bg-[var(--editor-accent)] hover:brightness-105 text-[var(--editor-accent-ink)]',
   }[type]
 
   const handleConfirm = async () => {
@@ -70,7 +70,7 @@ export function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--overlay)] animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget && !submitting) onClose()
       }}
@@ -81,13 +81,13 @@ export function Modal({
       >
         {/* Header */}
         <div className="flex items-start justify-between p-6 pb-4">
-          <h3 className="text-lg font-semibold text-[var(--editor-ink)]">
+          <h3 className="font-serif font-medium text-lg text-[var(--editor-ink)]">
             {title}
           </h3>
           <button
             onClick={onClose}
             disabled={submitting}
-            className="text-[var(--stone-gray)] hover:text-[var(--editor-ink)] transition-colors"
+            className="min-h-11 min-w-11 text-[var(--stone-gray)] hover:text-[var(--editor-ink)] transition-colors"
             aria-label="关闭"
           >
             <X className="w-5 h-5" />
@@ -108,7 +108,7 @@ export function Modal({
           <button
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-sm font-medium text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
+            className="min-h-11 min-w-11 px-4 py-2 text-sm font-medium text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
           >
             {cancelText}
           </button>
@@ -116,7 +116,7 @@ export function Modal({
             <button
               onClick={handleConfirm}
               disabled={submitting}
-              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${buttonColor}`}
+              className={`min-h-11 min-w-11 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${buttonColor}`}
             >
               {submitting ? '处理中…' : confirmText}
             </button>

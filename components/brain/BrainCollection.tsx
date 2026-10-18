@@ -97,10 +97,10 @@ export function BrainCollection({
       <header className="flex flex-wrap items-end justify-between gap-5">
         <div>
           <p className="brain-kicker">Personal workspace</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight">{title}</h1>
+          <h1 className="font-serif font-medium mt-3 text-3xl tracking-tight">{title}</h1>
           <p className="mt-3 text-sm text-[var(--editor-muted)]">{description}</p>
         </div>
-        <button className="brain-button" onClick={() => open()}>
+        <button className="min-h-11 min-w-11 brain-button brain-cta" onClick={() => open()}>
           <Plus size={16} />
           {action}
         </button>
@@ -108,21 +108,21 @@ export function BrainCollection({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <form className="flex gap-2" action={base}>
           <input
-            className="brain-input"
+            className="min-h-11 min-w-11 brain-input"
             name="q"
             defaultValue={query}
             placeholder="搜索标题"
             aria-label="搜索标题"
           />
           {archived && <input type="hidden" name="archived" value="1" />}
-          <button className="brain-secondary">搜索</button>
+          <button className="min-h-11 min-w-11 brain-secondary">搜索</button>
         </form>
         <div className="flex items-center gap-4 text-sm">
-          <Link className={!archived ? 'text-[var(--editor-accent)]' : ''} href={base}>
+          <Link className={`min-h-11 min-w-11 inline-flex items-center ${!archived ? 'text-[var(--editor-accent)]' : ''}`} href={base}>
             当前
           </Link>
           <Link
-            className={archived ? 'text-[var(--editor-accent)]' : ''}
+            className={`min-h-11 min-w-11 inline-flex items-center ${archived ? 'text-[var(--editor-accent)]' : ''}`}
             href={`${base}?archived=1`}
           >
             已归档
@@ -144,8 +144,8 @@ export function BrainCollection({
           }}
         >
           <div className="flex justify-between">
-            <h2 className="font-semibold">{editing ? '编辑' : action}</h2>
-            <button type="button" aria-label="关闭编辑" onClick={() => setEditing(undefined)}>
+            <h2 className="font-serif font-medium">{editing ? '编辑' : action}</h2>
+            <button type="button" aria-label="关闭编辑" onClick={() => setEditing(undefined)} className="min-h-11 min-w-11">
               <X size={18} />
             </button>
           </div>
@@ -155,7 +155,7 @@ export function BrainCollection({
               autoFocus
               required
               maxLength={200}
-              className="brain-input mt-2"
+              className="min-h-11 min-w-11 brain-input mt-2"
               value={form.title}
               onChange={(e) => set('title', e.target.value)}
             />
@@ -165,7 +165,7 @@ export function BrainCollection({
               <label className="block text-sm">
                 私人项目说明
                 <textarea
-                  className="brain-input mt-2 min-h-32"
+                  className="min-h-11 min-w-11 brain-input mt-2 min-h-32"
                   value={form.description}
                   onChange={(e) => set('description', e.target.value)}
                 />
@@ -173,7 +173,7 @@ export function BrainCollection({
               <label className="block text-sm">
                 下一步
                 <input
-                  className="brain-input mt-2"
+                  className="min-h-11 min-w-11 brain-input mt-2"
                   value={form.next_action}
                   onChange={(e) => set('next_action', e.target.value)}
                   placeholder="写下一件可以行动的小事"
@@ -182,7 +182,7 @@ export function BrainCollection({
               <label className="block text-sm">
                 状态
                 <select
-                  className="brain-input mt-2"
+                  className="min-h-11 min-w-11 brain-input mt-2"
                   value={form.status}
                   onChange={(e) => set('status', e.target.value)}
                 >
@@ -197,7 +197,7 @@ export function BrainCollection({
               <label className="block text-sm">
                 内容
                 <textarea
-                  className="brain-input mt-2 min-h-48"
+                  className="min-h-11 min-w-11 brain-input mt-2 min-h-48"
                   value={form.content}
                   onChange={(e) => set('content', e.target.value)}
                 />
@@ -206,7 +206,7 @@ export function BrainCollection({
                 来源链接（可选）
                 <input
                   type="url"
-                  className="brain-input mt-2"
+                  className="min-h-11 min-w-11 brain-input mt-2"
                   value={form.source_url}
                   onChange={(e) => set('source_url', e.target.value)}
                 />
@@ -218,7 +218,7 @@ export function BrainCollection({
               <LockKeyhole size={14} />
               仅自己可见
             </span>
-            <button className="brain-button" disabled={busy}>
+            <button className="min-h-11 min-w-11 brain-button brain-cta" disabled={busy}>
               保存
             </button>
           </div>
@@ -232,7 +232,7 @@ export function BrainCollection({
             void mutate({ id: publishing.id, action: 'publish', publish: true, ...publicForm })
           }}
         >
-          <h2 className="font-semibold">编辑公开版本</h2>
+          <h2 className="font-serif font-medium">编辑公开版本</h2>
           <p className="text-sm text-[var(--editor-muted)]">
             仅以下三个字段对外展示。私人说明和下一步不会公开。
           </p>
@@ -240,7 +240,7 @@ export function BrainCollection({
             公开标题
             <input
               required
-              className="brain-input mt-2"
+              className="min-h-11 min-w-11 brain-input mt-2"
               value={publicForm.title}
               onChange={(e) => setPublicForm((f) => ({ ...f, title: e.target.value }))}
             />
@@ -249,7 +249,7 @@ export function BrainCollection({
             公开摘要
             <textarea
               required
-              className="brain-input mt-2 min-h-24"
+              className="min-h-11 min-w-11 brain-input mt-2 min-h-24"
               value={publicForm.description}
               onChange={(e) => setPublicForm((f) => ({ ...f, description: e.target.value }))}
             />
@@ -259,16 +259,16 @@ export function BrainCollection({
             <input
               required
               type="url"
-              className="brain-input mt-2"
+              className="min-h-11 min-w-11 brain-input mt-2"
               value={publicForm.href}
               onChange={(e) => setPublicForm((f) => ({ ...f, href: e.target.value }))}
             />
           </label>
           <div className="flex gap-3">
-            <button className="brain-button" disabled={busy}>
+            <button className="min-h-11 min-w-11 brain-button brain-cta" disabled={busy}>
               确认发布这份内容
             </button>
-            <button type="button" className="brain-secondary" onClick={() => setPublishing(null)}>
+            <button type="button" className="min-h-11 min-w-11 brain-secondary" onClick={() => setPublishing(null)}>
               取消
             </button>
           </div>
@@ -278,7 +278,7 @@ export function BrainCollection({
         {items.length === 0 && (
           <div className="brain-panel col-span-full py-14 text-center">
             <BookOpen className="mx-auto mb-4 text-[var(--editor-muted)]" size={28} />
-            <h2 className="font-medium">
+            <h2 className="font-serif font-medium">
               {query
                 ? '没有找到匹配内容'
                 : archived
@@ -293,7 +293,7 @@ export function BrainCollection({
         {items.map((item) => (
           <article id={item.id} className="brain-panel scroll-mt-24" key={item.id}>
             <div className="flex justify-between gap-4">
-              <h2 className="font-semibold">{item.title}</h2>
+              <h2 className="font-serif font-medium">{item.title}</h2>
               <span className="shrink-0 text-xs text-[var(--editor-muted)]">
                 {item.published_payload
                   ? '已公开 · 独立版本'
@@ -312,7 +312,7 @@ export function BrainCollection({
             )}
             {item.source_url && (
               <a
-                className="mt-3 inline-flex items-center gap-1 text-sm text-[var(--editor-accent)]"
+                className="min-h-11 min-w-11 mt-3 inline-flex items-center gap-1 text-sm text-[var(--editor-accent)]"
                 href={item.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -323,7 +323,7 @@ export function BrainCollection({
             )}
             {item.target_id && (
               <Link
-                className="mt-3 block text-sm text-[var(--editor-accent)]"
+                className="min-h-11 min-w-11 mt-3 block text-sm text-[var(--editor-accent)]"
                 href={
                   item.target_type === 'post'
                     ? `/editor?edit=${encodeURIComponent(item.target_id)}`
@@ -334,20 +334,20 @@ export function BrainCollection({
               </Link>
             )}
             <div className="mt-6 flex flex-wrap gap-4 text-xs text-[var(--editor-muted)]">
-              <button disabled={busy} onClick={() => open(item)}>
+              <button disabled={busy} onClick={() => open(item)} className="min-h-11 min-w-11">
                 编辑
               </button>
               {kind === 'inbox' && item.status === 'inbox' && (
                 <>
                   <button
                     disabled={busy}
-                    onClick={() => void mutate({ id: item.id, action: 'convert', target: 'note' })}
+                    onClick={() => void mutate({ id: item.id, action: 'convert', target: 'note' })} className="min-h-11 min-w-11"
                   >
                     整理为笔记
                   </button>
                   <button
                     disabled={busy}
-                    className="inline-flex items-center gap-1"
+                    className="min-h-11 min-w-11 inline-flex items-center gap-1"
                     onClick={() => void mutate({ id: item.id, action: 'convert', target: 'post' })}
                   >
                     <FilePenLine size={13} />
@@ -358,14 +358,14 @@ export function BrainCollection({
               {kind === 'notes' && !archived && (
                 <button
                   disabled={busy}
-                  onClick={() => void mutate({ id: item.id, action: 'draft' })}
+                  onClick={() => void mutate({ id: item.id, action: 'draft' })} className="min-h-11 min-w-11"
                 >
                   转为文章草稿
                 </button>
               )}
               {kind === 'projects' && (
                 <>
-                  <button disabled={busy} onClick={() => openPublication(item)}>
+                  <button disabled={busy} onClick={() => openPublication(item)} className="min-h-11 min-w-11">
                     公开展示设置
                   </button>
                   {item.published_payload && (
@@ -373,7 +373,7 @@ export function BrainCollection({
                       disabled={busy}
                       onClick={() =>
                         void mutate({ id: item.id, action: 'publish', publish: false })
-                      }
+                      } className="min-h-11 min-w-11"
                     >
                       撤回公开
                     </button>
@@ -382,7 +382,7 @@ export function BrainCollection({
               )}
               <button
                 disabled={busy}
-                className="ml-auto inline-flex items-center gap-1"
+                className="min-h-11 min-w-11 ml-auto inline-flex items-center gap-1"
                 onClick={() =>
                   void mutate({ id: item.id, action: archived ? 'restore' : 'archive' })
                 }
@@ -399,7 +399,7 @@ export function BrainCollection({
         <nav className="flex justify-between text-sm">
           {page > 1 ? (
             <Link
-              href={`${base}?page=${page - 1}&q=${encodeURIComponent(query)}&archived=${archived ? '1' : '0'}`}
+              href={`${base}?page=${page - 1}&q=${encodeURIComponent(query)}&archived=${archived ? '1' : '0'}`} className="min-h-11 min-w-11 inline-flex items-center"
             >
               上一页
             </Link>
@@ -411,7 +411,7 @@ export function BrainCollection({
           </span>
           {page * 30 < total && (
             <Link
-              href={`${base}?page=${page + 1}&q=${encodeURIComponent(query)}&archived=${archived ? '1' : '0'}`}
+              href={`${base}?page=${page + 1}&q=${encodeURIComponent(query)}&archived=${archived ? '1' : '0'}`} className="min-h-11 min-w-11 inline-flex items-center"
             >
               下一页
             </Link>

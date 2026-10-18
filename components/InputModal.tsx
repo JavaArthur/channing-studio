@@ -34,11 +34,11 @@ export function InputModal({ open, title, placeholder, onConfirm, onCancel }: In
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30 px-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--overlay)] px-4"
       onClick={(e) => { if (e.target === e.currentTarget) onCancel() }}
     >
       <div className="w-full max-w-md rounded-xl bg-[var(--editor-panel)] p-5 shadow-xl">
-        <h3 className="text-sm font-semibold text-[var(--editor-ink)] mb-3">{title}</h3>
+        <h3 className="font-serif font-medium text-sm text-[var(--editor-ink)] mb-3">{title}</h3>
         <form
           onSubmit={(e) => { e.preventDefault(); handleSubmit() }}
           className="flex flex-col gap-3"
@@ -49,7 +49,7 @@ export function InputModal({ open, title, placeholder, onConfirm, onCancel }: In
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder={placeholder ?? '请输入链接'}
-            className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)] focus:ring-2 focus:ring-[var(--editor-accent)]/20 transition"
+            className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)] focus:ring-2 focus:ring-[var(--focus-ring)]/20 transition"
           />
           <div className="flex justify-end gap-2">
             <button
@@ -58,14 +58,14 @@ export function InputModal({ open, title, placeholder, onConfirm, onCancel }: In
                 setValue('')
                 onCancel()
               }}
-              className="px-3 py-1.5 text-sm rounded-md border border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition"
+              className="min-h-11 min-w-11 px-3 py-1.5 text-sm rounded-md border border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition"
             >
               取消
             </button>
             <button
               type="submit"
               disabled={!value.trim()}
-              className="px-3 py-1.5 text-sm rounded-md bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] hover:opacity-90 transition disabled:opacity-50"
+              className="min-h-11 min-w-11 px-3 py-1.5 text-sm rounded-md bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] hover:opacity-90 transition disabled:opacity-50"
             >
               确认
             </button>

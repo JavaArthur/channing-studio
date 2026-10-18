@@ -40,7 +40,7 @@ export function SiteHeader({ navLinks, initialTheme = 'light' }: Props) {
         target={link.openInNewTab ? '_blank' : undefined}
         rel={link.openInNewTab ? 'noopener noreferrer' : undefined}
         aria-current={pathname === link.url ? 'page' : undefined}
-        className="public-nav-link"
+        className="min-h-11 min-w-11 public-nav-link"
       >
         {link.label}
       </Link>
@@ -48,7 +48,7 @@ export function SiteHeader({ navLinks, initialTheme = 'light' }: Props) {
   return (
     <header className="public-header">
       <div className="public-header-inner">
-        <Link href="/" className="brand">
+        <Link href="/" className="min-h-11 min-w-11 brand">
           <span className="brand-mark">C.</span>
           <span>
             Channing<span className="brand-subtitle"> / Studio</span>
@@ -61,7 +61,7 @@ export function SiteHeader({ navLinks, initialTheme = 'light' }: Props) {
           <SearchEntry />
           <ThemeDropdown initialTheme={initialTheme} />
           <button
-            className="md:hidden"
+            className="min-h-11 min-w-11 md:hidden"
             aria-label={open ? '关闭菜单' : '打开菜单'}
             aria-expanded={open}
             onClick={() => setOpen(!open)}

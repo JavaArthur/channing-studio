@@ -29,7 +29,7 @@ export function PasswordPrompt({ error }: PasswordPromptProps) {
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-[var(--editor-ink)] mb-2">
+            <h2 className="font-serif font-medium text-xl text-[var(--editor-ink)] mb-2">
               此文章已加密
             </h2>
             <p className="text-sm text-[var(--editor-muted)]">
@@ -45,17 +45,17 @@ export function PasswordPrompt({ error }: PasswordPromptProps) {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="请输入密码"
                 autoFocus
-                className="w-full px-4 py-3 rounded-lg border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--editor-accent)] focus:border-transparent transition"
+                className="min-h-11 min-w-11 w-full px-4 py-3 rounded-lg border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:border-transparent transition"
               />
               {error && (
-                <p className="mt-2 text-sm text-rose-600">{error}</p>
+                <p className="mt-2 text-sm text-[var(--danger)]">{error}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={!password.trim()}
-              className="w-full px-4 py-3 rounded-lg bg-[var(--editor-accent)] text-white font-medium hover:brightness-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-11 min-w-11 w-full px-4 py-3 rounded-lg bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] font-medium hover:brightness-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               解锁文章
             </button>

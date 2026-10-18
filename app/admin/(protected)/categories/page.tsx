@@ -19,7 +19,7 @@ export default async function CategoriesPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-[var(--editor-ink)]">分类管理</h1>
+        <h1 className="font-serif font-medium text-xl text-[var(--editor-ink)]">分类管理</h1>
         <p className="text-sm text-[var(--editor-muted)] mt-0.5">
           共 {categories.length} 个分类
         </p>

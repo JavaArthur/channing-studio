@@ -57,7 +57,7 @@ export default async function ToolsPage() {
       <section>
         <div className="mb-8">
           <p className="studio-eyebrow">TOOLS</p>
-          <h2 className="studio-section-title mt-3">工具收藏</h2>
+          <h2 className="font-serif font-medium studio-section-title mt-3">工具收藏</h2>
         </div>
         {tools.length === 0 ? (
           <div className="studio-empty-state">
@@ -85,7 +85,7 @@ export default async function ToolsPage() {
                         src={tool.icon}
                         alt=""
                         loading="lazy"
-                        className="w-9 h-9 rounded-lg object-cover border border-[var(--editor-line)] bg-white flex-shrink-0"
+                        className="w-9 h-9 rounded-lg object-cover border border-[var(--editor-line)] bg-[var(--editor-panel)] flex-shrink-0"
                       />
                     ) : (
                       <div className="w-9 h-9 rounded-lg bg-[var(--editor-soft)] flex items-center justify-center text-[var(--stone-gray)] text-sm font-semibold flex-shrink-0">
@@ -94,7 +94,7 @@ export default async function ToolsPage() {
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h2 className="font-semibold text-[var(--editor-ink)] leading-snug truncate group-hover:text-[var(--editor-accent)] transition-colors">
+                        <h2 className="font-serif font-medium text-[var(--editor-ink)] leading-snug truncate group-hover:text-[var(--editor-accent)] transition-colors">
                           {tool.name}
                         </h2>
                         {tool.is_pinned === 1 && (
@@ -102,7 +102,7 @@ export default async function ToolsPage() {
                         )}
                       </div>
                       <div className="text-xs text-[var(--stone-gray)] mt-0.5 flex items-center gap-1.5 flex-wrap">
-                        <span className="px-1.5 py-0.5 rounded bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] border border-[var(--editor-accent)]/15">
+                        <span className="px-1.5 py-0.5 rounded-md bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] border border-[var(--editor-accent)]/15">
                           {TYPE_LABELS[tool.type] ?? tool.type}
                         </span>
                         {h && <span className="truncate">{h}</span>}

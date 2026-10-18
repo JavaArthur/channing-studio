@@ -187,7 +187,7 @@ export function AiActionsManager() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[var(--editor-ink)]">AI 快捷操作</h3>
+        <h3 className="font-serif font-medium text-base text-[var(--editor-ink)]">AI 快捷操作</h3>
         <button
           type="button"
           onClick={() => {
@@ -195,7 +195,7 @@ export function AiActionsManager() {
             setEditAction({ ...emptyAction, profile_id: defaultProfile?.id ?? null })
             setIsNew(true)
           }}
-          className="rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-white transition hover:brightness-105"
+          className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-[var(--editor-accent-ink)] transition hover:brightness-105"
         >
           + 新增操作
         </button>
@@ -224,7 +224,7 @@ export function AiActionsManager() {
                         type="button"
                         disabled={idx === 0}
                         onClick={() => moveAction(idx, 'up')}
-                        className="rounded px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
+                        className="min-h-11 min-w-11 rounded-md px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
                         aria-label="上移一行"
                       >↑</button>
                     </Tooltip>
@@ -233,7 +233,7 @@ export function AiActionsManager() {
                         type="button"
                         disabled={idx === actions.length - 1}
                         onClick={() => moveAction(idx, 'down')}
-                        className="rounded px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
+                        className="min-h-11 min-w-11 rounded-md px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
                         aria-label="下移一行"
                       >↓</button>
                     </Tooltip>
@@ -247,7 +247,7 @@ export function AiActionsManager() {
                   <button
                     type="button"
                     onClick={() => toggleEnabled(action)}
-                    className={`inline-block h-4 w-4 rounded-full transition ${action.is_enabled ? 'bg-emerald-500' : 'bg-[var(--editor-line)]'}`}
+                    className={`min-h-11 min-w-11 inline-block h-4 w-4 rounded-full transition ${action.is_enabled ? 'bg-[var(--success)]' : 'bg-[var(--editor-line)]'}`}
                     title={action.is_enabled ? '已启用（点击禁用）' : '已禁用（点击启用）'}
                     aria-label={action.is_enabled ? '禁用此操作' : '启用此操作'}
                   />
@@ -256,12 +256,12 @@ export function AiActionsManager() {
                   <button
                     type="button"
                     onClick={() => { setEditAction({ ...action }); setIsNew(false) }}
-                    className="text-xs text-[var(--editor-accent)] hover:underline"
+                    className="min-h-11 min-w-11 text-xs text-[var(--editor-accent)] hover:underline"
                   >编辑</button>
                   <button
                     type="button"
                     onClick={() => setDeleteTarget(action)}
-                    className="ml-2 text-xs text-rose-500 hover:underline"
+                    className="min-h-11 min-w-11 ml-2 text-xs text-[var(--danger)] hover:underline"
                   >删除</button>
                 </td>
               </tr>
@@ -271,9 +271,9 @@ export function AiActionsManager() {
       </div>
 
       {editAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setEditAction(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)]" onClick={() => setEditAction(null)}>
           <div className="mx-4 w-full max-w-lg rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-6 shadow-xl" onClick={e => e.stopPropagation()}>
-            <h3 className="mb-4 text-lg font-semibold text-[var(--editor-ink)]">
+            <h3 className="font-serif font-medium mb-4 text-lg text-[var(--editor-ink)]">
               {isNew ? '新增 AI 操作' : '编辑 AI 操作'}
             </h3>
 
@@ -284,7 +284,7 @@ export function AiActionsManager() {
                   type="text"
                   value={editAction.action_key || ''}
                   onChange={e => setEditAction({ ...editAction, action_key: e.target.value })}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
               </div>
 
@@ -294,7 +294,7 @@ export function AiActionsManager() {
                   type="text"
                   value={editAction.label || ''}
                   onChange={e => setEditAction({ ...editAction, label: e.target.value })}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
               </div>
 
@@ -304,7 +304,7 @@ export function AiActionsManager() {
                   type="text"
                   value={editAction.description || ''}
                   onChange={e => setEditAction({ ...editAction, description: e.target.value })}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
               </div>
 
@@ -314,7 +314,7 @@ export function AiActionsManager() {
                   rows={5}
                   value={editAction.prompt || ''}
                   onChange={e => setEditAction({ ...editAction, prompt: e.target.value })}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
               </div>
 
@@ -328,7 +328,7 @@ export function AiActionsManager() {
                     step={0.1}
                     value={editAction.temperature ?? 0.6}
                     onChange={e => setEditAction({ ...editAction, temperature: Number(e.target.value) })}
-                    className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                    className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                   />
                 </div>
                 <div>
@@ -355,7 +355,7 @@ export function AiActionsManager() {
               <button
                 type="button"
                 onClick={() => setEditAction(null)}
-                className="rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
+                className="min-h-11 min-w-11 rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
               >
                 取消
               </button>
@@ -363,7 +363,7 @@ export function AiActionsManager() {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-lg bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-white hover:brightness-105 disabled:opacity-50"
+                className="min-h-11 min-w-11 rounded-lg bg-cta px-4 py-2 text-sm font-semibold text-cta-ink hover:bg-cta-hover disabled:opacity-50"
               >
                 {saving ? '保存中…' : '保存'}
               </button>

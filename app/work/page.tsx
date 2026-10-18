@@ -40,10 +40,10 @@ export default async function WorkPage() {
     >
       <div className="grid gap-5 md:grid-cols-2">
         {content.projects.filter((project) => project.visible).map((project) => (
-          <StudioLink className="block" key={project.id} href={project.href}>
+          <StudioLink className="min-h-11 min-w-11 block" key={project.id} href={project.href}>
             <article className="studio-card h-full">
               <StudioCardLabel>PROJECT / {project.id}</StudioCardLabel>
-              <h2 className="studio-card-title mt-8">{project.title}</h2>
+              <h2 className="font-serif font-medium studio-card-title mt-8">{project.title}</h2>
               <p className="studio-card-description mt-4">{project.description}</p>
               <div className="mt-7 flex flex-wrap gap-2">
                 {project.tags.map((tag) => <span key={tag} className="studio-tag">{tag}</span>)}

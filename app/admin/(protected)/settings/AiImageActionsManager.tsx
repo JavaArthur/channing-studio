@@ -209,7 +209,7 @@ export function AiImageActionsManager() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[var(--editor-ink)]">图片快捷提示</h3>
+        <h3 className="font-serif font-medium text-base text-[var(--editor-ink)]">图片快捷提示</h3>
         <button
           type="button"
           onClick={() => {
@@ -217,7 +217,7 @@ export function AiImageActionsManager() {
             setEditAction({ ...emptyAction, profile_id: defaultProfile?.id ?? null })
             setIsNew(true)
           }}
-          className="rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-white transition hover:brightness-105"
+          className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-[var(--editor-accent-ink)] transition hover:brightness-105"
         >
           + 新增提示
         </button>
@@ -248,7 +248,7 @@ export function AiImageActionsManager() {
                         type="button"
                         disabled={index === 0}
                         onClick={() => moveAction(index, 'up')}
-                        className="rounded px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
+                        className="min-h-11 min-w-11 rounded-md px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
                         aria-label="上移一行"
                       >
                         ↑
@@ -259,7 +259,7 @@ export function AiImageActionsManager() {
                         type="button"
                         disabled={index === actions.length - 1}
                         onClick={() => moveAction(index, 'down')}
-                        className="rounded px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
+                        className="min-h-11 min-w-11 rounded-md px-1 text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] disabled:opacity-30"
                         aria-label="下移一行"
                       >
                         ↓
@@ -277,7 +277,7 @@ export function AiImageActionsManager() {
                   <button
                     type="button"
                     onClick={() => toggleEnabled(action)}
-                    className={`inline-block h-4 w-4 rounded-full transition ${action.is_enabled ? 'bg-emerald-500' : 'bg-[var(--editor-line)]'}`}
+                    className={`min-h-11 min-w-11 inline-block h-4 w-4 rounded-full transition ${action.is_enabled ? 'bg-[var(--success)]' : 'bg-[var(--editor-line)]'}`}
                     title={action.is_enabled ? '已启用（点击禁用）' : '已禁用（点击启用）'}
                     aria-label={action.is_enabled ? '禁用此操作' : '启用此操作'}
                   />
@@ -289,14 +289,14 @@ export function AiImageActionsManager() {
                       setEditAction({ ...action })
                       setIsNew(false)
                     }}
-                    className="text-xs text-[var(--editor-accent)] hover:underline"
+                    className="min-h-11 min-w-11 text-xs text-[var(--editor-accent)] hover:underline"
                   >
                     编辑
                   </button>
                   <button
                     type="button"
                     onClick={() => setDeleteTarget(action)}
-                    className="ml-2 text-xs text-rose-500 hover:underline"
+                    className="min-h-11 min-w-11 ml-2 text-xs text-[var(--danger)] hover:underline"
                   >
                     删除
                   </button>
@@ -308,9 +308,9 @@ export function AiImageActionsManager() {
       </div>
 
       {editAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setEditAction(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)]" onClick={() => setEditAction(null)}>
           <div className="mx-4 w-full max-w-2xl rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-6 shadow-xl" onClick={(event) => event.stopPropagation()}>
-            <h3 className="mb-4 text-lg font-semibold text-[var(--editor-ink)]">
+            <h3 className="font-serif font-medium mb-4 text-lg text-[var(--editor-ink)]">
               {isNew ? '新增图片提示' : '编辑图片提示'}
             </h3>
 
@@ -321,7 +321,7 @@ export function AiImageActionsManager() {
                   type="text"
                   value={editAction.action_key || ''}
                   onChange={(event) => setEditAction({ ...editAction, action_key: event.target.value })}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
               </div>
 
@@ -331,7 +331,7 @@ export function AiImageActionsManager() {
                   type="text"
                   value={editAction.label || ''}
                   onChange={(event) => setEditAction({ ...editAction, label: event.target.value })}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
               </div>
 
@@ -341,7 +341,7 @@ export function AiImageActionsManager() {
                   type="text"
                   value={editAction.description || ''}
                   onChange={(event) => setEditAction({ ...editAction, description: event.target.value })}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
               </div>
 
@@ -351,7 +351,7 @@ export function AiImageActionsManager() {
                   rows={6}
                   value={editAction.prompt || ''}
                   onChange={(event) => setEditAction({ ...editAction, prompt: event.target.value })}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
                 <div className="mt-1 text-xs text-[var(--editor-muted)]">
                   这里写的是风格模板。编辑器里用户输入的主题与正文上下文会自动拼接进去。
@@ -367,10 +367,10 @@ export function AiImageActionsManager() {
                         key={option.value}
                         type="button"
                         onClick={() => setEditAction({ ...editAction, aspect_ratio: option.value })}
-                        className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                        className={`min-h-11 min-w-11 rounded-full border px-3 py-1.5 text-sm transition ${
                           (editAction.aspect_ratio || 'auto') === option.value
                             ? 'border-[var(--editor-accent)] bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
-                            : 'border-[var(--editor-line)] bg-white text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
+                            : 'border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
                         }`}
                       >
                         {option.label}
@@ -385,7 +385,7 @@ export function AiImageActionsManager() {
                     <select
                       value={editAction.resolution || 'auto'}
                       onChange={(event) => setEditAction({ ...editAction, resolution: event.target.value as AIImageResolution })}
-                      className="w-full rounded-lg border border-[var(--editor-line)] bg-white px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                      className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                     >
                       {AI_IMAGE_RESOLUTION_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>{option.label}</option>
@@ -421,7 +421,7 @@ export function AiImageActionsManager() {
               <button
                 type="button"
                 onClick={() => setEditAction(null)}
-                className="rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
+                className="min-h-11 min-w-11 rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
               >
                 取消
               </button>
@@ -429,7 +429,7 @@ export function AiImageActionsManager() {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-lg bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-white hover:brightness-105 disabled:opacity-50"
+                className="min-h-11 min-w-11 rounded-lg bg-cta px-4 py-2 text-sm font-semibold text-cta-ink hover:bg-cta-hover disabled:opacity-50"
               >
                 {saving ? '保存中…' : '保存'}
               </button>

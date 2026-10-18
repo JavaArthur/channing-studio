@@ -19,7 +19,7 @@ export function PromptCopyButton({ prompt }: { prompt: string }) {
     <button
       type="button"
       onClick={copy}
-      className="studio-button studio-button-secondary min-h-10 px-4 text-sm"
+      className="min-h-11 min-w-11 studio-button studio-button-secondary px-4 text-sm"
       aria-label="复制提示词"
     >
       {copied ? '已复制' : '复制提示词'}

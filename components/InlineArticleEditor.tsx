@@ -354,7 +354,7 @@ export function InlineArticleEditor({
         type="file"
         accept="image/*"
         multiple
-        className="hidden"
+        className="min-h-11 min-w-11 hidden"
         onChange={(event) => {
           void handleSelectedFiles(event.target.files)
         }}
@@ -364,7 +364,7 @@ export function InlineArticleEditor({
         type="file"
         accept="video/*,audio/*,.pdf,.zip,.rar,.7z,.epub,.mobi,.azw,.azw3,.txt,image/*"
         multiple
-        className="hidden"
+        className="min-h-11 min-w-11 hidden"
         onChange={(event) => {
           void handleSelectedFiles(event.target.files)
         }}
@@ -377,13 +377,13 @@ export function InlineArticleEditor({
             <button
               type="button"
               onClick={onExitReading}
-              className="px-2 py-1 rounded-md border border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition"
+              className="min-h-11 min-w-11 px-2 py-1 rounded-md border border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition"
             >
               阅读
             </button>
             <Link
               href="/admin"
-              className="px-2 py-1 rounded-md border border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition"
+              className="min-h-11 min-w-11 inline-flex items-center px-2 py-1 rounded-md border border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition"
             >
               后台
             </Link>
@@ -399,7 +399,7 @@ export function InlineArticleEditor({
             <button
               type="button"
               onClick={(e) => openDocumentAIModal(e.currentTarget)}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)]"
+              className="min-h-11 min-w-11 inline-flex h-7 w-7 items-center justify-center rounded-md text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)]"
               aria-label="Ask AI（基于标题和正文）"
             >
               <WandSparkles className="h-3.5 w-3.5" />
@@ -409,7 +409,7 @@ export function InlineArticleEditor({
             <button
               type="button"
               onClick={openDocumentImageModal}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-md text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)]"
+              className="min-h-11 min-w-11 inline-flex h-7 w-7 items-center justify-center rounded-md text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)]"
               aria-label="生成图片"
             >
               <ImageIcon className="h-3.5 w-3.5" />
@@ -417,7 +417,7 @@ export function InlineArticleEditor({
           </Tooltip>
         </div>
         {feedback ? (
-          <span className={`font-medium ${feedback.type === 'success' ? 'text-emerald-600' : 'text-rose-600'}`}>
+          <span className={`font-medium ${feedback.type === 'success' ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
             {feedback.message}
           </span>
         ) : dirty ? (
@@ -427,7 +427,7 @@ export function InlineArticleEditor({
               type="button"
               onClick={handleDiscard}
               disabled={saving}
-              className="px-2 py-1 rounded-md border border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition disabled:opacity-50"
+              className="min-h-11 min-w-11 px-2 py-1 rounded-md border border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition disabled:opacity-50"
             >
               放弃
             </button>
@@ -435,7 +435,7 @@ export function InlineArticleEditor({
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="px-2 py-1 rounded-md bg-[var(--editor-ink)] text-white font-medium hover:brightness-110 transition disabled:opacity-50"
+              className="min-h-11 min-w-11 px-2 py-1 rounded-md bg-cta text-cta-ink font-medium hover:bg-cta-hover transition disabled:opacity-50"
             >
               {saving ? '保存中…' : '保存'}
             </button>
@@ -463,8 +463,8 @@ export function InlineArticleEditor({
           editorRef.current?.chain().focus().run()
           void handleSelectedFiles(files)
         }}
-        className="editor-title-textarea mb-2 block w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-2xl font-bold leading-tight text-[var(--editor-ink)] outline-none shadow-none focus:outline-none focus-visible:outline-none sm:text-4xl"
-        style={{ fontFamily: 'Georgia, "Noto Serif SC", serif' }}
+        className="font-serif font-medium min-h-11 min-w-11 editor-title-textarea mb-2 block w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-2xl leading-tight text-[var(--editor-ink)] outline-none shadow-none focus:outline-none focus-visible:outline-none sm:text-4xl"
+        style={{ fontFamily: 'var(--font-serif)' }}
         placeholder="文章标题"
       />
 

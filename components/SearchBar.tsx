@@ -112,7 +112,7 @@ export function SearchBar() {
       <Tooltip label="搜索 (⌘K)">
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
+          className="min-h-11 min-w-11 p-2 text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
           aria-label="搜索"
         >
           <Search className="w-[18px] h-[18px]" />
@@ -125,11 +125,11 @@ export function SearchBar() {
           onClick={(e) => { if (e.target === e.currentTarget) setIsOpen(false) }}
         >
           {/* 遮罩 */}
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" onClick={() => setIsOpen(false)} />
+          <div className="absolute inset-0 bg-[var(--overlay)] backdrop-blur-[2px]" onClick={() => setIsOpen(false)} />
 
           {/* 搜索面板 */}
           <div className="relative mx-auto mt-[12vh] sm:mt-[18vh] w-[92vw] max-w-[560px]">
-            <div className="bg-white rounded-2xl shadow-[0_25px_60px_-12px_rgba(0,0,0,0.25)] border border-black/[0.06] overflow-hidden">
+            <div className="bg-[var(--editor-panel)] rounded-2xl shadow-whisper border border-[var(--editor-line)] overflow-hidden">
 
               {/* 输入区 */}
               <form onSubmit={handleSubmit} onKeyDown={handleKeyNav}>
@@ -141,7 +141,7 @@ export function SearchBar() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="搜索文章..."
-                    className="flex-1 text-base bg-transparent outline-none placeholder:text-[var(--stone-gray)]/60 text-[var(--editor-ink)]"
+                    className="min-h-11 min-w-11 flex-1 text-base bg-transparent outline-none placeholder:text-[var(--stone-gray)]/60 text-[var(--editor-ink)]"
                     autoComplete="off"
                     spellCheck={false}
                   />
@@ -150,7 +150,7 @@ export function SearchBar() {
                       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                     </svg>
                   ) : (
-                    <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] text-[var(--stone-gray)] bg-[var(--editor-soft)] border border-[var(--editor-line)] rounded font-mono">
+                    <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] text-[var(--stone-gray)] bg-[var(--editor-soft)] border border-[var(--editor-line)] rounded-md font-mono">
                       ESC
                     </kbd>
                   )}
@@ -170,7 +170,7 @@ export function SearchBar() {
                       key={result.slug}
                       href={`/${result.slug}`}
                       onClick={() => setIsOpen(false)}
-                      className={`block mx-2 px-3 py-2.5 rounded-lg transition-colors ${
+                      className={`min-h-11 min-w-11 block mx-2 px-3 py-2.5 rounded-lg transition-colors ${
                         index === selectedIndex
                           ? 'bg-[var(--editor-accent)]/[0.06]'
                           : 'hover:bg-[var(--editor-panel)]'
@@ -178,7 +178,7 @@ export function SearchBar() {
                       onMouseEnter={() => setSelectedIndex(index)}
                     >
                       <div className="flex items-center gap-2 mb-0.5">
-                        <h3 className="text-sm font-medium text-[var(--editor-ink)] flex-1 line-clamp-1">
+                        <h3 className="font-serif font-medium text-sm text-[var(--editor-ink)] flex-1 line-clamp-1">
                           {result.title}
                         </h3>
                         <span className="text-[11px] text-[var(--stone-gray)] tabular-nums flex-shrink-0">
@@ -191,7 +191,7 @@ export function SearchBar() {
                         </p>
                       )}
                       {result.category && (
-                        <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] bg-[var(--editor-accent)]/8 text-[var(--editor-accent)]">
+                        <span className="inline-block mt-1 px-1.5 py-0.5 rounded-md text-[10px] bg-[var(--editor-accent)]/8 text-[var(--editor-accent)]">
                           {result.category}
                         </span>
                       )}
@@ -215,15 +215,15 @@ export function SearchBar() {
               {results.length > 0 && (
                 <div className="flex items-center gap-4 px-5 py-2.5 border-t border-[var(--editor-line)] bg-[var(--editor-panel)]/50">
                   <div className="flex items-center gap-1.5 text-[11px] text-[var(--stone-gray)]">
-                    <kbd className="px-1 py-0.5 bg-white border border-[var(--editor-line)] rounded text-[10px] font-mono">↑↓</kbd>
+                    <kbd className="px-1 py-0.5 bg-[var(--editor-panel)] border border-[var(--editor-line)] rounded-md text-[10px] font-mono">↑↓</kbd>
                     <span>选择</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-[var(--stone-gray)]">
-                    <kbd className="px-1 py-0.5 bg-white border border-[var(--editor-line)] rounded text-[10px] font-mono">↵</kbd>
+                    <kbd className="px-1 py-0.5 bg-[var(--editor-panel)] border border-[var(--editor-line)] rounded-md text-[10px] font-mono">↵</kbd>
                     <span>打开</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-[var(--stone-gray)]">
-                    <kbd className="px-1 py-0.5 bg-white border border-[var(--editor-line)] rounded text-[10px] font-mono">esc</kbd>
+                    <kbd className="px-1 py-0.5 bg-[var(--editor-panel)] border border-[var(--editor-line)] rounded-md text-[10px] font-mono">esc</kbd>
                     <span>关闭</span>
                   </div>
                 </div>

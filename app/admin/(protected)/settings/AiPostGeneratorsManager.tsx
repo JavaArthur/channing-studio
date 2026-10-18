@@ -243,7 +243,7 @@ export function AiPostGeneratorsManager() {
   return (
     <div className="space-y-5">
       <div className="rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-5">
-        <h3 className="text-base font-semibold text-[var(--editor-ink)]">文章元数据 AI 生成</h3>
+        <h3 className="font-serif font-medium text-base text-[var(--editor-ink)]">文章元数据 AI 生成</h3>
         <p className="mt-2 text-sm leading-6 text-[var(--editor-muted)]">
           为摘要、标签、slug、封面分别绑定不同模型和提示词。文本字段可选择 Workers AI 或后台已配置的文本模型；封面可选择 Workers AI 图片模型或后台已配置的图片模型。
         </p>
@@ -265,7 +265,7 @@ export function AiPostGeneratorsManager() {
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
-                <div className="text-base font-semibold text-[var(--editor-ink)]">{item.label}</div>
+                <div className="font-serif text-base font-medium text-[var(--editor-ink)]">{item.label}</div>
                 <p className="mt-1 text-sm leading-6 text-[var(--editor-muted)]">{item.description}</p>
               </div>
               <label className="inline-flex items-center gap-2 text-sm text-[var(--editor-ink)]">
@@ -273,7 +273,7 @@ export function AiPostGeneratorsManager() {
                   type="checkbox"
                   checked={item.is_enabled === 1}
                   onChange={(event) => updateItem(target, { is_enabled: event.target.checked ? 1 : 0 })}
-                  className="h-4 w-4 rounded border-[var(--editor-line)]"
+                  className="min-h-11 min-w-11 h-4 w-4 rounded-md border-[var(--editor-line)]"
                 />
                 启用
               </label>
@@ -287,7 +287,7 @@ export function AiPostGeneratorsManager() {
                   onChange={(event) => updateItem(target, {
                     provider_mode: event.target.value === 'profile' ? 'profile' : 'workers_ai',
                   })}
-                  className="w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 >
                   <option value="workers_ai">Workers AI</option>
                   <option value="profile">{isCover ? '已配置图片模型' : '已配置文本模型'}</option>
@@ -302,7 +302,7 @@ export function AiPostGeneratorsManager() {
                       type="button"
                       onClick={() => void loadWorkersModels(target)}
                       disabled={loadingWorkersModelsTarget !== null}
-                      className="text-xs font-medium text-[var(--editor-accent)] hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                      className="min-h-11 min-w-11 text-xs font-medium text-[var(--editor-accent)] hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {loadingWorkersModelsTarget === target ? '拉取中…' : '拉取模型'}
                     </button>
@@ -310,7 +310,7 @@ export function AiPostGeneratorsManager() {
                   <input
                     value={item.workers_model}
                     onChange={(event) => updateItem(target, { workers_model: event.target.value })}
-                    className="w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                    className="min-h-11 min-w-11 w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                     placeholder={isCover ? '@cf/black-forest-labs/flux-1-schnell' : '@cf/meta/llama-3.1-8b-instruct'}
                   />
                   {workersModelOptions.length > 0 ? (
@@ -357,7 +357,7 @@ export function AiPostGeneratorsManager() {
                     <select
                       value={item.aspect_ratio}
                       onChange={(event) => updateItem(target, { aspect_ratio: event.target.value as AIImageAspectRatio })}
-                      className="w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                      className="min-h-11 min-w-11 w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                     >
                       {AI_IMAGE_ASPECT_RATIO_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -371,7 +371,7 @@ export function AiPostGeneratorsManager() {
                     <select
                       value={item.resolution}
                       onChange={(event) => updateItem(target, { resolution: event.target.value as AIImageResolution })}
-                      className="w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                      className="min-h-11 min-w-11 w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                     >
                       {AI_IMAGE_RESOLUTION_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -392,7 +392,7 @@ export function AiPostGeneratorsManager() {
                       step={0.1}
                       value={item.temperature}
                       onChange={(event) => updateItem(target, { temperature: Number(event.target.value) })}
-                      className="w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                      className="min-h-11 min-w-11 w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                     />
                   </div>
                   <div>
@@ -405,7 +405,7 @@ export function AiPostGeneratorsManager() {
                         const nextValue = Number(event.target.value.replace(/[^\d]/g, ''))
                         updateItem(target, { max_tokens: Number.isFinite(nextValue) && nextValue > 0 ? nextValue : 0 })
                       }}
-                      className="w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                      className="min-h-11 min-w-11 w-full rounded-xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                     />
                   </div>
                 </>
@@ -418,7 +418,7 @@ export function AiPostGeneratorsManager() {
                 rows={isCover ? 7 : 6}
                 value={item.prompt}
                 onChange={(event) => updateItem(target, { prompt: event.target.value })}
-                className="w-full rounded-2xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-3 text-sm leading-6 text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                className="min-h-11 min-w-11 w-full rounded-2xl border border-[var(--editor-line)] bg-[var(--background)] px-3 py-3 text-sm leading-6 text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
               />
             </div>
 
@@ -436,7 +436,7 @@ export function AiPostGeneratorsManager() {
                 type="button"
                 onClick={() => void saveItem(target)}
                 disabled={savingTarget === target}
-                className="inline-flex items-center justify-center rounded-xl bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
+                className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-xl bg-cta px-4 py-2 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {savingTarget === target ? '保存中…' : '保存设置'}
               </button>

@@ -30,9 +30,9 @@ function VideoComponent({ node }: NodeViewProps) {
           </div>
         )}
         {hasError ? (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
-            <p className="text-sm text-red-600">视频加载失败</p>
-            <p className="text-xs text-red-500 mt-1">{src}</p>
+          <div className="p-4 bg-[var(--danger-soft-bg)] border border-[var(--danger-line)] rounded-lg text-center">
+            <p className="text-sm text-[var(--danger)]">视频加载失败</p>
+            <p className="text-xs text-[var(--danger)] mt-1">{src}</p>
           </div>
         ) : (
           <video

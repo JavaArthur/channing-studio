@@ -160,22 +160,22 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
   }
 
   const inputCls =
-    'w-full px-3 py-2 rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-sm text-[var(--editor-ink)] focus:outline-none focus:border-[var(--editor-accent)] transition-colors'
+    'w-full px-3 py-2 rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-sm text-[var(--editor-ink)] focus:outline-none focus:border-[var(--focus-ring)] transition-colors'
 
   return (
     <div className="space-y-8">
       <p className="text-sm text-[var(--editor-muted)]">新收藏默认私密。保存只修改工作版本，点击“保存并公开”才更新公开内容。</p>
-      <button className="brain-button" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
+      <button className="min-h-11 min-w-11 brain-button" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
       {/* 录入表单 */}
       <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[var(--editor-ink)]">
+          <h2 className="font-serif font-medium text-sm text-[var(--editor-ink)]">
             {isEditing ? '编辑工具' : '添加工具'}
           </h2>
           {isEditing && (
             <button
               onClick={() => setForm(EMPTY)}
-              className="text-xs text-[var(--editor-muted)] hover:text-[var(--editor-ink)]"
+              className="min-h-11 min-w-11 text-xs text-[var(--editor-muted)] hover:text-[var(--editor-ink)]"
             >
               取消编辑
             </button>
@@ -185,7 +185,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
         {/* URL + 自动抓取 */}
         <div className="flex gap-2">
           <input
-            className={inputCls}
+            className={`min-h-11 min-w-11 ${inputCls}`}
             placeholder="贴入 URL（可选，留空表示无链接的东西）"
             value={form.url}
             onChange={(e) => setForm({ ...form, url: e.target.value })}
@@ -193,7 +193,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
           <button
             onClick={autoFetch}
             disabled={fetching}
-            className="px-4 py-2 rounded-lg bg-[var(--editor-soft)] text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-line)] transition-colors whitespace-nowrap disabled:opacity-50"
+            className="min-h-11 min-w-11 px-4 py-2 rounded-lg bg-[var(--editor-soft)] text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-line)] transition-colors whitespace-nowrap disabled:opacity-50"
           >
             {fetching ? '抓取中…' : '自动填充'}
           </button>
@@ -201,13 +201,13 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <input
-            className={inputCls}
+            className={`min-h-11 min-w-11 ${inputCls}`}
             placeholder="名称 *"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
           <select
-            className={inputCls}
+            className={`min-h-11 min-w-11 ${inputCls}`}
             value={form.type}
             onChange={(e) => setForm({ ...form, type: e.target.value as ToolType })}
           >
@@ -220,7 +220,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
         </div>
 
         <input
-          className={inputCls}
+          className={`min-h-11 min-w-11 ${inputCls}`}
           placeholder="一句话点评：我为什么收它"
           value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -228,13 +228,13 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <input
-            className={inputCls}
+            className={`min-h-11 min-w-11 ${inputCls}`}
             placeholder="标签，逗号分隔（如 AI, 效率）"
             value={form.tags}
             onChange={(e) => setForm({ ...form, tags: e.target.value })}
           />
           <input
-            className={inputCls}
+            className={`min-h-11 min-w-11 ${inputCls}`}
             placeholder="图标 URL（可选，自动填充会带上）"
             value={form.icon}
             onChange={(e) => setForm({ ...form, icon: e.target.value })}
@@ -246,14 +246,14 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
             <input
               type="checkbox"
               checked={form.is_pinned}
-              onChange={(e) => setForm({ ...form, is_pinned: e.target.checked })}
+              onChange={(e) => setForm({ ...form, is_pinned: e.target.checked })} className="min-h-11 min-w-11"
             />
             置顶
           </label>
           <button
             onClick={() => void save()}
             disabled={saving}
-            className="px-5 py-2 rounded-lg bg-[var(--editor-accent)] text-white text-sm font-medium hover:brightness-105 transition-all disabled:opacity-50"
+            className="min-h-11 min-w-11 px-5 py-2 rounded-lg bg-cta text-cta-ink text-sm font-medium hover:bg-cta-hover transition-all disabled:opacity-50"
           >
             {saving ? '保存中…' : isEditing ? '更新' : '添加'}
           </button>
@@ -270,15 +270,15 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
           {initialTools.map((tool) => (
             <div id={String(tool.id)} key={tool.id} className="flex items-center gap-3 px-4 py-3">
               {tool.icon ? (
-                <img src={tool.icon} alt="" className="w-8 h-8 rounded border border-[var(--editor-line)] object-cover bg-white flex-shrink-0" />
+                <img src={tool.icon} alt="" className="w-8 h-8 rounded-md border border-[var(--editor-line)] object-cover bg-[var(--editor-panel)] flex-shrink-0" />
               ) : (
-                <div className="w-8 h-8 rounded bg-[var(--editor-soft)] flex items-center justify-center text-xs text-[var(--stone-gray)] flex-shrink-0">
+                <div className="w-8 h-8 rounded-md bg-[var(--editor-soft)] flex items-center justify-center text-xs text-[var(--stone-gray)] flex-shrink-0">
                   {tool.name.slice(0, 1).toUpperCase()}
                 </div>
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-[var(--editor-ink)] truncate">{tool.name}</span><span className="shrink-0 text-xs text-[var(--editor-muted)]">{tool.is_hidden ? '私密' : '已公开'}</span>
+                  <span className="font-serif font-medium text-[var(--editor-ink)] truncate">{tool.name}</span><span className="shrink-0 text-xs text-[var(--editor-muted)]">{tool.is_hidden ? '私密' : '已公开'}</span>
                   {tool.is_pinned === 1 && <span className="text-[var(--editor-accent)] text-xs">★</span>}
                 </div>
                 {tool.description && (
@@ -289,13 +289,13 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
                 {tool.is_hidden === 0 && <ResourceWithdrawal kind="tools" id={tool.id}/>}
                 <button
                   onClick={() => edit(tool)}
-                  className="text-xs px-2 py-1 rounded text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
+                  className="min-h-11 min-w-11 text-xs px-2 py-1 rounded-md text-[var(--editor-muted)] hover:text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
                 >
                   编辑
                 </button>
                 <button
                   onClick={() => remove(tool.id, tool.name)}
-                  className="text-xs px-2 py-1 rounded text-rose-500 hover:bg-rose-50 transition-colors"
+                  className="min-h-11 min-w-11 text-xs px-2 py-1 rounded-md text-[var(--danger)] hover:bg-[var(--danger-soft-bg)] transition-colors"
                 >
                   删除
                 </button>

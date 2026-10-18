@@ -42,7 +42,7 @@ export function KnowledgeDashboard({ model }: { model: DashboardModel }) {
         <p className="mb-4 text-xs font-semibold tracking-[0.22em] text-[var(--editor-accent)] uppercase">
           Personal knowledge desk
         </p>
-        <h1 className="text-3xl font-medium leading-tight tracking-[-0.03em] sm:text-5xl">
+        <h1 className="font-serif font-medium text-3xl leading-tight tracking-[-0.03em] sm:text-5xl">
           这一周，你的想法正在变成资产
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-8 text-[var(--editor-muted)] sm:text-lg">
@@ -51,8 +51,8 @@ export function KnowledgeDashboard({ model }: { model: DashboardModel }) {
       </header>
 
       {model.blocked && (
-        <div className="rounded-2xl border border-amber-500/35 bg-amber-500/8 px-5 py-4">
-          <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">最近一次同步没有完成</p>
+        <div className="rounded-2xl border border-[var(--warning-line)] bg-[var(--warning-soft-bg)] px-5 py-4">
+          <p className="text-sm font-medium text-[var(--warning)] dark:text-[var(--warning)]">最近一次同步没有完成</p>
           <p className="mt-1 text-sm leading-6 text-[var(--editor-muted)]">{model.blocked.message}</p>
           {model.blocked.nextAction && <p className="mt-2 text-sm leading-6 text-[var(--editor-muted)]">下一步：{model.blocked.nextAction}</p>}
           <p className="mt-2 font-mono text-xs text-[var(--stone-gray)]">{model.blocked.code}</p>
@@ -72,16 +72,16 @@ export function KnowledgeDashboard({ model }: { model: DashboardModel }) {
                 <span>Hermes 筛选</span><span>→</span>
                 <span>{featured.stage}</span>
               </div>
-              <h2 className="mt-5 text-2xl font-medium leading-snug tracking-[-0.02em] sm:text-3xl">{featured.title}</h2>
+              <h2 className="font-serif font-medium mt-5 text-2xl leading-snug tracking-[-0.02em] sm:text-3xl">{featured.title}</h2>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--editor-muted)]">{featured.summary}</p>
               <p className="mt-7 text-xs text-[var(--stone-gray)]">归属：{domainLabels[featured.domain]} · 最近更新 {formatSyncTime(featured.updatedAt)}</p>
               {featured.publicUrl && (
-                <Link className="mt-4 inline-block text-sm text-[var(--editor-accent)] hover:underline" href={featured.publicUrl}>查看公开成果</Link>
+                <Link className="min-h-11 min-w-11 mt-4 inline-block text-sm text-[var(--editor-accent)] hover:underline" href={featured.publicUrl}>查看公开成果</Link>
               )}
             </div>
           ) : (
             <div className="mt-8 min-h-48 rounded-2xl border border-dashed border-[var(--editor-line)] p-6">
-              <h2 className="text-xl font-medium">等待第一条高价值想法</h2>
+              <h2 className="font-serif font-medium text-xl">等待第一条高价值想法</h2>
               <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--editor-muted)]">不需要在这里填写任何内容。继续使用 Flomo，Hermes 会严格筛选；没有达到门槛时，合法结果就是暂时不沉淀。</p>
             </div>
           )}
@@ -106,7 +106,7 @@ export function KnowledgeDashboard({ model }: { model: DashboardModel }) {
         <div className="mb-5 flex items-end justify-between">
           <div>
             <p className="text-xs tracking-[0.18em] text-[var(--stone-gray)] uppercase">Pipeline</p>
-            <h2 className="mt-2 text-2xl font-medium">正在生长的内容</h2>
+            <h2 className="font-serif font-medium mt-2 text-2xl">正在生长的内容</h2>
           </div>
           <p className="text-xs text-[var(--stone-gray)]">只展示成果，不在这里派任务</p>
         </div>
@@ -118,7 +118,7 @@ export function KnowledgeDashboard({ model }: { model: DashboardModel }) {
                 <p className="text-xs font-semibold text-[var(--editor-accent)]">{typeLabels[type]}</p>
                 {artifact ? (
                   <>
-                    <h3 className="mt-5 text-lg font-medium leading-7">{artifact.title}</h3>
+                    <h3 className="font-serif font-medium mt-5 text-lg leading-7">{artifact.title}</h3>
                     <p className="mt-3 line-clamp-3 text-sm leading-6 text-[var(--editor-muted)]">{artifact.summary}</p>
                     <p className="mt-5 text-xs text-[var(--stone-gray)]">{domainLabels[artifact.domain]} · {artifact.stage}</p>
                   </>
@@ -135,7 +135,7 @@ export function KnowledgeDashboard({ model }: { model: DashboardModel }) {
         <div className="grid gap-8 md:grid-cols-[0.7fr_1.3fr]">
           <div>
             <p className="text-xs tracking-[0.18em] text-[var(--stone-gray)] uppercase">Overview</p>
-            <h2 className="mt-3 text-2xl font-medium">全局概览</h2>
+            <h2 className="font-serif font-medium mt-3 text-2xl">全局概览</h2>
             <p className="mt-3 text-sm leading-6 text-[var(--editor-muted)]">工作、投资、知识与内容，不追求每一栏都热闹，只显示真实进展。</p>
           </div>
           <div className="grid gap-x-7 gap-y-6 sm:grid-cols-2">
@@ -143,7 +143,7 @@ export function KnowledgeDashboard({ model }: { model: DashboardModel }) {
               const item = snapshot?.domains[domain]
               return (
                 <div key={domain} className="border-t border-[var(--editor-line)] pt-4">
-                  <p className="text-sm font-medium">{domainLabels[domain]}</p>
+                  <p className="font-serif text-sm font-medium">{domainLabels[domain]}</p>
                   <p className="mt-2 text-sm leading-6 text-[var(--editor-muted)]">{item?.detail || '本周期暂无需要突出展示的变化'}</p>
                 </div>
               )
