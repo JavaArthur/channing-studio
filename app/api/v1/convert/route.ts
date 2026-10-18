@@ -73,14 +73,18 @@ function buildStandaloneHtml(html: string, fontSize: FontSize): string {
       border: 0;
       border-radius: 6px;
       background: #07c160; /* #07c160: WeChat brand green, intentionally kept */
-      color: #fff;
+      /* Standalone page has no access to site tokens: #141413 = Near Black (--editor-ink), 7.73:1 on #07c160 */
+      color: #141413;
       cursor: pointer;
       font-size: 14px;
       font-weight: 600;
       line-height: 1;
+      min-height: 44px;
       padding: 11px 16px;
       white-space: nowrap;
     }
+    /* #3898ec = Focus Blue (--focus-ring); hardcoded because this page cannot read site tokens */
+    .copy-button:focus-visible { outline: 2px solid #3898ec; outline-offset: 2px; }
     .copy-button:active { transform: translateY(1px); }
     .copy-button[disabled] {
       cursor: default;

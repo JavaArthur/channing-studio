@@ -30,7 +30,7 @@ const STATUS_CONFIG = {
   unlisted: {
     label: '私密',
     icon: Link2,
-    description: '不在首页显示，但可通过私密',
+    description: '不在首页和列表显示，公开链接也打不开，仅后台可见',
   },
 }
 

@@ -136,14 +136,14 @@ export function XDraftBoard({ items, total, page, has_more, status, range, query
   return <div className="min-w-0 space-y-6">
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div><p className="brain-kicker">Personal workspace</p><h1 className="mt-3 text-3xl font-semibold tracking-tight">X 短帖草稿</h1><p className="mt-3 text-[var(--editor-muted)]">收集短帖灵感，复制后发布，记录每一次分享。</p></div>
-      <button className="brain-button brain-cta min-h-[44px]" onClick={() => setCreating(!creating)}>{creating ? '取消新建' : '新建草稿'}</button>
+      <button className={`min-h-[44px] ${creating ? 'brain-secondary' : 'brain-button brain-cta'}`} onClick={() => setCreating(!creating)}>{creating ? '取消新建' : '新建草稿'}</button>
     </header>
     {creating && <form onSubmit={create} className="brain-panel min-w-0 space-y-4 p-5">
       <label className="block space-y-2"><span>正文</span><textarea className={inputClass} rows={6} required maxLength={10000} value={content} onChange={event => setContent(event.target.value)} /></label>
       <CharacterCount count={count} />
       <label className="block space-y-2"><span>来源链接</span><input className={inputClass} type="url" value={sourceUrl} onChange={event => setSourceUrl(event.target.value)} /></label>
       <label className="block space-y-2"><span>来源类型</span><select className={inputClass} value={sourceType} onChange={event => setSourceType(event.target.value)}>{Object.entries(SOURCE_TYPES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-      <button className="brain-button min-h-[44px]" disabled={busy}>保存草稿</button>
+      <button className="brain-button brain-cta min-h-[44px]" disabled={busy}>保存草稿</button>
       {error && <p role="alert" className="text-[var(--danger)]">{error}</p>}
     </form>}
     <nav aria-label="草稿状态" className="flex flex-wrap gap-2">{Object.entries(statuses).map(([value, label]) => <Link key={value} href={href({ status: value })} aria-current={status === value ? 'page' : undefined} className={tabClass(status === value)}>{label}</Link>)}</nav>

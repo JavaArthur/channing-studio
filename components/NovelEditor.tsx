@@ -962,7 +962,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     { key: 'public' as const, label: '公开访问', desc: '所有人可见，出现在首页和搜索', Icon: Globe },
     { key: 'draft' as const, label: '草稿自见', desc: '仅自己可见，不会发布', Icon: Eye },
     { key: 'encrypted' as const, label: '加密访问', desc: '需要密码才能查看', Icon: Lock },
-    { key: 'unlisted' as const, label: '私密', desc: '不在首页显示，但可通过私密', Icon: Link2 },
+    { key: 'unlisted' as const, label: '私密', desc: '不在首页和列表显示，公开链接也打不开，仅后台可见', Icon: Link2 },
   ]
 
   // ── Save status display ──
@@ -1192,7 +1192,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                         disabled={saving}
                         className="min-h-11 min-w-11 px-3 py-1.5 text-sm font-semibold text-[var(--editor-accent-ink)] bg-[var(--editor-accent)] rounded-lg hover:brightness-105 transition disabled:opacity-50"
                       >
-                        {saving ? '保存中…' : editSlug ? '更新文章' : '发布'}
+                        {saving ? '保存中…' : editSlug ? '更新文章' : '确认发布'}
                       </button>
                     </div>
                   </div>
