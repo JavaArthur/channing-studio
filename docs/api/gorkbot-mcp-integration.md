@@ -19,8 +19,8 @@
 
 凭据与权限：
 
-- `MCP_READ_TOKEN`：4 个只读工具，可读三类私人数据。
-- `MCP_WRITE_TOKEN`：10 个工具，可读写三类私人数据，并执行整理流程。
+- `MCP_READ_TOKEN`：6 个只读工具，可读工作空间与 X 短帖草稿。
+- `MCP_WRITE_TOKEN`：14 个工具，可读写工作空间与 X 短帖草稿，并执行整理流程。
 - 现有 Hermes Token、`qm_` Token、后台 Cookie 均不能登录 `/mcp`。更换 MCP secret 不影响这些旧接口。
 - 当前是两个独立静态凭据，按读写分权，没有每个 Bot 独立账号、自动过期或 OAuth 授权流程。不要将其描述为完整 OAuth 授权服务。
 - Token 不进入工具参数、提示词、URL、Git 或日志。仅在可信服务端客户端配置；来自其他站点的浏览器 Origin 会被拒绝，不开放跨站 CORS。
@@ -54,9 +54,20 @@
 | `organize_inbox` | **一次事务将收集项转换为笔记并关联到项目** |
 | `link_note_to_project` | 将已有未归档笔记关联项目，要求 project_revision |
 
-只读凭据不能发现或调用后六个工具，权限由服务端执行。工具注解帮助客户端展示行为，不替代鉴权。
+只读凭据只能发现和调用读取工具，不能调用任何写入工具，权限由服务端执行。工具注解帮助客户端展示行为，不替代鉴权。
 
 现有公开发布仍由后台完成。MCP 不提供永久删除、项目公开发布、文章管理、私人附件或原始 Flomo 数据导入。
+
+X 短帖草稿工具（只保存草稿和人工发布状态，不代发到 X）：
+
+| 工具 | 权限与行为 |
+|---|---|
+| `list_x_drafts` | 只读；status/source_type/q/since/until/page/limit 筛选，默认待发 |
+| `get_x_draft` | 只读；按 id 读取正文、revision、char_count 和 over_limit |
+| `create_x_draft` | 写入；request_key 幂等创建，正文必填，来源链接与类型可选 |
+| `update_x_draft` | 写入；expected_revision 乐观锁，支持正文、来源、状态和 posted_url |
+
+超出 280 加权字符仅提示，不阻止保存。来源类型支持自定义小写标识。链接仅限 HTTP(S)；版本冲突返回 412，同一请求键换正文返回 409。部署前先备份 D1，再应用可重复运行的 `db/migrations/2026-10-18-x-drafts.sql`。
 
 ## 整理完整流程
 

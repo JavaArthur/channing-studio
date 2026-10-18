@@ -7,6 +7,9 @@ import { createAgentBrainItem, getAgentBrainItem, listAgentBrainItems, listAgent
 import { checkMcpWorkspace, organizeInboxIntoProject } from '@/lib/repositories/mcp-workflows'
 import type { Database } from '@/lib/repositories/schema'
 
+import { createXDraft, getXDraft, listXDrafts, updateXDraft } from '@/lib/repositories/x-drafts'
+import { xDraftCreateSchema, xDraftListSchema, xDraftUpdateSchema } from '@/lib/x-drafts/validation'
+
 export type McpAccess = 'read' | 'write'
 const id = z.string().min(1).max(180).regex(/^[A-Za-z0-9_-]+$/)
 const revision = z.number().int().positive().max(Number.MAX_SAFE_INTEGER)
@@ -65,8 +68,26 @@ export function createWorkspaceMcpServer(db: Database, access: McpAccess) {
   }, args => outcome(async () => ({ project: await getAgentBrainItem(db, 'projects', args.project_id),
     notes: await listAgentProjectNotes(db, args.project_id, query(args)) })))
 
+  server.registerTool('list_x_drafts', {
+    description: 'List private X post drafts by status, source, creation time or literal text. Includes approximate weighted character counts.',
+    inputSchema: xDraftListSchema, annotations: readAnnotations,
+  }, args => outcome(() => listXDrafts(db, args)))
+  server.registerTool('get_x_draft', {
+    description: 'Read a private X post draft and its revision before updating it.',
+    inputSchema: z.object({ id }).strict(), annotations: readAnnotations,
+  }, args => outcome(async () => ({ draft: await getXDraft(db, args.id) })))
+
   // Read-only credentials cannot discover or call mutations; authorization is enforced server-side.
   if (access === 'read') return server
+
+  server.registerTool('create_x_draft', {
+    description: 'Create a private X post draft. Reuse request_key and identical fields on retry. Does not publish to X.',
+    inputSchema: xDraftCreateSchema.extend({ request_key: requestKey }).strict(), annotations: writeAnnotations,
+  }, ({ request_key, ...fields }) => outcome(() => createXDraft(db, request_key, fields)))
+  server.registerTool('update_x_draft', {
+    description: 'Update a draft using its expected_revision, or mark it posted/discarded/pending. Does not publish to X.',
+    inputSchema: xDraftUpdateSchema.extend({ id }).strict(), annotations: writeAnnotations,
+  }, args => outcome(async () => ({ draft: await updateXDraft(db, args.id, args.expected_revision, args.changes) })))
   for (const [name, target] of [['capture_inbox', 'inbox'], ['create_note', 'notes']] as const) {
     server.registerTool(name, {
       description: `Create a private ${target === 'inbox' ? 'inbox capture' : 'note'}. Generate one UUID request_key per logical creation; preserve it and all arguments on retries. Do not import Flomo original text.`,
