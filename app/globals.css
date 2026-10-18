@@ -24,6 +24,7 @@
   --color-cta-disabled: var(--cta-disabled-bg);
   --color-cta-disabled-ink: var(--cta-disabled-ink);
   --color-focus-ring: var(--focus-ring);
+  --color-focus-ring-outer: var(--focus-ring-outer);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft-bg);
   --color-danger-line: var(--danger-line);
@@ -207,10 +208,25 @@ body {
   pointer-events: none;
 }
 
-/* Focus states */
+/* Focus states.
+   Dark mode (and the fallback): single 2px #3898ec ring with 2px offset.
+   Light mode: two-tone ring — 2px #3898ec (outline, offset 0) hugging the control,
+   plus a 2px var(--focus-ring-outer) ring (box-shadow spread 4px) that touches the page background.
+   Outer #141413 contrast: parchment 16.72, ivory 17.50, sand 14.73; vs blue 6.03.
+   .novel-prose (the editor body) keeps its existing outline:none writing surface, so it gets no outer ring either. */
 *:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+:root[data-color-mode="light"] *:focus-visible:not(.novel-prose) {
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px var(--focus-ring-outer);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-color-mode]) *:focus-visible:not(.novel-prose) {
+    outline-offset: 0;
+    box-shadow: 0 0 0 4px var(--focus-ring-outer);
+  }
 }
 
 /* Smooth scrolling */

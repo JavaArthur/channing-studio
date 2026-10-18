@@ -22,10 +22,9 @@
   --cta-divider: #a9502f;
   --cta-disabled-bg: var(--editor-sand);
   --cta-disabled-ink: var(--stone-gray);
-  /* change only these two lines; pending decision on #2b80cc for light */
-  --focus-ring-light: #3898ec;
-  --focus-ring-dark: #3898ec;
-  --focus-ring: var(--focus-ring-light);
+  /* Focus: light mode = 2px #3898ec inner ring + 2px Near Black outer ring (see :focus-visible in app/globals.css) */
+  --focus-ring: #3898ec;
+  --focus-ring-outer: #141413;
   --danger: #b53333;
   --danger-soft-bg: #f6e7e2;
   --danger-line: #e9c8bf;
@@ -77,7 +76,9 @@
   --cta-divider: #a9502f;
   --cta-disabled-bg: var(--editor-sand);
   --cta-disabled-ink: var(--stone-gray);
-  --focus-ring: var(--focus-ring-dark);
+  /* Dark mode keeps the single #3898ec ring; the outer ring is not drawn */
+  --focus-ring: #3898ec;
+  --focus-ring-outer: transparent;
   --danger: #e07a6a;
   --danger-soft-bg: #3a2320;
   --danger-line: #6b3a33;
@@ -130,7 +131,9 @@
   --cta-divider: #a9502f;
   --cta-disabled-bg: var(--editor-sand);
   --cta-disabled-ink: var(--stone-gray);
-  --focus-ring: var(--focus-ring-dark);
+  /* Dark mode keeps the single #3898ec ring; the outer ring is not drawn */
+  --focus-ring: #3898ec;
+  --focus-ring-outer: transparent;
   --danger: #e07a6a;
   --danger-soft-bg: #3a2320;
   --danger-line: #6b3a33;

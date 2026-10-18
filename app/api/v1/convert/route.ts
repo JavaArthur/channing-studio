@@ -83,8 +83,9 @@ function buildStandaloneHtml(html: string, fontSize: FontSize): string {
       padding: 11px 16px;
       white-space: nowrap;
     }
-    /* #3898ec = Focus Blue (--focus-ring); hardcoded because this page cannot read site tokens */
-    .copy-button:focus-visible { outline: 2px solid #3898ec; outline-offset: 2px; }
+    /* Same two-tone focus ring as the site's light mode; hardcoded because this page cannot read site tokens:
+       #3898ec = --focus-ring (2px inner), #141413 = --focus-ring-outer (2px outer, touches the #f5f4ed page). */
+    .copy-button:focus-visible { outline: 2px solid #3898ec; outline-offset: 0; box-shadow: 0 0 0 4px #141413; }
     .copy-button:active { transform: translateY(1px); }
     .copy-button[disabled] {
       cursor: default;

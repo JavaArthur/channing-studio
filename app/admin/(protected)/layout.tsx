@@ -15,7 +15,11 @@ export default async function AdminProtectedLayout({ children }: { children: Rea
         <Link href="/admin" className="min-h-11 min-w-11 brand mb-9 px-2">
           <span className="brand-mark">C.</span>我的大脑
         </Link>
-        <div className="flex-1 overflow-y-auto">
+        <div
+          // -m-1 p-1 scroll-py-1: room for the 4px focus ring inside the scroll container
+          // (also when focus scrolls an item into view) without shifting layout.
+          className="-m-1 flex-1 scroll-py-1 overflow-y-auto p-1"
+        >
           <BrainNav />
         </div>
         <div className="mt-6 flex items-center justify-between border-t border-[var(--editor-line)] pt-5">
