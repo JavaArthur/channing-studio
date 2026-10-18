@@ -84,7 +84,7 @@ export default async function CategoryPage({
           <div className="text-xs uppercase tracking-[0.18em] text-[var(--stone-gray)] mb-3">
             分类
           </div>
-          <h1 className="article-display-title text-3xl sm:text-4xl font-bold text-[var(--editor-ink)] leading-tight">
+          <h1 className="font-serif font-medium article-display-title text-3xl sm:text-4xl text-[var(--editor-ink)] leading-tight">
             {category.name}
           </h1>
           <p className="mt-3 text-sm text-[var(--editor-muted)]">
@@ -97,7 +97,7 @@ export default async function CategoryPage({
             <p className="text-[var(--editor-muted)] mb-2">这个分类下还没有公开文章</p>
             <Link
               href="/"
-              className="text-sm text-[var(--editor-accent)] hover:underline underline-offset-2"
+              className="min-h-11 min-w-11 inline-flex items-center text-sm text-[var(--editor-accent)] hover:underline underline-offset-2"
             >
               返回首页
             </Link>
@@ -113,9 +113,9 @@ export default async function CategoryPage({
                 >
                   <Link
                     href={`/${post.slug}`}
-                    className="block py-6 sm:py-7 transition-all duration-200 hover:bg-[var(--editor-panel)] border-l-2 border-l-transparent hover:border-l-[var(--editor-accent)] pl-4"
+                    className="min-h-11 min-w-11 block py-6 sm:py-7 transition-all duration-200 hover:bg-[var(--editor-panel)] border-l-2 border-l-transparent hover:border-l-[var(--editor-accent)] pl-4"
                   >
-                    <h2 className="text-xl sm:text-2xl font-bold text-[var(--editor-ink)] leading-snug mb-2 group-hover:text-[var(--editor-accent)] transition-colors duration-200">
+                    <h2 className="font-serif font-medium text-xl sm:text-2xl text-[var(--editor-ink)] leading-snug mb-2 group-hover:text-[var(--editor-accent)] transition-colors duration-200">
                       {post.title}
                     </h2>
                     {post.description ? (

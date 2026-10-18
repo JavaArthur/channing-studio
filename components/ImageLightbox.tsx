@@ -34,7 +34,7 @@ export function ImageLightbox({ src, alt = '图片预览', onClose }: ImageLight
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/85 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[var(--overlay)] backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label={alt}
@@ -44,7 +44,7 @@ export function ImageLightbox({ src, alt = '图片预览', onClose }: ImageLight
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/25"
+          className="min-h-11 min-w-11 absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--editor-panel)] text-[var(--editor-ink)] transition hover:bg-[var(--editor-sand)]"
           aria-label="关闭预览"
         >
           <X className="h-5 w-5" />
@@ -59,7 +59,7 @@ export function ImageLightbox({ src, alt = '图片预览', onClose }: ImageLight
       />
 
       <div
-        className="mt-4 flex max-w-[90vw] items-center gap-3 rounded-full bg-black/50 px-4 py-2 text-xs text-white/90"
+        className="mt-4 flex max-w-[90vw] items-center gap-3 rounded-full bg-[var(--editor-panel)] px-4 py-2 text-xs text-[var(--editor-ink)]"
         onClick={e => e.stopPropagation()}
       >
         <span className="truncate" title={src}>{src}</span>
@@ -67,7 +67,7 @@ export function ImageLightbox({ src, alt = '图片预览', onClose }: ImageLight
           href={src}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-white transition hover:bg-white/25"
+          className="min-h-11 min-w-11 inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--editor-sand)] px-3 py-1 text-[var(--editor-ink)] transition hover:bg-[var(--editor-sand)]"
         >
           <ExternalLink className="h-3 w-3" />
           新标签页打开

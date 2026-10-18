@@ -49,7 +49,7 @@ export function ProjectLinks({ projectId }: { projectId: string }) {
   return (
     <div className="mt-5 border-t border-[var(--editor-line)] pt-4 text-sm">
       <button
-        className="text-[var(--editor-accent)]"
+        className="min-h-11 min-w-11 text-[var(--editor-accent)]"
         onClick={() => {
           setOpen(!open)
           if (!open) void run(() => load())
@@ -65,13 +65,13 @@ export function ProjectLinks({ projectId }: { projectId: string }) {
           </p>
           {links.map((item) => (
             <div className="flex justify-between gap-3" key={`${item.kind}:${item.id}`}>
-              <Link className="min-w-0 truncate" href={item.href}>
+              <Link className="min-h-11 min-w-11 inline-flex items-center truncate" href={item.href}>
                 {names[item.kind]} · {item.title}
               </Link>
               <button
                 disabled={busy}
                 onClick={() => void run(() => change(item, true))}
-                className="shrink-0 text-xs text-[var(--editor-muted)]"
+                className="min-h-11 min-w-11 shrink-0 text-xs text-[var(--editor-muted)]"
               >
                 取消关联
               </button>
@@ -86,13 +86,13 @@ export function ProjectLinks({ projectId }: { projectId: string }) {
             }}
           >
             <input
-              className="brain-input min-w-0"
+              className="min-h-11 min-w-11 brain-input"
               placeholder="按标题查找资料"
               aria-label="按标题查找资料"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
-            <button disabled={busy} className="brain-secondary shrink-0">
+            <button disabled={busy} className="min-h-11 min-w-11 brain-secondary shrink-0">
               查找
             </button>
           </form>
@@ -108,7 +108,7 @@ export function ProjectLinks({ projectId }: { projectId: string }) {
                 </span>
                 <button
                   disabled={busy}
-                  className="shrink-0 text-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 shrink-0 text-[var(--editor-accent)]"
                   onClick={() => void run(() => change(item))}
                 >
                   关联

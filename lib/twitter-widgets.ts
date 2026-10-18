@@ -71,7 +71,7 @@ export async function renderTweetEmbed(container: HTMLElement, src: string) {
       dnt: true,
     })
   } catch {
-    container.innerHTML = `<a href="${src}" target="_blank" rel="noopener noreferrer" style="color:#1da1f2">${src}</a>`
+    container.innerHTML = `<a href="${src}" target="_blank" rel="noopener noreferrer" style="color:var(--editor-link)">${src}</a>`
   }
 
   return true

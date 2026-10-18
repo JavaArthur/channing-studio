@@ -56,7 +56,7 @@ export default async function AdminPostsPage({
             {!q && (
               <Link
                 href="/editor"
-                className="inline-flex items-center gap-1.5 text-sm text-[var(--editor-accent)] hover:underline underline-offset-2 font-medium"
+                className="min-h-11 min-w-11 inline-flex items-center gap-1.5 text-sm text-[var(--editor-accent)] hover:underline underline-offset-2 font-medium"
               >
                 写第一篇文章 →
               </Link>

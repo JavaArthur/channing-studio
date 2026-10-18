@@ -317,11 +317,11 @@ export function AiImageProviderManager() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[var(--editor-ink)]">图片模型配置</h3>
+        <h3 className="font-serif font-medium text-base text-[var(--editor-ink)]">图片模型配置</h3>
         <button
           type="button"
           onClick={openCreate}
-          className="rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-white transition hover:brightness-105"
+          className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-[var(--editor-accent-ink)] transition hover:brightness-105"
         >
           + 新增配置
         </button>
@@ -344,7 +344,7 @@ export function AiImageProviderManager() {
             <button
               type="button"
               onClick={() => setTemplateModalOpen(true)}
-              className="rounded-md border border-[var(--editor-line)] px-2.5 py-1 text-xs text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
+              className="min-h-11 min-w-11 rounded-md border border-[var(--editor-line)] px-2.5 py-1 text-xs text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
             >
               快捷模板
             </button>
@@ -367,7 +367,7 @@ export function AiImageProviderManager() {
                 <input
                   type="checkbox"
                   checked={editing.is_default}
-                  onChange={(event) => updateEditing({ is_default: event.target.checked })}
+                  onChange={(event) => updateEditing({ is_default: event.target.checked })} className="min-h-11 min-w-11"
                 />
                 设为默认配置
             </label>
@@ -377,7 +377,7 @@ export function AiImageProviderManager() {
             <button
               type="button"
               onClick={() => setEditing(null)}
-              className="rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
+              className="min-h-11 min-w-11 rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
             >
               取消
             </button>
@@ -385,7 +385,7 @@ export function AiImageProviderManager() {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="rounded-lg bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-white hover:brightness-105 disabled:opacity-50"
+              className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-[var(--editor-accent-ink)] hover:brightness-105 disabled:opacity-50"
             >
               {saving ? '保存中…' : '保存'}
             </button>

@@ -48,7 +48,7 @@ export function PinToggle({ slug, isPinned }: PinToggleProps) {
       <button
         onClick={() => setShowModal(true)}
         disabled={loading}
-        className={`p-1.5 rounded transition-colors disabled:opacity-50 ${
+        className={`min-h-11 min-w-11 p-1.5 rounded-md transition-colors disabled:opacity-50 ${
           pinned === 1
             ? 'text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/10'
             : 'text-[var(--stone-gray)] hover:bg-[var(--editor-soft)]'

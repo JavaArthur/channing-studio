@@ -58,12 +58,12 @@ function AdminLoginForm() {
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] text-xl font-bold mb-4">
               C
             </div>
-          <h1 className="text-2xl font-bold text-[var(--editor-ink)]">Channing Studio</h1>
+          <h1 className="font-serif font-medium text-2xl text-[var(--editor-ink)]">Channing Studio</h1>
           <p className="text-sm text-[var(--editor-muted)] mt-1">我的大脑</p>
         </div>
 
         {/* 登录表单 */}
-        <div className="bg-[var(--editor-panel)] rounded-2xl border border-[var(--editor-line)] shadow-[0_8px_28px_rgba(37,32,24,0.08)] p-8">
+        <div className="bg-[var(--editor-panel)] rounded-2xl border border-[var(--editor-line)] shadow-whisper p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label
@@ -83,12 +83,12 @@ function AdminLoginForm() {
                 placeholder="请输入管理密码"
                 autoFocus
                 autoComplete="current-password"
-                className="w-full border border-[var(--editor-line)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--editor-ink)] bg-[var(--editor-app-bg)] outline-none transition focus:border-[var(--editor-accent)] focus:ring-2 focus:ring-[var(--editor-accent)]/10 placeholder:text-[var(--editor-muted)]"
+                className="min-h-11 min-w-11 w-full border border-[var(--editor-line)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--editor-ink)] bg-[var(--editor-app-bg)] outline-none transition focus:border-[var(--focus-ring)] focus:ring-2 focus:ring-[var(--focus-ring)]/10 placeholder:text-[var(--editor-muted)]"
               />
             </div>
 
             {error && (
-              <p className="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-md px-3 py-2">
+              <p className="text-sm text-[var(--danger)] bg-[var(--danger-soft-bg)] border border-[var(--danger-line)] rounded-md px-3 py-2">
                 {error}
               </p>
             )}
@@ -96,7 +96,7 @@ function AdminLoginForm() {
             <button
               type="submit"
               disabled={loading || !password}
-              className="w-full bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] rounded-lg py-2.5 text-sm font-semibold hover:brightness-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-11 min-w-11 w-full bg-cta text-cta-ink rounded-lg py-2.5 text-sm font-semibold hover:bg-cta-hover transition disabled:bg-cta-disabled disabled:text-cta-disabled-ink disabled:cursor-not-allowed"
             >
               {loading ? '登录中…' : '登录'}
             </button>
@@ -104,7 +104,7 @@ function AdminLoginForm() {
         </div>
 
         <p className="text-center mt-6 text-xs text-[var(--editor-muted)]">
-          <Link href="/" className="hover:text-[var(--editor-ink)] transition-colors">
+          <Link href="/" className="min-h-11 min-w-11 inline-flex items-center hover:text-[var(--editor-ink)] transition-colors">
             ← 返回公开首页
           </Link>
         </p>

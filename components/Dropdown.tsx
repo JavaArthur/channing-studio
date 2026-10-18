@@ -86,13 +86,13 @@ export function Dropdown({
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
-        className={`
+        className={`min-h-11 min-w-11
           w-full px-3 py-2 rounded-lg border text-sm text-left
           flex items-center justify-between gap-2
           transition-colors
           ${disabled
             ? 'bg-[var(--editor-soft)] text-[var(--stone-gray)] cursor-not-allowed'
-            : 'bg-[var(--background)] border-[var(--editor-line)] text-[var(--editor-ink)] hover:border-[var(--editor-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--editor-accent)]/20'
+            : 'bg-[var(--background)] border-[var(--editor-line)] text-[var(--editor-ink)] hover:border-[var(--editor-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]/20'
           }
         `}
       >
@@ -125,7 +125,7 @@ export function Dropdown({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="搜索..."
-                className="w-full px-3 py-1.5 text-sm rounded border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--editor-accent)]/20"
+                className="min-h-11 min-w-11 w-full px-3 py-1.5 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]/20"
               />
             </div>
           )}
@@ -143,7 +143,7 @@ export function Dropdown({
                   type="button"
                   onClick={() => handleSelect(option.value)}
                   title={option.title}
-                  className={`
+                  className={`focus-ring-inset min-h-11 min-w-11
                     w-full px-3 py-2 text-sm text-left
                     flex items-center justify-between gap-2
                     transition-colors

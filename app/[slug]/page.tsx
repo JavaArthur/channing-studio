@@ -211,7 +211,7 @@ export default async function PostPage({
             <header className="mb-10 sm:mb-12">
               <h1
                 data-admin-edit-trigger
-                className="article-display-title text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--editor-ink)] leading-snug mb-4 sm:mb-5"
+                className="font-serif font-medium article-display-title text-2xl sm:text-3xl lg:text-4xl text-[var(--editor-ink)] leading-snug mb-4 sm:mb-5"
               >
                 {post.title}
               </h1>
@@ -221,7 +221,7 @@ export default async function PostPage({
                     {activeCategorySlug ? (
                       <Link
                         href={`/category/${activeCategorySlug}`}
-                        className="px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors"
+                        className="hit-area-44 px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors"
                       >
                         {post.category}
                       </Link>
@@ -253,7 +253,7 @@ export default async function PostPage({
                     href={post.source_url}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="text-[var(--editor-accent)] hover:underline underline-offset-2 break-all"
+                    className="min-h-11 min-w-11 inline-flex items-center text-[var(--editor-accent)] hover:underline underline-offset-2 break-all"
                   >
                     {post.source_url}
                   </a>

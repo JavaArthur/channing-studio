@@ -30,8 +30,8 @@ function TweetComponent(props: ReactNodeViewProps) {
     <NodeViewWrapper data-type="twitter" className="twitter-node-view">
       <div ref={containerRef} style={{ minHeight: 100 }}>
         {!tweetId && (
-          <p style={{ color: '#999', fontSize: 14 }}>
-            无效的推文链接：<a href={src} target="_blank" rel="noopener noreferrer">{src}</a>
+          <p style={{ color: 'var(--stone-gray)', fontSize: 14 }}>
+            无效的推文链接：<a href={src} target="_blank" rel="noopener noreferrer" className="min-h-11 min-w-11 inline-flex items-center">{src}</a>
           </p>
         )}
       </div>

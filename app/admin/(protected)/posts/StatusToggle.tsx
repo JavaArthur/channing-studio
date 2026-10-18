@@ -48,7 +48,7 @@ export function StatusToggle({ slug, currentStatus }: StatusToggleProps) {
       <button
         onClick={() => setShowModal(true)}
         disabled={loading}
-        className="text-xs text-[var(--editor-muted)] hover:text-[var(--editor-accent)] transition-colors disabled:opacity-50"
+        className="min-h-11 min-w-11 text-xs text-[var(--editor-muted)] hover:text-[var(--editor-accent)] transition-colors disabled:opacity-50"
         title={status === 'draft' ? '发布文章' : '改为草稿'}
       >
         {loading ? '...' : status === 'draft' ? '发布' : '取消发布'}

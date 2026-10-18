@@ -48,11 +48,11 @@ export default async function LabsPage() {
     >
       <div className="divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
         {content.labs.filter((lab) => lab.visible).map((lab) => (
-          <StudioLink key={lab.id} href={lab.href}>
+          <StudioLink key={lab.id} href={lab.href} className="min-h-11 min-w-11 inline-flex items-center">
             <article className="studio-lab-row">
               <div>
                 <StudioCardLabel>{lab.type.toUpperCase()}</StudioCardLabel>
-                <h2 className="mt-2 text-xl font-semibold text-[var(--editor-ink)]">{lab.title}</h2>
+                <h2 className="font-serif font-medium mt-2 text-xl text-[var(--editor-ink)]">{lab.title}</h2>
               </div>
               <div className="flex items-center gap-5">
                 <p className="hidden max-w-lg text-sm leading-7 text-[var(--editor-muted)] sm:block">{lab.description}</p>
@@ -66,14 +66,14 @@ export default async function LabsPage() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="studio-eyebrow">TOOLS / 05</p>
-            <h2 className="studio-section-title mt-3">相关工具</h2>
+            <h2 className="font-serif font-medium studio-section-title mt-3">相关工具</h2>
           </div>
-          <StudioLink href="/tools">完整工具箱 →</StudioLink>
+          <StudioLink href="/tools" className="min-h-11 min-w-11 inline-flex items-center">完整工具箱 →</StudioLink>
         </div>
         {tools.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-3">
             {selectStudioTools(tools).map((tool) => (
-              <StudioLink key={tool.id} href={tool.url || '/tools'}>{tool.name} ↗</StudioLink>
+              <StudioLink key={tool.id} href={tool.url || '/tools'} className="min-h-11 min-w-11 inline-flex items-center">{tool.name} ↗</StudioLink>
             ))}
           </div>
         )}

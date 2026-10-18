@@ -106,7 +106,7 @@ function BubbleIconButton({
         aria-label={label}
         onMouseDown={(e) => e.preventDefault()}
         onClick={onClick}
-        className={`inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-sm font-medium transition ${
+        className={`hit-44 inline-flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-sm font-medium transition ${
           active
             ? 'bg-[var(--editor-accent)] text-[var(--editor-accent-ink)]'
             : 'text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
@@ -132,7 +132,7 @@ function BubbleActionButton({
       type="button"
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
-      className={`inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm transition ${
+      className={`min-h-11 min-w-11 inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm transition ${
         tone === 'primary'
           ? 'bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] hover:brightness-105'
           : 'border border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
@@ -159,7 +159,7 @@ function BubblePanelButton({
       type="button"
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
-      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${
+      className={`min-h-11 min-w-11 flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${
         active
           ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
           : 'text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
@@ -776,10 +776,10 @@ export function FormattingBubble() {
       shouldShow={({ editor: currentEditor }) => {
         return shouldShowEditorBubble(currentEditor.state.selection, currentEditor.isEditable)
       }}
-      className="overflow-hidden rounded-xl border border-[var(--editor-line)] bg-white shadow-[0_12px_30px_rgba(37,32,24,0.12)]"
+      className="max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-whisper"
     >
       {/* ── 工具栏（始终可见）── */}
-      <div className="flex items-center gap-0.5 p-1">
+      <div className="flex flex-wrap items-center gap-0.5 p-1">
 
         {/* Ask AI */}
         <Tooltip label="用 AI 改写或处理选中文本">
@@ -787,7 +787,7 @@ export function FormattingBubble() {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={openAIModal}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold transition bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/15"
+            className="min-h-11 min-w-11 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold transition bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] hover:bg-[var(--editor-accent)]/15"
             aria-label="用 AI 改写或处理选中文本"
           >
             <WandSparkles className="h-3.5 w-3.5" />
@@ -807,7 +807,7 @@ export function FormattingBubble() {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => toggleMode('text')}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm transition ${
+            className={`min-h-11 min-w-11 inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm transition ${
               mode === 'text' ? 'bg-[var(--editor-soft)]' : 'hover:bg-[var(--editor-soft)]'
             }`}
             aria-label="切换段落类型"
@@ -828,7 +828,7 @@ export function FormattingBubble() {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => toggleMode('link')}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium transition ${
+            className={`min-h-11 min-w-11 inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium transition ${
               mode === 'link' || editor.isActive('link')
                 ? 'bg-[var(--editor-soft)] text-[var(--editor-accent)]'
                 : 'text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
@@ -859,7 +859,7 @@ export function FormattingBubble() {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => toggleMode('more')}
-            className={`inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm transition ${
+            className={`min-h-11 min-w-11 inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-sm transition ${
               mode === 'more' ? 'bg-[var(--editor-soft)]' : 'hover:bg-[var(--editor-soft)]'
             }`}
             aria-label="更多格式选项"
@@ -887,7 +887,7 @@ export function FormattingBubble() {
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => { option.apply(editor); setMode('main') }}
-                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition hover:bg-[var(--editor-soft)]"
+                  className="min-h-11 min-w-11 flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition hover:bg-[var(--editor-soft)]"
                 >
                   <span className="flex h-5 w-5 items-center justify-center text-[var(--editor-muted)]">
                     {option.icon}
@@ -915,7 +915,7 @@ export function FormattingBubble() {
                 }}
                 placeholder="https://"
                 autoFocus
-                className="w-full rounded-md border border-[var(--editor-line)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                className="min-h-11 min-w-11 w-full rounded-md border border-[var(--editor-line)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
               />
               <div className="flex items-center justify-between gap-2">
                 <BubbleActionButton
@@ -955,9 +955,9 @@ export function FormattingBubble() {
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setColorTarget('text')}
-                  className={`flex-1 rounded-md px-3 py-1.5 text-sm transition ${
+                  className={`min-h-11 min-w-11 flex-1 rounded-md px-3 py-1.5 text-sm transition ${
                     colorTarget === 'text'
-                      ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                      ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                       : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                   }`}
                 >
@@ -967,9 +967,9 @@ export function FormattingBubble() {
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setColorTarget('highlight')}
-                  className={`flex-1 rounded-md px-3 py-1.5 text-sm transition ${
+                  className={`min-h-11 min-w-11 flex-1 rounded-md px-3 py-1.5 text-sm transition ${
                     colorTarget === 'highlight'
-                      ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                      ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                       : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                   }`}
                 >
@@ -1002,7 +1002,7 @@ export function FormattingBubble() {
 
                           setMode('main')
                         }}
-                        className={`flex flex-col items-center gap-1 rounded-xl border px-1.5 py-2 transition ${
+                        className={`min-h-11 min-w-11 flex flex-col items-center gap-1 rounded-xl border px-1.5 py-2 transition ${
                           isActive
                             ? 'border-[var(--editor-accent)] bg-[var(--editor-accent)]/8'
                             : 'border-[var(--editor-line)] hover:bg-[var(--editor-soft)]'
@@ -1010,14 +1010,14 @@ export function FormattingBubble() {
                         aria-label={colorOption.label}
                       >
                         <span
-                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-black/10 text-xs font-bold"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--editor-line)] text-xs font-bold"
                           style={colorTarget === 'text'
                             ? {
                                 color: colorOption.value || 'var(--editor-ink)',
-                                background: colorOption.value ? `${colorOption.value}18` : 'white',
+                                background: colorOption.value ? `${colorOption.value}18` : 'var(--editor-panel)',
                               }
                             : {
-                                background: colorOption.value || 'white',
+                                background: colorOption.value || 'var(--editor-panel)',
                                 color: 'var(--editor-ink)',
                               }}
                         >
@@ -1037,7 +1037,7 @@ export function FormattingBubble() {
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => setMode('more')}
-                  className="text-xs font-medium text-[var(--editor-muted)] transition hover:text-[var(--editor-ink)]"
+                  className="min-h-11 min-w-11 text-xs font-medium text-[var(--editor-muted)] transition hover:text-[var(--editor-ink)]"
                 >
                   返回更多
                 </button>
@@ -1109,7 +1109,7 @@ export function FormattingBubble() {
                     },
                   }))
                 }}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
+                className="min-h-11 min-w-11 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
               >
                 <Sigma className="h-4 w-4" />
                 <span>数学公式</span>
@@ -1143,7 +1143,7 @@ export function EditorFooter({ saveStatus }: { saveStatus: DraftSaveStatus }) {
       } ${
         saveStatus === 'saving'
           ? 'bg-[var(--editor-soft)] text-[var(--stone-gray)]'
-          : 'bg-emerald-50 text-emerald-600'
+          : 'bg-[var(--success-soft-bg)] text-[var(--success)]'
       }`}>
         {saveStatus === 'saving' ? '正在保存…' : '已保存'}
       </span>
@@ -1153,11 +1153,11 @@ export function EditorFooter({ saveStatus }: { saveStatus: DraftSaveStatus }) {
 
 export function SlashMenu() {
   return (
-    <EditorCommand className="z-50 h-auto max-h-[340px] w-80 overflow-y-auto rounded-md border border-[var(--editor-line)] bg-white p-1 shadow-[0_20px_40px_rgba(37,32,24,0.14)]">
+    <EditorCommand className="z-50 h-auto max-h-[340px] w-80 overflow-y-auto rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] p-1 shadow-whisper">
       <EditorCommandEmpty className="px-3 py-2 text-sm text-[var(--editor-muted)]">没找到匹配项</EditorCommandEmpty>
       <EditorCommandList>
         {suggestionItems.map((item) => (
-          <EditorCommandItem key={item.title} value={item.title} keywords={item.searchTerms} onCommand={(props) => item.command?.(props)} className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition hover:bg-[var(--editor-soft)] aria-selected:bg-[var(--editor-soft)]">
+          <EditorCommandItem key={item.title} value={item.title} keywords={item.searchTerms} onCommand={(props) => item.command?.(props)} className="min-h-11 min-w-11 flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition hover:bg-[var(--editor-soft)] aria-selected:bg-[var(--editor-soft)]">
             {item.icon}
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-[var(--editor-ink)]">{item.title}</p>

@@ -16,7 +16,7 @@ export function ResourceTabs({ active }: { active: 'tools' | 'prompts' }) {
           key={key}
           href={`/${key}`}
           aria-current={active === key ? 'page' : undefined}
-          className={active === key ? 'brain-button' : 'brain-secondary'}
+          className={`min-h-11 min-w-11 ${active === key ? 'brain-button' : 'brain-secondary'}`}
         >
           {label}
         </Link>

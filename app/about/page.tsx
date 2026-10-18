@@ -42,14 +42,14 @@ export default async function AboutPage() {
         <div>
           <p className="studio-eyebrow">{content.profile.subtitle}</p>
           <div className="mt-8 flex flex-wrap gap-4">
-            {content.profile.contactLinks.map((link) => <StudioLink key={link.url} href={link.url}>{link.label} ↗</StudioLink>)}
+            {content.profile.contactLinks.map((link) => <StudioLink key={link.url} href={link.url} className="min-h-11 min-w-11 inline-flex items-center">{link.label} ↗</StudioLink>)}
           </div>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
           {content.profile.capabilities.map((capability, index) => (
             <article key={capability.title} className="studio-card">
               <StudioCardLabel>0{index + 1}</StudioCardLabel>
-              <h2 className="mt-8 text-xl font-semibold text-[var(--editor-ink)]">{capability.title}</h2>
+              <h2 className="font-serif font-medium mt-8 text-xl text-[var(--editor-ink)]">{capability.title}</h2>
               <p className="mt-4 text-sm leading-7 text-[var(--editor-muted)]">{capability.description}</p>
             </article>
           ))}

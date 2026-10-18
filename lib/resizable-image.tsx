@@ -194,7 +194,7 @@ function ResizableImageView(props: any) {
     ? createPortal(
         <div
           ref={menuRef}
-          className="fixed z-[80] min-w-[220px] overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.18)]"
+          className="fixed z-[80] min-w-[220px] overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-1.5 shadow-whisper"
           style={{ left: menuPosition.x, top: menuPosition.y }}
           onMouseDown={(event) => event.stopPropagation()}
         >
@@ -204,7 +204,7 @@ function ResizableImageView(props: any) {
               downloadEditorImage(imageTarget.src, imageTarget.alt || 'image')
               closeMenu()
             }}
-            className="editor-image-menu-item"
+            className="min-h-11 min-w-11 editor-image-menu-item"
           >
             <Download className="h-4 w-4" />
             <span>下载图片</span>
@@ -221,7 +221,7 @@ function ResizableImageView(props: any) {
                 closeMenu()
               }
             }}
-            className="editor-image-menu-item"
+            className="min-h-11 min-w-11 editor-image-menu-item"
           >
             <Copy className="h-4 w-4" />
             <span>复制图片</span>
@@ -232,7 +232,7 @@ function ResizableImageView(props: any) {
               imageActions?.onSetCover?.(imageTarget)
               closeMenu()
             }}
-            className="editor-image-menu-item"
+            className="min-h-11 min-w-11 editor-image-menu-item"
           >
             <ImagePlus className="h-4 w-4" />
             <span>设为封面</span>
@@ -244,7 +244,7 @@ function ResizableImageView(props: any) {
               updateAttributes({ align: 'left' })
               closeMenu()
             }}
-            className={`editor-image-menu-item ${align === 'left' ? 'editor-image-menu-item-active' : ''}`}
+            className={`min-h-11 min-w-11 editor-image-menu-item ${align === 'left' ? 'editor-image-menu-item-active' : ''}`}
           >
             <AlignLeft className="h-4 w-4" />
             <span>左对齐</span>
@@ -255,7 +255,7 @@ function ResizableImageView(props: any) {
               updateAttributes({ align: 'center' })
               closeMenu()
             }}
-            className={`editor-image-menu-item ${align === 'center' ? 'editor-image-menu-item-active' : ''}`}
+            className={`min-h-11 min-w-11 editor-image-menu-item ${align === 'center' ? 'editor-image-menu-item-active' : ''}`}
           >
             <AlignCenter className="h-4 w-4" />
             <span>居中对齐</span>
@@ -267,7 +267,7 @@ function ResizableImageView(props: any) {
               imageActions?.onOpenReferenceImage?.(imageTarget)
               closeMenu()
             }}
-            className="editor-image-menu-item"
+            className="min-h-11 min-w-11 editor-image-menu-item"
           >
             <WandSparkles className="h-4 w-4" />
             <span>参考生图</span>
@@ -278,7 +278,7 @@ function ResizableImageView(props: any) {
               imageActions?.onOpenCrop?.(imageTarget)
               closeMenu()
             }}
-            className="editor-image-menu-item"
+            className="min-h-11 min-w-11 editor-image-menu-item"
           >
             <Crop className="h-4 w-4" />
             <span>裁剪图片</span>
@@ -325,7 +325,7 @@ function ResizableImageView(props: any) {
                 const rect = event.currentTarget.getBoundingClientRect()
                 openMenu(rect.left, rect.bottom + 8)
               }}
-              className="absolute -right-2 -top-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--editor-line)] bg-white text-[var(--editor-muted)] shadow-sm transition hover:text-[var(--editor-ink)]"
+              className="min-h-11 min-w-11 absolute -right-2 -top-2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--editor-muted)] shadow-sm transition hover:text-[var(--editor-ink)]"
               aria-label="打开图片菜单"
             >
               <MoreHorizontal className="h-4 w-4" />

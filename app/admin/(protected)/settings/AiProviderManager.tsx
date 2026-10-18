@@ -372,11 +372,11 @@ export function AiProviderManager() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-[var(--editor-ink)]">AI 模型配置</h3>
+        <h3 className="font-serif font-medium text-base text-[var(--editor-ink)]">AI 模型配置</h3>
         <button
           type="button"
           onClick={openCreate}
-          className="rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-white transition hover:brightness-105"
+          className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-accent)] px-3 py-1.5 text-sm font-semibold text-[var(--editor-accent-ink)] transition hover:brightness-105"
         >
           + 新增配置
         </button>
@@ -399,7 +399,7 @@ export function AiProviderManager() {
             <button
               type="button"
               onClick={() => setTemplateModalOpen(true)}
-              className="rounded-md border border-[var(--editor-line)] px-2.5 py-1 text-xs text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
+              className="min-h-11 min-w-11 rounded-md border border-[var(--editor-line)] px-2.5 py-1 text-xs text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
             >
               快捷模板
             </button>
@@ -426,7 +426,7 @@ export function AiProviderManager() {
                   step={0.1}
                   value={editing.temperature}
                   onChange={e => updateEditing({ temperature: clampTemperature(Number(e.target.value)) })}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
               </div>
               <div>
@@ -446,7 +446,7 @@ export function AiProviderManager() {
                       updateEditing({ max_tokens: 2000 })
                     }
                   }}
-                  className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                 />
                 <div className="mt-1 text-xs text-[var(--editor-muted)]">留空默认 2000，支持任意正整数。</div>
               </div>
@@ -455,7 +455,7 @@ export function AiProviderManager() {
                   <input
                     type="checkbox"
                     checked={editing.is_default}
-                    onChange={e => updateEditing({ is_default: e.target.checked })}
+                    onChange={e => updateEditing({ is_default: e.target.checked })} className="min-h-11 min-w-11"
                   />
                   默认配置
                 </label>
@@ -463,7 +463,7 @@ export function AiProviderManager() {
             </div>
 
             {testResult ? (
-              <div className={`mt-3 rounded-lg border px-3 py-2 text-sm ${testResult.success ? 'border-emerald-400/40 bg-emerald-500/10 text-[var(--editor-ink)]' : 'border-rose-400/40 bg-rose-500/10 text-[var(--editor-ink)]'}`}>
+              <div className={`mt-3 rounded-lg border px-3 py-2 text-sm ${testResult.success ? 'border-[var(--success-line)] bg-[var(--success-soft-bg)] text-[var(--editor-ink)]' : 'border-[var(--danger-line)] bg-[var(--danger-soft-bg)] text-[var(--editor-ink)]'}`}>
                 {testResult.success ? '✅ ' : '❌ '}
                 {testResult.message}
               </div>
@@ -474,14 +474,14 @@ export function AiProviderManager() {
                 type="button"
                 onClick={handleTest}
                 disabled={testing}
-                className="rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
+                className="min-h-11 min-w-11 rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
               >
                 {testing ? '测试中…' : '测试连接'}
               </button>
               <button
                 type="button"
                 onClick={() => setEditing(null)}
-                className="rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
+                className="min-h-11 min-w-11 rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
               >
                 取消
               </button>
@@ -489,7 +489,7 @@ export function AiProviderManager() {
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-lg bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-white hover:brightness-105 disabled:opacity-50"
+                className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-[var(--editor-accent-ink)] hover:brightness-105 disabled:opacity-50"
               >
                 {saving ? '保存中…' : '保存'}
               </button>

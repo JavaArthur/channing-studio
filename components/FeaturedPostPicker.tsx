@@ -33,7 +33,7 @@ export function FeaturedPostPicker({
         {selected.map((slug, i) => (
           <button
             type="button"
-            className="brain-secondary max-w-full"
+            className="min-h-11 min-w-11 brain-secondary max-w-full"
             title="移出精选"
             key={slug}
             onClick={() => onChange(selected.filter((item) => item !== slug))}
@@ -53,13 +53,13 @@ export function FeaturedPostPicker({
         }}
       >
         <input
-          className="brain-input"
+          className="min-h-11 min-w-11 brain-input"
           aria-label="查找公开文章"
           placeholder="按标题查找公开文章"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <button disabled={busy} className="brain-secondary">
+        <button disabled={busy} className="min-h-11 min-w-11 brain-secondary">
           查找
         </button>
       </form>
@@ -70,7 +70,7 @@ export function FeaturedPostPicker({
             type="button"
             key={item.slug}
             disabled={selected.length >= 3}
-            className="block text-left text-sm text-[var(--editor-accent)] disabled:opacity-40"
+            className="min-h-11 min-w-11 block text-left text-sm text-[var(--editor-accent)] disabled:opacity-40"
             onClick={() => onChange([...selected, item.slug])}
           >
             + {item.title}

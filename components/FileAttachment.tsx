@@ -38,18 +38,17 @@ export function FileAttachment({ url, name, size }: FileAttachmentProps) {
     <a
       href={url}
       download={name}
-      className="
-        inline-flex items-center gap-3 px-4 py-3
-        bg-[var(--editor-panel)] border border-[var(--editor-line)]
-        rounded-lg hover:border-[var(--editor-accent)]
-        transition-all duration-200
-        group cursor-pointer
-        max-w-md
-      "
+      className="min-h-11 min-w-11
+ inline-flex items-center gap-3 px-4 py-3
+ bg-[var(--editor-panel)] border border-[var(--editor-line)]
+ rounded-lg hover:border-[var(--editor-accent)]
+ transition-all duration-200
+ group cursor-pointer
+ max-w-md"
     >
       <span className="text-2xl flex-shrink-0">{icon}</span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-[var(--editor-ink)] truncate group-hover:text-[var(--editor-accent)] transition-colors">
+        <p className="font-serif text-sm font-medium text-[var(--editor-ink)] truncate group-hover:text-[var(--editor-accent)] transition-colors">
           {name}
         </p>
         {sizeText && (

@@ -80,7 +80,7 @@ export function DeleteButton({ slug, title, status }: { slug: string; title: str
           type="button"
           onClick={handleRestore}
           disabled={loading}
-          className="text-xs text-emerald-600 hover:text-emerald-700 hover:underline underline-offset-2 transition-colors disabled:opacity-50"
+          className="min-h-11 min-w-11 text-xs text-[var(--success)] hover:text-[var(--success)] hover:underline underline-offset-2 transition-colors disabled:opacity-50"
         >
           {loading ? '恢复中...' : '恢复'}
         </button>
@@ -88,7 +88,7 @@ export function DeleteButton({ slug, title, status }: { slug: string; title: str
           type="button"
           onClick={() => setShowPermanentModal(true)}
           disabled={loading}
-          className="text-xs text-rose-500 hover:text-rose-700 hover:underline underline-offset-2 transition-colors disabled:opacity-50"
+          className="min-h-11 min-w-11 text-xs text-[var(--danger)] hover:text-[var(--danger)] hover:underline underline-offset-2 transition-colors disabled:opacity-50"
         >
           永久删除
         </button>
@@ -112,7 +112,7 @@ export function DeleteButton({ slug, title, status }: { slug: string; title: str
         type="button"
         onClick={() => setShowDeleteModal(true)}
         disabled={loading}
-        className="text-xs text-rose-500 hover:text-rose-700 hover:underline underline-offset-2 transition-colors disabled:opacity-50"
+        className="min-h-11 min-w-11 text-xs text-[var(--danger)] hover:text-[var(--danger)] hover:underline underline-offset-2 transition-colors disabled:opacity-50"
       >
         删除
       </button>

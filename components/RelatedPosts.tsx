@@ -44,7 +44,7 @@ export function RelatedPosts({ slug }: { slug: string }) {
     <section className="mt-14 border-t border-[var(--editor-line)] pt-8 sm:mt-16 sm:pt-10">
       <div className="mb-5 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-[var(--editor-ink)] sm:text-xl">继续阅读</h2>
+          <h2 className="font-serif font-medium text-lg text-[var(--editor-ink)] sm:text-xl">继续阅读</h2>
           <p className="mt-1 text-xs text-[var(--stone-gray)]">
             {payload.source === 'vectorize' ? '基于向量召回' : '基于全文检索与主题相似度'}
           </p>
@@ -55,7 +55,7 @@ export function RelatedPosts({ slug }: { slug: string }) {
           <Link
             key={item.slug}
             href={`/${item.slug}`}
-            className="group rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]/55 p-4 transition-colors hover:border-[var(--editor-accent)]/35 hover:bg-[var(--editor-panel)]"
+            className="min-h-11 min-w-11 inline-flex items-center group rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]/55 p-4 transition-colors hover:border-[var(--editor-accent)]/35 hover:bg-[var(--editor-panel)]"
           >
             <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-[var(--stone-gray)]">
               {item.category && (
@@ -65,7 +65,7 @@ export function RelatedPosts({ slug }: { slug: string }) {
               )}
               <time>{formatDate(item.published_at)}</time>
             </div>
-            <h3 className="text-base font-semibold leading-snug text-[var(--editor-ink)] transition-colors group-hover:text-[var(--editor-accent)]">
+            <h3 className="font-serif font-medium text-base leading-snug text-[var(--editor-ink)] transition-colors group-hover:text-[var(--editor-accent)]">
               {item.title}
             </h3>
             {item.description && (

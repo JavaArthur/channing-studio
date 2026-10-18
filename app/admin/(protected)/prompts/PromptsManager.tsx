@@ -31,7 +31,7 @@ const EMPTY: FormState = {
   sort_order: 0,
 }
 
-const inputClass = 'w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)] focus:ring-2 focus:ring-[var(--editor-accent)]/15'
+const inputClass = 'w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)] focus:ring-2 focus:ring-[var(--focus-ring)]/15'
 
 export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] }) {
   const router = useRouter()
@@ -117,30 +117,30 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
   return (
     <div className="space-y-8">
       <p className="text-sm text-[var(--editor-muted)]">提示词只在你的浏览器中复制，不会发送给第三方服务。新收藏默认私密。</p>
-      <button className="brain-button" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
+      <button className="min-h-11 min-w-11 brain-button brain-cta" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
       <section className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-5">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[var(--editor-ink)]">{editing ? '编辑提示词' : '添加提示词'}</h2>
-          {editing && <button type="button" onClick={() => setForm(EMPTY)} className="text-xs text-[var(--editor-muted)] hover:text-[var(--editor-ink)]">取消编辑</button>}
+          <h2 className="font-serif font-medium text-sm text-[var(--editor-ink)]">{editing ? '编辑提示词' : '添加提示词'}</h2>
+          {editing && <button type="button" onClick={() => setForm(EMPTY)} className="min-h-11 min-w-11 text-xs text-[var(--editor-muted)] hover:text-[var(--editor-ink)]">取消编辑</button>}
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <input className={inputClass} placeholder="标题 *" value={form.title} onChange={(event) => setField('title', event.target.value)} />
-          <input className={inputClass} placeholder="分类，例如：写作 / 编程" value={form.category} onChange={(event) => setField('category', event.target.value)} />
-          <input className={inputClass} placeholder="标签，用逗号分隔" value={form.tags} onChange={(event) => setField('tags', event.target.value)} />
-          <input className={inputClass} placeholder="来源 URL（可选）" value={form.source_url} onChange={(event) => setField('source_url', event.target.value)} />
-          <textarea className={`${inputClass} min-h-16 resize-y sm:col-span-2`} placeholder="一句话说明适用场景" value={form.description} onChange={(event) => setField('description', event.target.value)} />
-          <textarea className={`${inputClass} min-h-48 resize-y font-mono sm:col-span-2`} placeholder="提示词正文 *" value={form.prompt} onChange={(event) => setField('prompt', event.target.value)} />
+          <input className={`min-h-11 min-w-11 ${inputClass}`} placeholder="标题 *" value={form.title} onChange={(event) => setField('title', event.target.value)} />
+          <input className={`min-h-11 min-w-11 ${inputClass}`} placeholder="分类，例如：写作 / 编程" value={form.category} onChange={(event) => setField('category', event.target.value)} />
+          <input className={`min-h-11 min-w-11 ${inputClass}`} placeholder="标签，用逗号分隔" value={form.tags} onChange={(event) => setField('tags', event.target.value)} />
+          <input className={`min-h-11 min-w-11 ${inputClass}`} placeholder="来源 URL（可选）" value={form.source_url} onChange={(event) => setField('source_url', event.target.value)} />
+          <textarea className={`min-h-11 min-w-11 ${inputClass} min-h-16 resize-y sm:col-span-2`} placeholder="一句话说明适用场景" value={form.description} onChange={(event) => setField('description', event.target.value)} />
+          <textarea className={`min-h-11 min-w-11 ${inputClass} min-h-48 resize-y font-mono sm:col-span-2`} placeholder="提示词正文 *" value={form.prompt} onChange={(event) => setField('prompt', event.target.value)} />
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-[var(--editor-muted)]">
           <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2"><input type="checkbox" checked={form.is_pinned} onChange={(event) => setField('is_pinned', event.target.checked)} />置顶</label>
+            <label className="flex items-center gap-2"><input type="checkbox" checked={form.is_pinned} onChange={(event) => setField('is_pinned', event.target.checked)} className="min-h-11 min-w-11" />置顶</label>
 
-            <label className="flex items-center gap-2">排序<input className={`${inputClass} w-20`} type="number" value={form.sort_order} onChange={(event) => setField('sort_order', Number(event.target.value) || 0)} /></label>
+            <label className="flex items-center gap-2">排序<input className={`min-h-11 min-w-11 ${inputClass} w-20`} type="number" value={form.sort_order} onChange={(event) => setField('sort_order', Number(event.target.value) || 0)} /></label>
           </div>
-          <button type="button" onClick={() => void save()} disabled={saving} className="rounded-lg bg-[var(--editor-accent)] px-5 py-2.5 text-sm font-semibold text-white hover:brightness-105 disabled:opacity-50">{saving ? '保存中…' : editing ? '更新提示词' : '添加提示词'}</button>
+          <button type="button" onClick={() => void save()} disabled={saving} className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--editor-accent-ink)] hover:brightness-105 disabled:opacity-50">{saving ? '保存中…' : editing ? '更新提示词' : '添加提示词'}</button>
         </div>
-        {message && <p className="mt-4 text-sm text-emerald-700">{message}</p>}
-        {error && <p className="mt-4 text-sm text-rose-600">{error}</p>}
+        {message && <p className="mt-4 text-sm text-[var(--success)]">{message}</p>}
+        {error && <p className="mt-4 text-sm text-[var(--danger)]">{error}</p>}
       </section>
 
       <section className="space-y-3">
@@ -151,13 +151,13 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-semibold text-[var(--editor-ink)]">{prompt.title}</h3>
+                  <h3 className="font-serif font-medium text-[var(--editor-ink)]">{prompt.title}</h3>
                   {prompt.is_pinned === 1 && <span className="text-xs text-[var(--editor-accent)]">置顶</span>}
                   <span className="text-xs text-[var(--stone-gray)]">{prompt.is_hidden ? '私密' : '已公开'}</span>
                 </div>
                 {prompt.description && <p className="mt-1 text-sm text-[var(--editor-muted)]">{prompt.description}</p>}
               </div>
-              <div className="flex gap-3 text-xs text-[var(--editor-muted)]">{prompt.is_hidden === 0 && <ResourceWithdrawal kind="prompts" id={prompt.id}/>}<button type="button" onClick={() => edit(prompt)} className="hover:text-[var(--editor-ink)]">编辑</button><button type="button" onClick={() => remove(prompt)} className="text-rose-500 hover:underline">删除</button></div>
+              <div className="flex gap-3 text-xs text-[var(--editor-muted)]">{prompt.is_hidden === 0 && <ResourceWithdrawal kind="prompts" id={prompt.id}/>}<button type="button" onClick={() => edit(prompt)} className="min-h-11 min-w-11 hover:text-[var(--editor-ink)]">编辑</button><button type="button" onClick={() => remove(prompt)} className="min-h-11 min-w-11 text-[var(--danger)] hover:underline">删除</button></div>
             </div>
             <pre className="mt-3 line-clamp-3 whitespace-pre-wrap rounded-lg bg-[var(--editor-soft)] p-3 text-xs leading-6 text-[var(--editor-muted)]">{prompt.prompt}</pre>
           </article>

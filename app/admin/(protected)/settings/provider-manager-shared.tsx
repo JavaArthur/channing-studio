@@ -106,7 +106,7 @@ export function ProviderListTable<T extends BaseProviderProfile>({
               <td className="px-3 py-2 font-medium text-[var(--editor-ink)]">
                 {profile.name}
                 {profile.id === defaultProfileId || profile.is_default === 1 ? (
-                  <span className="ml-2 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-600">默认</span>
+                  <span className="ml-2 rounded-md bg-[var(--success-soft-bg)] px-1.5 py-0.5 text-[10px] text-[var(--success)]">默认</span>
                 ) : null}
               </td>
               <td className="hidden px-3 py-2 text-[var(--editor-muted)] sm:table-cell">
@@ -121,7 +121,7 @@ export function ProviderListTable<T extends BaseProviderProfile>({
                   <button
                     type="button"
                     onClick={() => onSetDefault(profile)}
-                    className="text-xs text-[var(--editor-accent)] hover:underline"
+                    className="min-h-11 min-w-11 text-xs text-[var(--editor-accent)] hover:underline"
                   >
                     默认
                   </button>
@@ -129,14 +129,14 @@ export function ProviderListTable<T extends BaseProviderProfile>({
                 <button
                   type="button"
                   onClick={() => onEdit(profile)}
-                  className="ml-2 text-xs text-[var(--editor-accent)] hover:underline"
+                  className="min-h-11 min-w-11 ml-2 text-xs text-[var(--editor-accent)] hover:underline"
                 >
                   编辑
                 </button>
                 <button
                   type="button"
                   onClick={() => onDelete(profile)}
-                  className="ml-2 text-xs text-rose-500 hover:underline"
+                  className="min-h-11 min-w-11 ml-2 text-xs text-[var(--danger)] hover:underline"
                 >
                   删除
                 </button>
@@ -165,13 +165,13 @@ interface ProviderDialogProps {
 
 export function ProviderDialog({ title, onClose, headerAction, children }: ProviderDialogProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)]" onClick={onClose}>
       <div
         className="mx-4 w-full max-w-2xl rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-6 shadow-xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-[var(--editor-ink)]">{title}</h3>
+          <h3 className="font-serif font-medium text-lg text-[var(--editor-ink)]">{title}</h3>
           {headerAction}
         </div>
         {children}
@@ -196,16 +196,16 @@ export function ProviderTemplateModal({
   onSelect,
 }: ProviderTemplateModalProps) {
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[var(--overlay)]" onClick={onClose}>
       <div
         className="mx-4 w-full max-w-xl rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-6 shadow-xl"
         onClick={(event) => event.stopPropagation()}
       >
-        <h3 className="mb-4 text-lg font-semibold text-[var(--editor-ink)]">快捷模板</h3>
+        <h3 className="font-serif font-medium mb-4 text-lg text-[var(--editor-ink)]">快捷模板</h3>
         <div className="space-y-4">
           {groups.map((group) => (
             <div key={group.category}>
-              <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--editor-muted)]">
+              <div className="mb-2 text-xs font-medium uppercase tracking-wider text-[var(--editor-muted)]">
                 {group.category}
               </div>
               <div className="space-y-2">
@@ -214,12 +214,12 @@ export function ProviderTemplateModal({
                     key={preset.id}
                     type="button"
                     onClick={() => onSelect(preset.id)}
-                    className="w-full rounded-lg border border-[var(--editor-line)] px-4 py-3 text-left hover:bg-[var(--editor-soft)]"
+                    className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] px-4 py-3 text-left hover:bg-[var(--editor-soft)]"
                   >
-                    <div className="text-sm font-semibold text-[var(--editor-ink)]">
+                    <div className="font-serif text-sm font-medium text-[var(--editor-ink)]">
                       {preset.name}
                       {preset.recommended ? (
-                        <span className="ml-2 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-600">推荐</span>
+                        <span className="ml-2 rounded-md bg-[var(--success-soft-bg)] px-1.5 py-0.5 text-[10px] text-[var(--success)]">推荐</span>
                       ) : null}
                     </div>
                     <div className="mt-1 text-xs text-[var(--editor-muted)]">{preset.description}</div>
@@ -232,9 +232,9 @@ export function ProviderTemplateModal({
           <button
             type="button"
             onClick={() => onSelect('custom')}
-            className="w-full rounded-lg border border-dashed border-[var(--editor-line)] px-4 py-3 text-left hover:bg-[var(--editor-soft)]"
+            className="min-h-11 min-w-11 w-full rounded-lg border border-dashed border-[var(--editor-line)] px-4 py-3 text-left hover:bg-[var(--editor-soft)]"
           >
-            <div className="text-sm font-semibold text-[var(--editor-ink)]">{customOptionLabel}</div>
+            <div className="font-serif text-sm font-medium text-[var(--editor-ink)]">{customOptionLabel}</div>
             <div className="mt-1 text-xs text-[var(--editor-muted)]">{customOptionDescription}</div>
           </button>
         </div>
@@ -274,7 +274,7 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
           type="text"
           value={editing.name}
           onChange={(event) => onChange({ name: event.target.value } as Partial<T>)}
-          className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+          className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
         />
       </div>
       <div>
@@ -283,7 +283,7 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
           type="text"
           value={editing.provider_name || editing.provider}
           onChange={(event) => onChange({ provider_name: event.target.value } as Partial<T>)}
-          className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+          className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
         />
       </div>
 
@@ -293,7 +293,7 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
           type="url"
           value={editing.base_url}
           onChange={(event) => onChange({ base_url: event.target.value } as Partial<T>)}
-          className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+          className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
         />
       </div>
 
@@ -305,7 +305,7 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
               href={editing.api_key_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-[var(--editor-accent)] hover:underline"
+              className="min-h-11 min-w-11 inline-flex items-center text-xs text-[var(--editor-accent)] hover:underline"
             >
               获取 Key
             </a>
@@ -315,7 +315,7 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
           type="password"
           value={editing.api_key}
           onChange={(event) => onChange({ api_key: event.target.value } as Partial<T>)}
-          className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+          className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
         />
         {editing.api_key_masked ? (
           <div className="mt-1 text-xs text-[var(--editor-muted)]">已保存：{editing.api_key_masked}</div>
@@ -329,7 +329,7 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
             type="button"
             onClick={onFetchModels}
             disabled={loadingModels}
-            className="rounded-md border border-[var(--editor-line)] px-2.5 py-1 text-xs text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
+            className="min-h-11 min-w-11 rounded-md border border-[var(--editor-line)] px-2.5 py-1 text-xs text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] disabled:opacity-50"
           >
             {loadingModels ? '拉取中…' : fetchModelsLabel}
           </button>
@@ -338,7 +338,7 @@ export function ProviderBasicFields<T extends BaseProviderFormState>({
           type="text"
           value={editing.model}
           onChange={(event) => onChange({ model: event.target.value } as Partial<T>)}
-          className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+          className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
         />
         {models.length > 0 ? (
           <div className="mt-2 space-y-2">

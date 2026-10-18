@@ -56,7 +56,7 @@ function MathComponent(props: ReactNodeViewProps) {
             defaultValue={latex}
             placeholder="E = mc^2"
             rows={displayMode ? 3 : 1}
-            className="math-editor-input"
+            className="min-h-11 min-w-11 math-editor-input"
             onBlur={(e) => {
               const val = e.target.value.trim()
               if (val) {

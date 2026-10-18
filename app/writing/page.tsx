@@ -68,11 +68,11 @@ export default async function WritingPage({
         <>
           <div className="divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
             {posts.map((post) => (
-              <StudioLink key={post.slug} href={`/${post.slug}`}>
+              <StudioLink key={post.slug} href={`/${post.slug}`} className="min-h-11 min-w-11 inline-flex items-center">
                 <article className="studio-writing-row group">
                   <div className="min-w-0">
                     <StudioCardLabel>{post.category || 'NOTE'}</StudioCardLabel>
-                    <h2 className="studio-writing-title mt-2">{post.title}</h2>
+                    <h2 className="font-serif font-medium studio-writing-title mt-2">{post.title}</h2>
                     {post.description && <p className="studio-writing-description mt-2">{post.description}</p>}
                     <time className="studio-writing-date" dateTime={new Date(post.published_at * 1000).toISOString()}>
                       {formatDate(post.published_at)}

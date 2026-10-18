@@ -1,28 +1,34 @@
 a, button, input, select, textarea { -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 2px solid var(--editor-accent); outline-offset: 4px; }
 .public-header { position: sticky; top: 0; z-index: 40; border-bottom: 1px solid var(--editor-line); background: var(--background); }
 .public-header-inner { max-width: 1152px; margin: auto; min-height: 80px; padding: 0 24px; display:flex; justify-content:space-between; align-items:center; gap:24px; }
 .brand { display:flex; align-items:center; gap:12px; font-size:17px; font-weight:600; letter-spacing:-.03em; }
 .brand-mark { display:grid; place-items:center; height:36px; width:36px; border-radius:10px; background:var(--editor-ink); color:var(--background); font-size:22px; }
 .brand-subtitle { color:var(--editor-muted); font-weight:400; }
-.public-nav-link { color:var(--editor-muted); font-size:14px; }
+.public-nav-link { display:inline-flex; align-items:center; min-height:44px; min-width:44px; color:var(--editor-muted); font-size:14px; }
 .public-nav-link:hover, .public-nav-link[aria-current] { color:var(--editor-accent); }
-.color-mode-toggle { display:grid; place-items:center; width:36px; height:36px; border:1px solid var(--editor-line); border-radius:50%; color:var(--editor-ink); cursor:pointer; }
+.color-mode-toggle { display:grid; place-items:center; width:44px; height:44px; flex-shrink:0; border:1px solid var(--editor-line); border-radius:50%; color:var(--editor-ink); cursor:pointer; }
 .brain-panel { border:1px solid var(--editor-line); background:var(--editor-panel); border-radius:16px; padding:24px; }
-.brain-input { width:100%; min-width:0; border:1px solid var(--editor-line); border-radius:8px; padding:10px 12px; background:var(--background); color:var(--editor-ink); }
-.brain-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:8px; padding:10px 16px; background:var(--editor-accent); color:var(--editor-accent-ink); font-size:14px; font-weight:600; cursor:pointer; }
+.brain-input { min-height:44px; min-width:44px; width:100%; border:1px solid var(--editor-line); border-radius:8px; padding:10px 12px; background:var(--background); color:var(--editor-ink); }
+.brain-button { min-height:44px; min-width:44px; display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:8px; padding:10px 16px; background:var(--editor-accent); color:var(--editor-accent-ink); font-size:14px; font-weight:600; cursor:pointer; }
 .brain-button:disabled { opacity:.5; cursor:wait; }
-.brain-secondary { white-space:nowrap; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid var(--editor-line); border-radius:8px; padding:9px 14px; color:var(--editor-ink); font-size:14px; cursor:pointer; }
+.brain-secondary { background:var(--editor-sand); box-shadow:var(--shadow-ring); min-height:44px; min-width:44px; white-space:nowrap; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid var(--editor-line); border-radius:8px; padding:9px 14px; color:var(--editor-ink); font-size:14px; cursor:pointer; }
 .brain-kicker { font-size:11px; text-transform:uppercase; letter-spacing:.16em; color:var(--editor-muted); font-weight:600; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
 
 @media (max-width: 639px) { [role="tooltip"] { display:none; } }
 
-/* Existing controls share the same accessible accent foreground in both modes. */
-.bg-\[var\(--editor-accent\)\].text-white,
-.bg-\[var\(--editor-accent\)\].text-white .text-white {
-  color: var(--editor-accent-ink);
-}
 @media (max-width: 1023px) {
   .editor-settings-panel { position:static !important; width:100% !important; height:auto !important; border-left:0; border-top:1px solid var(--editor-line); }
+}
+
+/* Primary actions opt in; active tabs and ordinary filled controls stay charcoal. */
+.brain-cta { background:var(--cta-bg); color:var(--cta-ink); }
+.brain-cta:hover { background:var(--cta-bg-hover); }
+.brain-cta:disabled { background:var(--cta-disabled-bg); color:var(--cta-disabled-ink); opacity:1; cursor:not-allowed; }
+
+/* Header controls fit the 390px canvas with full 44px touch targets. */
+@media (max-width: 639px) {
+  .public-header-inner { padding-inline:16px; gap:12px; }
+  .public-header-inner > div:last-child { gap:4px; }
+  .brand { gap:8px; }
 }

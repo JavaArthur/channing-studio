@@ -44,7 +44,7 @@ export function NavLinksEditor({ initialValue, onSave, saving }: Props) {
     setLinks((prev) => { const n = [...prev]; [n[idx], n[idx + 1]] = [n[idx + 1], n[idx]]; return n })
   }
 
-  const inputCls = 'h-9 rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 text-sm text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] outline-none focus:border-[var(--editor-accent)] transition-colors'
+  const inputCls = 'h-9 rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 text-sm text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] outline-none focus:border-[var(--focus-ring)] transition-colors'
   const btnCls = 'h-9 px-3 rounded-lg text-sm font-medium transition-colors'
 
   return (
@@ -52,13 +52,13 @@ export function NavLinksEditor({ initialValue, onSave, saving }: Props) {
       {links.map((link, idx) => (
         <div key={idx} className="flex items-center gap-2 flex-wrap">
           <input
-            className={`${inputCls} w-24`}
+            className={`min-h-11 min-w-11 ${inputCls} w-24`}
             placeholder="名称"
             value={link.label}
             onChange={(e) => update(idx, 'label', e.target.value)}
           />
           <input
-            className={`${inputCls} flex-1 min-w-[180px]`}
+            className={`min-h-11 min-w-11 ${inputCls} flex-1 min-w-[180px]`}
             placeholder="URL"
             value={link.url}
             onChange={(e) => update(idx, 'url', e.target.value)}
@@ -68,24 +68,24 @@ export function NavLinksEditor({ initialValue, onSave, saving }: Props) {
               type="checkbox"
               checked={link.openInNewTab}
               onChange={(e) => update(idx, 'openInNewTab', e.target.checked)}
-              className="accent-[var(--editor-accent)]"
+              className="min-h-11 min-w-11 accent-[var(--editor-accent)]"
             />
             新窗口
           </label>
-          <Tooltip label="上移此链接"><button onClick={() => moveUp(idx)} disabled={idx === 0} className={`${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`} aria-label="上移此链接">↑</button></Tooltip>
-          <Tooltip label="下移此链接"><button onClick={() => moveDown(idx)} disabled={idx === links.length - 1} className={`${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`} aria-label="下移此链接">↓</button></Tooltip>
-          <Tooltip label="删除此链接"><button onClick={() => remove(idx)} className={`${btnCls} text-red-500 hover:bg-rose-500/10`} aria-label="删除此链接">删除</button></Tooltip>
+          <Tooltip label="上移此链接"><button onClick={() => moveUp(idx)} disabled={idx === 0} className={`min-h-11 min-w-11 ${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`} aria-label="上移此链接">↑</button></Tooltip>
+          <Tooltip label="下移此链接"><button onClick={() => moveDown(idx)} disabled={idx === links.length - 1} className={`min-h-11 min-w-11 ${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`} aria-label="下移此链接">↓</button></Tooltip>
+          <Tooltip label="删除此链接"><button onClick={() => remove(idx)} className={`min-h-11 min-w-11 ${btnCls} text-[var(--danger)] hover:bg-[var(--danger-soft-bg)]`} aria-label="删除此链接">删除</button></Tooltip>
         </div>
       ))}
 
       <div className="flex items-center gap-3 pt-2">
-        <button onClick={add} className={`${btnCls} bg-[var(--editor-soft)] text-[var(--editor-ink)] hover:bg-[var(--border-warm)]`}>
+        <button onClick={add} className={`min-h-11 min-w-11 ${btnCls} bg-[var(--editor-soft)] text-[var(--editor-ink)] hover:bg-[var(--border-warm)]`}>
           + 添加链接
         </button>
         <button
           onClick={() => onSave(JSON.stringify(links))}
           disabled={saving}
-          className={`${btnCls} bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] hover:brightness-105 disabled:opacity-60`}
+          className={`min-h-11 min-w-11 ${btnCls} bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] hover:brightness-105 disabled:opacity-60`}
         >
           {saving ? '保存中…' : '保存导航'}
         </button>

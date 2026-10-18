@@ -85,16 +85,16 @@ export function ImageCropModal({
 
   return (
     <div
-      className="fixed inset-0 z-[75] bg-black/55 px-3 py-3 sm:px-4 sm:py-4"
+      className="fixed inset-0 z-[75] bg-[var(--overlay)] px-3 py-3 sm:px-4 sm:py-4"
       onClick={(event) => {
         if (event.target === event.currentTarget && !submitting) onClose()
       }}
     >
       <div className="flex min-h-full items-center justify-center">
-        <div className="flex w-full max-w-5xl max-h-[calc(100vh-1.5rem)] flex-col overflow-hidden rounded-[28px] border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+        <div className="flex w-full max-w-5xl max-h-[calc(100vh-1.5rem)] flex-col overflow-hidden rounded-[28px] border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-whisper">
           <div className="flex items-start justify-between gap-4 border-b border-[var(--editor-line)] px-5 py-4">
             <div className="min-w-0">
-              <div className="text-base font-semibold text-[var(--editor-ink)]">裁剪图片</div>
+              <div className="font-serif text-base font-medium text-[var(--editor-ink)]">裁剪图片</div>
               <div className="mt-1 text-sm text-[var(--editor-muted)]">拖动调整取景区域，裁完后可以替换当前图或插入新图。</div>
             </div>
             <Tooltip label="关闭裁剪面板">
@@ -102,7 +102,7 @@ export function ImageCropModal({
                 type="button"
                 onClick={onClose}
                 disabled={submitting}
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)] disabled:opacity-50"
+                className="min-h-11 min-w-11 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)] disabled:opacity-50"
                 aria-label="关闭裁剪面板"
               >
                 <X className="h-4 w-4" />
@@ -111,7 +111,7 @@ export function ImageCropModal({
           </div>
 
           <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1.15fr)_320px]">
-            <div className="relative min-h-[360px] bg-[#111] lg:min-h-[520px]">
+            <div className="relative min-h-[360px] bg-[var(--editor-soft)] lg:min-h-[520px]">
               <Cropper
                 image={imageUrl}
                 crop={crop}
@@ -137,7 +137,7 @@ export function ImageCropModal({
                 <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5">
                   <div className="space-y-2">
                     <div className="text-xs font-medium text-[var(--editor-muted)]">原图预览</div>
-                    <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white">
+                    <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]">
                       <img
                         src={imageUrl}
                         alt={imageAlt || '待裁剪图片'}
@@ -154,7 +154,7 @@ export function ImageCropModal({
                           key={option.value}
                           type="button"
                           onClick={() => setAspectPreset(option.value)}
-                          className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                          className={`min-h-11 min-w-11 rounded-full border px-3 py-1.5 text-sm transition ${
                             aspectPreset === option.value
                               ? 'border-[var(--editor-accent)] bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
                               : 'border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
@@ -172,9 +172,9 @@ export function ImageCropModal({
                       <button
                         type="button"
                         onClick={() => setPlacementMode('replace')}
-                        className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
+                        className={`min-h-11 min-w-11 rounded-xl px-3 py-2 text-sm font-medium transition ${
                           placementMode === 'replace'
-                            ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                            ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                             : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                         }`}
                       >
@@ -183,9 +183,9 @@ export function ImageCropModal({
                       <button
                         type="button"
                         onClick={() => setPlacementMode('insert')}
-                        className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
+                        className={`min-h-11 min-w-11 rounded-xl px-3 py-2 text-sm font-medium transition ${
                           placementMode === 'insert'
-                            ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                            ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                             : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                         }`}
                       >
@@ -212,7 +212,7 @@ export function ImageCropModal({
                         step={0.01}
                         value={zoom}
                         onChange={(event) => setZoom(Number(event.target.value))}
-                        className="w-full accent-[var(--editor-accent)]"
+                        className="min-h-11 min-w-11 w-full accent-[var(--editor-accent)]"
                       />
                     </div>
                   </div>
@@ -220,7 +220,7 @@ export function ImageCropModal({
 
                 <div className="border-t border-[var(--editor-line)] px-5 py-4">
                   {error ? (
-                    <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                    <div className="mb-3 rounded-xl border border-[var(--danger-line)] bg-[var(--danger-soft-bg)] px-3 py-2 text-sm text-[var(--danger)]">
                       {error}
                     </div>
                   ) : null}
@@ -230,7 +230,7 @@ export function ImageCropModal({
                       type="button"
                       onClick={onClose}
                       disabled={submitting}
-                      className="rounded-xl border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)] disabled:opacity-50"
+                      className="min-h-11 min-w-11 rounded-xl border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)] disabled:opacity-50"
                     >
                       取消
                     </button>
@@ -258,7 +258,7 @@ export function ImageCropModal({
                           setSubmitting(false)
                         }
                       }}
-                      className="inline-flex items-center gap-2 rounded-xl bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="min-h-11 min-w-11 inline-flex items-center gap-2 rounded-xl bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-[var(--editor-accent-ink)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crop className="h-4 w-4" />}
                       {placementMode === 'replace' ? '裁剪并替换' : '裁剪并插入'}

@@ -19,7 +19,7 @@ export function ThemeDropdown({ initialTheme = 'light' }: { initialTheme?: Theme
   return (
     <button
       type="button"
-      className="color-mode-toggle"
+      className="min-h-11 min-w-11 color-mode-toggle"
       onClick={() => setClientThemePreference(next)}
       aria-label={`切换到${next === 'light' ? '白天' : '晚上'}模式`}
       title={`切换到${next === 'light' ? '白天' : '晚上'}模式`}

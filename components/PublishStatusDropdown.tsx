@@ -30,7 +30,7 @@ const STATUS_CONFIG = {
   unlisted: {
     label: '私密',
     icon: Link2,
-    description: '不在首页显示，但可通过私密',
+    description: '不在首页和列表显示，公开链接也打不开，仅后台可见',
   },
 }
 
@@ -60,7 +60,7 @@ export function PublishStatusDropdown({ value, onChange, disabled }: PublishStat
         type="button"
         onClick={() => setOpen(!open)}
         disabled={disabled}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--editor-line)] bg-[var(--background)] text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="min-h-11 min-w-11 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[var(--editor-line)] bg-[var(--background)] text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Icon className="w-4 h-4" />
         <span>{currentConfig.label}</span>
@@ -82,7 +82,7 @@ export function PublishStatusDropdown({ value, onChange, disabled }: PublishStat
                     onChange(status)
                     setOpen(false)
                   }}
-                  className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--editor-soft)] transition-colors ${
+                  className={`focus-ring-inset min-h-11 min-w-11 w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--editor-soft)] transition-colors ${
                     isActive ? 'bg-[var(--editor-accent)]/5' : ''
                   }`}
                 >

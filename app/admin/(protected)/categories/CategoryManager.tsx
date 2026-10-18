@@ -126,7 +126,7 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
     <div className="space-y-6">
       {/* 添加分类 */}
       <form onSubmit={handleAdd} className="bg-[var(--editor-panel)] rounded-xl border border-[var(--editor-line)] p-5">
-        <h2 className="text-sm font-semibold text-[var(--editor-ink)] mb-3">添加分类</h2>
+        <h2 className="font-serif font-medium text-sm text-[var(--editor-ink)] mb-3">添加分类</h2>
         <div className="flex gap-3 items-end">
           <div className="flex-1">
             <label className="text-xs text-[var(--editor-muted)] mb-1 block">名称</label>
@@ -135,7 +135,7 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="如：AI工具"
-              className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-ink)] transition"
+              className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)] transition"
             />
           </div>
           <div className="flex-1">
@@ -145,18 +145,18 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               placeholder="如：ai-tools"
-              className="w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-ink)] transition"
+              className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)] transition"
             />
           </div>
           <button
             type="submit"
             disabled={loading || !name.trim() || !slug.trim()}
-            className="px-4 py-2 text-sm rounded-lg bg-[var(--editor-ink)] text-white font-medium hover:brightness-110 transition disabled:opacity-50"
+            className="min-h-11 min-w-11 px-4 py-2 text-sm rounded-lg bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] font-medium hover:brightness-105 transition disabled:opacity-50"
           >
             {loading ? '添加中…' : '添加'}
           </button>
         </div>
-        {error && <p className="text-xs text-rose-500 mt-2">{error}</p>}
+        {error && <p className="text-xs text-[var(--danger)] mt-2">{error}</p>}
       </form>
 
       {/* 分类列表 */}
@@ -176,18 +176,18 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="text-sm rounded border border-[var(--editor-line)] bg-[var(--background)] px-2 py-1 text-[var(--editor-ink)] outline-none focus:border-[var(--editor-ink)]"
+                    className="min-h-11 min-w-11 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] px-2 py-1 text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                   />
                   <input
                     type="text"
                     value={editSlugVal}
                     onChange={(e) => setEditSlugVal(e.target.value)}
-                    className="text-xs font-mono rounded border border-[var(--editor-line)] bg-[var(--background)] px-2 py-1 text-[var(--editor-ink)] outline-none focus:border-[var(--editor-ink)]"
+                    className="min-h-11 min-w-11 text-xs font-mono rounded-md border border-[var(--editor-line)] bg-[var(--background)] px-2 py-1 text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                   />
                   <span className="text-xs text-[var(--editor-muted)] text-right tabular-nums">{cat.post_count}</span>
                   <div className="flex gap-2">
-                    <button type="button" onClick={handleUpdate} className="text-xs text-emerald-600 hover:underline">保存</button>
-                    <button type="button" onClick={() => setEditingSlug(null)} className="text-xs text-[var(--editor-muted)] hover:underline">取消</button>
+                    <button type="button" onClick={handleUpdate} className="min-h-11 min-w-11 text-xs text-[var(--success)] hover:underline">保存</button>
+                    <button type="button" onClick={() => setEditingSlug(null)} className="min-h-11 min-w-11 text-xs text-[var(--editor-muted)] hover:underline">取消</button>
                   </div>
                 </>
               ) : (
@@ -196,8 +196,8 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
                   <span className="text-xs text-[var(--editor-muted)] font-mono">{cat.slug}</span>
                   <span className="text-xs text-[var(--editor-muted)] text-right tabular-nums">{cat.post_count}</span>
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => startEditing(cat)} className="text-xs text-[var(--editor-accent)] hover:underline">编辑</button>
-                    <button type="button" onClick={() => handleDelete(cat.slug, cat.name)} className="text-xs text-rose-500 hover:underline">删除</button>
+                    <button type="button" onClick={() => startEditing(cat)} className="min-h-11 min-w-11 text-xs text-[var(--editor-accent)] hover:underline">编辑</button>
+                    <button type="button" onClick={() => handleDelete(cat.slug, cat.name)} className="min-h-11 min-w-11 text-xs text-[var(--danger)] hover:underline">删除</button>
                   </div>
                 </>
               )}

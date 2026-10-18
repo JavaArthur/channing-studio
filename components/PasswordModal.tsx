@@ -91,7 +91,7 @@ export function PasswordModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--overlay)] animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
@@ -99,12 +99,12 @@ export function PasswordModal({
       <div className="bg-[var(--editor-panel)] rounded-lg shadow-xl max-w-md w-full animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-start justify-between p-6 pb-4">
-          <h3 className="text-lg font-semibold text-[var(--editor-ink)]">
+          <h3 className="font-serif font-medium text-lg text-[var(--editor-ink)]">
             密码保护
           </h3>
           <button
             onClick={onClose}
-            className="text-[var(--stone-gray)] hover:text-[var(--editor-ink)] transition-colors"
+            className="min-h-11 min-w-11 text-[var(--stone-gray)] hover:text-[var(--editor-ink)] transition-colors"
             aria-label="关闭"
           >
             <X className="w-5 h-5" />
@@ -124,12 +124,12 @@ export function PasswordModal({
                     type="text"
                     value={password}
                     readOnly
-                    className="flex-1 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--editor-soft)] text-[var(--editor-ink)]"
+                    className="min-h-11 min-w-11 flex-1 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--editor-soft)] text-[var(--editor-ink)]"
                   />
                   <button
                     type="button"
                     onClick={() => copyToClipboard(password, 'password')}
-                    className="px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
+                    className="min-h-11 min-w-11 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
                   >
                     {copied === 'password' ? '✓' : '复制'}
                   </button>
@@ -145,12 +145,12 @@ export function PasswordModal({
                     type="text"
                     value={fullUrl}
                     readOnly
-                    className="flex-1 px-3 py-2 text-xs rounded-md border border-[var(--editor-line)] bg-[var(--editor-soft)] text-[var(--editor-muted)] font-mono"
+                    className="min-h-11 min-w-11 flex-1 px-3 py-2 text-xs rounded-md border border-[var(--editor-line)] bg-[var(--editor-soft)] text-[var(--editor-muted)] font-mono"
                   />
                   <button
                     type="button"
                     onClick={() => copyToClipboard(fullUrl, 'url')}
-                    className="px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
+                    className="min-h-11 min-w-11 px-3 py-2 text-sm rounded-md border border-[var(--editor-line)] bg-[var(--background)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition-colors"
                   >
                     {copied === 'url' ? '✓' : '复制'}
                   </button>
@@ -164,7 +164,7 @@ export function PasswordModal({
                 type="button"
                 onClick={handleToggleEncryption}
                 disabled={loading}
-                className="w-full px-4 py-2 text-sm font-medium text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-50 transition-colors disabled:opacity-50"
+                className="min-h-11 min-w-11 w-full px-4 py-2 text-sm font-medium text-[var(--danger)] border border-[var(--danger-line)] rounded-lg hover:bg-[var(--danger-soft-bg)] transition-colors disabled:opacity-50"
               >
                 {loading ? '处理中...' : '取消密码保护'}
               </button>
@@ -178,7 +178,7 @@ export function PasswordModal({
                 type="button"
                 onClick={handleToggleEncryption}
                 disabled={loading}
-                className="w-full px-4 py-2 text-sm font-semibold bg-[var(--editor-accent)] text-white rounded-lg hover:brightness-105 transition-all disabled:opacity-50"
+                className="min-h-11 min-w-11 w-full px-4 py-2 text-sm font-semibold bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] rounded-lg hover:brightness-105 transition-all disabled:opacity-50"
               >
                 {loading ? '处理中...' : '启用密码保护'}
               </button>

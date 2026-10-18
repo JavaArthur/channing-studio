@@ -64,7 +64,7 @@ export function CategorySelector({ value, onChange, className = '' }: CategorySe
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="h-9 min-w-[120px] text-sm font-medium rounded-lg border border-[var(--editor-line)] bg-[var(--editor-soft)] text-[var(--editor-ink)] pl-3 pr-8 outline-none cursor-pointer hover:bg-[var(--border-warm)] focus:ring-1 focus:ring-[var(--editor-accent)] transition-colors text-left relative"
+        className="min-h-11 min-w-11 h-9 min-w-[120px] text-sm font-medium rounded-lg border border-[var(--editor-line)] bg-[var(--editor-soft)] text-[var(--editor-ink)] pl-3 pr-8 outline-none cursor-pointer hover:bg-[var(--border-warm)] focus:ring-1 focus:ring-[var(--focus-ring)] transition-colors text-left relative"
       >
         <span className="truncate block">{value || '未分类'}</span>
         <svg
@@ -92,7 +92,7 @@ export function CategorySelector({ value, onChange, className = '' }: CategorySe
                 onChange(cat.name)
                 setOpen(false)
               }}
-              className={`w-full text-left px-3 py-2 text-sm transition-colors ${
+              className={`focus-ring-inset min-h-11 min-w-11 w-full text-left px-3 py-2 text-sm transition-colors ${
                 cat.name === value
                   ? 'bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium'
                   : 'text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'

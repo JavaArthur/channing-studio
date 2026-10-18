@@ -962,15 +962,15 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     { key: 'public' as const, label: '公开访问', desc: '所有人可见，出现在首页和搜索', Icon: Globe },
     { key: 'draft' as const, label: '草稿自见', desc: '仅自己可见，不会发布', Icon: Eye },
     { key: 'encrypted' as const, label: '加密访问', desc: '需要密码才能查看', Icon: Lock },
-    { key: 'unlisted' as const, label: '私密', desc: '不在首页显示，但可通过私密', Icon: Link2 },
+    { key: 'unlisted' as const, label: '私密', desc: '不在首页和列表显示，公开链接也打不开，仅后台可见', Icon: Link2 },
   ]
 
   // ── Save status display ──
   const saveStatusText = saveState === 'saved' ? `已保存 · ${relativeTime(lastSavedAt)}` :
     saveState === 'dirty' ? '未保存' : saveState === 'saving' ? '保存中…' : '保存失败'
 
-  const saveStatusColor = saveState === 'saved' ? 'text-emerald-600' :
-    saveState === 'error' ? 'text-orange-500' : 'text-[var(--stone-gray)]'
+  const saveStatusColor = saveState === 'saved' ? 'text-[var(--success)]' :
+    saveState === 'error' ? 'text-[var(--warning)]' : 'text-[var(--stone-gray)]'
 
   const showSidebar = sidebarOpen
   const currentEditorHtml = editorRef.current?.getHTML() || ''
@@ -986,7 +986,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
           {/* Left: Back */}
           <Link
             href="/admin/posts"
-            className="flex items-center gap-1 shrink-0 text-sm text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
+            className="min-h-11 min-w-11 flex items-center gap-1 shrink-0 text-sm text-[var(--editor-muted)] hover:text-[var(--editor-ink)] transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">文章列表</span>
@@ -998,9 +998,9 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className={`flex items-center gap-1.5 text-sm sm:min-w-[140px] ${saveStatusColor}`}>
               <span className={`inline-block h-2 w-2 rounded-full shrink-0 ${
-                saveState === 'saved' ? 'bg-emerald-500' :
-                saveState === 'dirty' ? 'bg-gray-300' :
-                saveState === 'saving' ? 'bg-gray-400 animate-pulse' : 'bg-orange-500'
+                saveState === 'saved' ? 'bg-[var(--success)]' :
+                saveState === 'dirty' ? 'bg-[var(--editor-accent)]' :
+                saveState === 'saving' ? 'bg-[var(--editor-accent)] animate-pulse' : 'bg-[var(--warning)]'
               }`} />
               <span className="truncate">{saveStatusText}</span>
             </div>
@@ -1046,7 +1046,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                     () => toast.error('复制失败'),
                   )
                 }}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)] transition"
+                className="hit-44 inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)] transition"
                 aria-label="复制 Markdown"
               >
                 <ClipboardCopy className="h-4 w-4" />
@@ -1066,7 +1066,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                     toast.error('复制公众号格式失败')
                   }
                 }}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)] transition"
+                className="hit-44 inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)] transition"
                 aria-label="复制公众号格式"
               >
                 <Copy className="h-4 w-4" />
@@ -1077,7 +1077,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
               <button
                 type="button"
                 onClick={() => setWechatPreviewOpen((open) => !open)}
-                className={`inline-flex h-8 w-8 items-center justify-center rounded-md transition ${
+                className={`hit-44 inline-flex h-8 w-8 items-center justify-center rounded-md transition ${
                   wechatPreviewOpen
                     ? 'bg-[var(--editor-soft)] text-[var(--editor-accent)]'
                     : 'text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)]'
@@ -1094,7 +1094,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
               <button
                 type="button"
                 onClick={(e) => openDocumentAIModal(e.currentTarget)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)] transition"
+                className="hit-44 inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)] transition"
                 aria-label="Ask AI（基于标题和正文）"
               >
                 <WandSparkles className="h-4 w-4" />
@@ -1105,7 +1105,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
               <button
                 type="button"
                 onClick={openDocumentImageModal}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)] transition"
+                className="hit-44 inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-accent)] transition"
                 aria-label="生成图片"
               >
                 <ImageIcon className="h-4 w-4" />
@@ -1117,7 +1117,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
               <button
                 type="button"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] transition"
+                className="hit-44 inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] transition"
                 aria-label={sidebarOpen ? '收起侧边栏' : '展开侧边栏'}
               >
                 {sidebarOpen ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
@@ -1136,7 +1136,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                   type="button"
                   onClick={() => void handleSave()}
                   disabled={saving || uploadingImage}
-                  className="inline-flex items-center gap-1.5 rounded-l-lg bg-[var(--editor-accent)] pl-3 pr-2 py-1.5 text-sm font-semibold text-[var(--editor-accent-ink)] whitespace-nowrap transition hover:brightness-105 disabled:opacity-60"
+                  className="min-h-11 min-w-11 inline-flex items-center gap-1.5 rounded-l-lg bg-cta pl-3 pr-2 py-1.5 text-sm font-semibold text-cta-ink whitespace-nowrap transition hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-cta-disabled-ink disabled:cursor-not-allowed"
                 >
                   <Globe className="h-3.5 w-3.5" />
                   {saving ? '保存中…' : publishStatus === 'draft' ? '存为草稿' : editSlug ? '发布更新' : '发布'}
@@ -1145,7 +1145,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                   <button
                     type="button"
                     onClick={() => setPublishPanelOpen(!publishPanelOpen)}
-                    className="inline-flex items-center rounded-r-lg bg-[var(--editor-accent)] px-1.5 py-1.5 text-[var(--editor-accent-ink)] border-l border-white/25 hover:brightness-105 transition"
+                    className="min-h-11 min-w-11 inline-flex items-center rounded-r-lg bg-cta px-1.5 py-1.5 text-cta-ink border-l border-[var(--cta-divider)] hover:bg-cta-hover transition"
                     aria-label="展开发布选项"
                   >
                     <ChevronUp className={`h-3.5 w-3.5 transition-transform ${publishPanelOpen ? 'rotate-180' : ''}`} />
@@ -1156,7 +1156,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
               {/* Publish panel dropdown */}
               {publishPanelOpen && (
                 <div className="absolute right-0 top-full mt-2 w-72 rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-xl z-50 overflow-hidden">
-                  <div className="px-4 pt-3 pb-2 text-xs font-semibold text-[var(--editor-muted)] uppercase tracking-wider">选择发布状态</div>
+                  <div className="px-4 pt-3 pb-2 text-xs font-medium text-[var(--editor-muted)] uppercase tracking-wider">选择发布状态</div>
                   {STATUS_CONFIG.map(({ key, label, desc, Icon }) => {
                     const active = publishStatus === key
                     return (
@@ -1164,7 +1164,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                         key={key}
                         type="button"
                         onClick={() => setPublishStatus(key)}
-                        className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--editor-soft)] transition ${active ? 'bg-[var(--editor-accent)]/5' : ''}`}
+                        className={`focus-ring-inset min-h-11 min-w-11 w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--editor-soft)] transition ${active ? 'bg-[var(--editor-accent)]/5' : ''}`}
                       >
                         <Icon className={`h-5 w-5 mt-0.5 shrink-0 ${active ? 'text-[var(--editor-accent)]' : 'text-[var(--editor-muted)]'}`} />
                         <div className="flex-1 min-w-0">
@@ -1182,7 +1182,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                         type="button"
                         onClick={() => { clearAutosaveTimers(); void persistDraft() }}
                         disabled={saving}
-                        className="px-3 py-1.5 text-sm text-[var(--editor-ink)] border border-[var(--editor-line)] rounded-lg hover:bg-[var(--editor-soft)] transition disabled:opacity-50"
+                        className="min-h-11 min-w-11 px-3 py-1.5 text-sm text-[var(--editor-ink)] border border-[var(--editor-line)] rounded-lg hover:bg-[var(--editor-soft)] transition disabled:opacity-50"
                       >
                         保存工作稿
                       </button>
@@ -1190,9 +1190,9 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                         type="button"
                         onClick={() => void handleSave()}
                         disabled={saving}
-                        className="px-3 py-1.5 text-sm font-semibold text-[var(--editor-accent-ink)] bg-[var(--editor-accent)] rounded-lg hover:brightness-105 transition disabled:opacity-50"
+                        className="min-h-11 min-w-11 px-3 py-1.5 text-sm font-semibold text-[var(--editor-accent-ink)] bg-[var(--editor-accent)] rounded-lg hover:brightness-105 transition disabled:opacity-50"
                       >
-                        {saving ? '保存中…' : editSlug ? '更新文章' : '发布'}
+                        {saving ? '保存中…' : editSlug ? '更新文章' : '确认发布'}
                       </button>
                     </div>
                   </div>
@@ -1206,22 +1206,22 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
         {feedback && (
           <div className="border-t border-[var(--editor-line)] px-4 py-2">
             <div className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
-              feedback.type === 'success' ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-800'
+              feedback.type === 'success' ? 'bg-[var(--success-soft-bg)] text-[var(--success)]' : 'bg-[var(--danger-soft-bg)] text-[var(--danger)]'
             }`}>
               <span>{feedback.message}</span>
               {feedback.slug && (
-                <a href={`/${feedback.slug}`} className="font-medium underline underline-offset-2">打开文章</a>
+                <a href={`/${feedback.slug}`} className="min-h-11 min-w-11 inline-flex items-center font-medium underline underline-offset-2">打开文章</a>
               )}
-              <Tooltip label="关闭提示"><button type="button" onClick={() => setFeedback(null)} className="ml-auto" aria-label="关闭提示"><X className="h-3.5 w-3.5" /></button></Tooltip>
+              <Tooltip label="关闭提示"><button type="button" onClick={() => setFeedback(null)} className="min-h-11 min-w-11 ml-auto" aria-label="关闭提示"><X className="h-3.5 w-3.5" /></button></Tooltip>
             </div>
           </div>
         )}
       </header>
 
       {/* Hidden file inputs */}
-      <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={e => { void handleSelectedFiles(e.target.files) }} />
-      <input ref={fileUploadRef} type="file" accept="video/*,audio/*,.pdf,.zip,.rar,.7z,.epub,.mobi,.azw,.azw3,.txt,image/*" multiple className="hidden" onChange={e => { void handleSelectedFiles(e.target.files) }} />
-      <input ref={coverInputRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) void handleCoverUpload(f) }} />
+      <input ref={fileInputRef} type="file" accept="image/*" multiple className="min-h-11 min-w-11 hidden" onChange={e => { void handleSelectedFiles(e.target.files) }} />
+      <input ref={fileUploadRef} type="file" accept="video/*,audio/*,.pdf,.zip,.rar,.7z,.epub,.mobi,.azw,.azw3,.txt,image/*" multiple className="min-h-11 min-w-11 hidden" onChange={e => { void handleSelectedFiles(e.target.files) }} />
+      <input ref={coverInputRef} type="file" accept="image/*" className="min-h-11 min-w-11 hidden" onChange={e => { const f = e.target.files?.[0]; if (f) void handleCoverUpload(f) }} />
 
       {/* ── Main layout: editor or WeChat layout studio ── */}
       {wechatPreviewOpen ? (
@@ -1265,7 +1265,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                     editorRef.current?.chain().focus().run()
                   }
                 }}
-                className="editor-title-textarea block w-full appearance-none bg-transparent p-0 m-0 resize-none overflow-hidden border-0 rounded-none shadow-none outline-none ring-0 focus:border-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 text-4xl font-bold leading-tight tracking-tight text-[var(--editor-ink)] placeholder:text-[var(--stone-gray)]"
+                className="font-serif font-medium min-h-11 min-w-11 editor-title-textarea block w-full appearance-none bg-transparent p-0 m-0 resize-none overflow-hidden border-0 rounded-none shadow-none outline-none ring-0 focus:border-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 text-4xl leading-tight tracking-tight text-[var(--editor-ink)] placeholder:text-[var(--stone-gray)]"
                 style={{ minHeight: '52px' }}
               />
             </div>
@@ -1373,9 +1373,9 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
             <div className="max-w-full px-5 py-6 space-y-6" style={{ width: sidebarWidth }}>
               {/* Close button */}
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-[var(--stone-gray)] uppercase tracking-wider">文章设置</span>
+                <span className="text-xs font-medium text-[var(--stone-gray)] uppercase tracking-wider">文章设置</span>
                 <Tooltip label="收起侧边栏" placement="left">
-                  <button type="button" onClick={() => setSidebarOpen(false)} className="text-[var(--stone-gray)] hover:text-[var(--editor-ink)]" aria-label="收起侧边栏">
+                  <button type="button" onClick={() => setSidebarOpen(false)} className="min-h-11 min-w-11 text-[var(--stone-gray)] hover:text-[var(--editor-ink)]" aria-label="收起侧边栏">
                     <X className="h-4 w-4" />
                   </button>
                 </Tooltip>
@@ -1390,7 +1390,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                       type="button"
                       onClick={() => void handleGenerateMetadata('tags')}
                       disabled={isMetadataTargetPending('tags')}
-                      className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--stone-gray)] transition hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="min-h-11 min-w-11 inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--stone-gray)] transition hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-50"
                       aria-label={isMetadataTargetPending('tags') ? '生成标签中…' : 'AI 生成标签'}
                     >
                       {isMetadataTargetPending('tags') ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <WandSparkles className="h-3.5 w-3.5" />}
@@ -1402,7 +1402,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                     <span key={tag} className="inline-flex items-center gap-1 rounded-md bg-[var(--editor-accent)]/8 px-2 py-0.5 text-xs text-[var(--editor-accent)]">
                       {tag}
                       <Tooltip label="移除此标签" placement="left">
-                        <button type="button" onClick={() => removeTag(idx)} className="hover:text-[var(--editor-ink)]" aria-label="移除此标签">
+                        <button type="button" onClick={() => removeTag(idx)} className="min-h-11 min-w-11 hover:text-[var(--editor-ink)]" aria-label="移除此标签">
                           <X className="h-3 w-3" />
                         </button>
                       </Tooltip>
@@ -1421,7 +1421,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                       if (e.key === 'Backspace' && !tagInput && tags.length > 0) removeTag(tags.length - 1)
                     }}
                     placeholder="添加标签…"
-                    className="w-full rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2.5 py-1.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                    className="min-h-11 min-w-11 w-full rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2.5 py-1.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                   />
                 )}
               </div>
@@ -1435,7 +1435,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                       type="button"
                       onClick={() => void handleGenerateMetadata('summary')}
                       disabled={isMetadataTargetPending('summary')}
-                      className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--stone-gray)] transition hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="min-h-11 min-w-11 inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--stone-gray)] transition hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-50"
                       aria-label={isMetadataTargetPending('summary') ? '生成摘要中…' : 'AI 生成摘要'}
                     >
                       {isMetadataTargetPending('summary') ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <WandSparkles className="h-3.5 w-3.5" />}
@@ -1451,7 +1451,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                     markDirty({ description: nextDescription })
                   }}
                   placeholder="文章摘要（建议 ≤ 160 字）"
-                  className="w-full rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2.5 py-2 text-sm text-[var(--editor-ink)] outline-none resize-y focus:border-[var(--editor-accent)]"
+                  className="min-h-11 min-w-11 w-full rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2.5 py-2 text-sm text-[var(--editor-ink)] outline-none resize-y focus:border-[var(--focus-ring)]"
                   style={{ minHeight: '290px' }}
                 />
                 <div className="mt-1 text-right text-[10px] text-[var(--stone-gray)]">{description.length}/160</div>
@@ -1466,7 +1466,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                       type="button"
                       onClick={() => void handleGenerateMetadata('cover')}
                       disabled={isMetadataTargetPending('cover')}
-                      className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--stone-gray)] transition hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="min-h-11 min-w-11 inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--stone-gray)] transition hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-50"
                       aria-label={isMetadataTargetPending('cover') ? '生成封面中…' : 'AI 生成封面'}
                     >
                       {isMetadataTargetPending('cover') ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <WandSparkles className="h-3.5 w-3.5" />}
@@ -1480,13 +1480,13 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                       <button
                         type="button"
                         onClick={() => setCoverLightboxOpen(true)}
-                        className="block w-full h-full cursor-zoom-in"
+                        className="min-h-11 min-w-11 block w-full h-full cursor-zoom-in"
                         aria-label="查看封面大图"
                       >
                       <img src={coverImage} alt="封面预览" className="w-full h-full object-cover" />
                       {/* hover 遮罩 + 居中文案 */}
-                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-white">
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[var(--overlay)] opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="flex items-center gap-1.5 rounded-md bg-[var(--editor-panel)] px-2 py-1 text-xs font-medium text-[var(--editor-ink)]">
                           <Maximize2 className="h-3.5 w-3.5" />
                           查看大图
                         </span>
@@ -1499,7 +1499,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                       <button
                         type="button"
                         onClick={() => setCoverLightboxOpen(true)}
-                        className="absolute right-1.5 top-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white opacity-80 transition hover:bg-black/75 hover:opacity-100"
+                        className="min-h-11 min-w-11 absolute right-1.5 top-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--editor-panel)] text-[var(--editor-ink)] opacity-80 transition hover:bg-[var(--editor-sand)] hover:opacity-100"
                         aria-label="查看封面大图"
                       >
                         <Maximize2 className="h-3.5 w-3.5" />
@@ -1512,7 +1512,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                         <button
                           type="button"
                           onClick={() => coverInputRef.current?.click()}
-                          className="pointer-events-auto flex items-center justify-center w-8 h-8 rounded-full bg-[var(--editor-panel)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition shadow"
+                          className="min-h-11 min-w-11 pointer-events-auto flex items-center justify-center w-8 h-8 rounded-full bg-[var(--editor-panel)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)] transition shadow"
                           aria-label="重新上传封面"
                         >
                           <ImageIcon className="h-4 w-4" />
@@ -1525,7 +1525,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                             setCoverImage('')
                             markDirty({ coverImage: '' })
                           }}
-                          className="pointer-events-auto flex items-center justify-center w-8 h-8 rounded-full bg-[var(--editor-panel)] text-rose-600 hover:bg-[var(--editor-soft)] transition shadow"
+                          className="min-h-11 min-w-11 pointer-events-auto flex items-center justify-center w-8 h-8 rounded-full bg-[var(--editor-panel)] text-[var(--danger)] hover:bg-[var(--editor-soft)] transition shadow"
                           aria-label="删除封面"
                         >
                           <X className="h-4 w-4" />
@@ -1543,7 +1543,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                       if (f?.type.startsWith('image/')) void handleCoverUpload(f)
                     }}
                     onDragOver={e => e.preventDefault()}
-                    className="flex w-full flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-[var(--editor-line)] py-8 text-[var(--stone-gray)] hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] transition"
+                    className="min-h-11 min-w-11 flex w-full flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-[var(--editor-line)] py-8 text-[var(--stone-gray)] hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] transition"
                   >
                     <ImageIcon className="h-6 w-6" />
                     <span className="text-xs">点击或拖拽上传封面</span>
@@ -1560,7 +1560,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                       type="button"
                       onClick={() => void handleGenerateMetadata('slug')}
                       disabled={isMetadataTargetPending('slug')}
-                      className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--stone-gray)] transition hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="min-h-11 min-w-11 inline-flex h-7 w-7 items-center justify-center rounded-lg border border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--stone-gray)] transition hover:border-[var(--editor-accent)]/40 hover:text-[var(--editor-accent)] disabled:cursor-not-allowed disabled:opacity-50"
                       aria-label={isMetadataTargetPending('slug') ? '生成 slug 中…' : 'AI 生成 slug'}
                     >
                       {isMetadataTargetPending('slug') ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <WandSparkles className="h-3.5 w-3.5" />}
@@ -1589,7 +1589,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                       }
                     }}
                     placeholder={editSlug || 'auto-generated'}
-                    className="flex-1 rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2 py-1.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                    className="min-h-11 min-w-11 flex-1 rounded-md border border-[var(--editor-line)] bg-[var(--editor-panel)] px-2 py-1.5 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                   />
                 </div>
                 <div className="mt-1 text-[10px] text-[var(--stone-gray)]">

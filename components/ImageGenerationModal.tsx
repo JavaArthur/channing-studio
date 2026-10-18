@@ -420,22 +420,22 @@ export function ImageGenerationModal({
 
   return (
     <div
-      className="fixed inset-0 z-[70] bg-black/45 px-3 py-3 sm:px-4 sm:py-4"
+      className="fixed inset-0 z-[70] bg-[var(--overlay)] px-3 py-3 sm:px-4 sm:py-4"
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose()
       }}
     >
       <div className="flex min-h-full items-center justify-center">
-        <div className="flex w-full max-w-5xl max-h-[calc(100vh-1.5rem)] flex-col overflow-hidden rounded-[28px] border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+        <div className="flex w-full max-w-5xl max-h-[calc(100vh-1.5rem)] flex-col overflow-hidden rounded-[28px] border border-[var(--editor-line)] bg-[var(--editor-panel)] shadow-whisper">
           <div className="flex items-start justify-between gap-4 border-b border-[var(--editor-line)] px-5 py-4">
             <div className="min-w-0">
-              <div className="text-base font-semibold text-[var(--editor-ink)]">生成图片</div>
+              <div className="font-serif text-base font-medium text-[var(--editor-ink)]">生成图片</div>
             </div>
             <Tooltip label="关闭生成图片面板">
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)]"
+                className="min-h-11 min-w-11 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)]"
                 aria-label="关闭生成图片面板"
               >
                 <X className="h-4 w-4" />
@@ -459,7 +459,7 @@ export function ImageGenerationModal({
                         value={prompt}
                         onChange={(event) => setPrompt(event.target.value)}
                         placeholder="例如：一个在暴雨里抬头看霓虹灯牌的孤独程序员，Mondo 风格，但不要在图里放文字"
-                        className="w-full rounded-2xl border border-[var(--editor-line)] bg-white px-3 py-3 pl-10 text-sm leading-6 text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)] focus:ring-1 focus:ring-[var(--editor-accent)]"
+                        className="min-h-11 min-w-11 w-full rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-3 pl-10 text-sm leading-6 text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)] focus:ring-1 focus:ring-[var(--focus-ring)]"
                       />
                     </div>
                   </div>
@@ -467,7 +467,7 @@ export function ImageGenerationModal({
                   {referenceImageUrl ? (
                     <div className="space-y-2">
                       <div className="text-xs font-medium text-[var(--editor-muted)]">参考图片</div>
-                      <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white">
+                      <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]">
                         <img
                           src={referenceImageUrl}
                           alt="参考图片"
@@ -486,7 +486,7 @@ export function ImageGenerationModal({
                       <button
                         type="button"
                         onClick={() => setSelectedAction('custom')}
-                        className={`shrink-0 rounded-full border px-3 py-1.5 text-sm transition ${
+                        className={`min-h-11 min-w-11 shrink-0 rounded-full border px-3 py-1.5 text-sm transition ${
                           selectedAction === 'custom'
                             ? 'border-[var(--editor-accent)] bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
                             : 'border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
@@ -503,7 +503,7 @@ export function ImageGenerationModal({
                             setSelectedAspectRatio(action.aspect_ratio || 'auto')
                             setSelectedResolution(action.resolution || '2k')
                           }}
-                          className={`shrink-0 rounded-full border px-3 py-1.5 text-sm transition ${
+                          className={`min-h-11 min-w-11 shrink-0 rounded-full border px-3 py-1.5 text-sm transition ${
                             selectedAction === action.action_key
                               ? 'border-[var(--editor-accent)] bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
                               : 'border-[var(--editor-line)] text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'
@@ -517,7 +517,7 @@ export function ImageGenerationModal({
                       <button
                         type="button"
                         onClick={() => setTemplatesExpanded((value) => !value)}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-[var(--editor-muted)] transition hover:text-[var(--editor-ink)]"
+                        className="min-h-11 min-w-11 inline-flex items-center gap-1 text-xs font-medium text-[var(--editor-muted)] transition hover:text-[var(--editor-ink)]"
                       >
                         {templatesExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                         {templatesExpanded ? '收起模板' : '展开模板'}
@@ -533,7 +533,7 @@ export function ImageGenerationModal({
                         <select
                           value={selectedAspectRatio}
                           onChange={(event) => setSelectedAspectRatio(event.target.value as AIImageAspectRatio)}
-                          className="w-full rounded-xl border border-[var(--editor-line)] bg-white px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                          className="min-h-11 min-w-11 w-full rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                         >
                           {AI_IMAGE_ASPECT_RATIO_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>{option.label}</option>
@@ -545,7 +545,7 @@ export function ImageGenerationModal({
                         <select
                           value={selectedResolution}
                           onChange={(event) => setSelectedResolution(event.target.value as AIImageResolution)}
-                          className="w-full rounded-xl border border-[var(--editor-line)] bg-white px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--editor-accent)]"
+                          className="min-h-11 min-w-11 w-full rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2 text-sm text-[var(--editor-ink)] outline-none focus:border-[var(--focus-ring)]"
                         >
                           {AI_IMAGE_RESOLUTION_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>{option.label}</option>
@@ -575,9 +575,9 @@ export function ImageGenerationModal({
                         <button
                           type="button"
                           onClick={() => setPlacementMode('replace')}
-                          className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
+                          className={`min-h-11 min-w-11 rounded-xl px-3 py-2 text-sm font-medium transition ${
                             placementMode === 'replace'
-                              ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                              ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                               : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                           }`}
                         >
@@ -586,9 +586,9 @@ export function ImageGenerationModal({
                         <button
                           type="button"
                           onClick={() => setPlacementMode('insert')}
-                          className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
+                          className={`min-h-11 min-w-11 rounded-xl px-3 py-2 text-sm font-medium transition ${
                             placementMode === 'insert'
-                              ? 'bg-white text-[var(--editor-ink)] shadow-sm'
+                              ? 'bg-[var(--editor-panel)] text-[var(--editor-ink)] shadow-sm'
                               : 'text-[var(--editor-muted)] hover:text-[var(--editor-ink)]'
                           }`}
                         >
@@ -603,7 +603,7 @@ export function ImageGenerationModal({
                       <button
                         type="button"
                         onClick={() => setShowContext((value) => !value)}
-                        className="flex w-full items-start justify-between gap-3 rounded-2xl border border-[var(--editor-line)] bg-white px-4 py-3 text-left transition hover:bg-[var(--editor-soft)]/50"
+                        className="min-h-11 min-w-11 flex w-full items-start justify-between gap-3 rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-4 py-3 text-left transition hover:bg-[var(--editor-soft)]/50"
                       >
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-3">
@@ -631,7 +631,7 @@ export function ImageGenerationModal({
 
                 <div className="border-t border-[var(--editor-line)] px-5 py-4">
                   {error ? (
-                    <div className="mb-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                    <div className="mb-3 rounded-xl border border-[var(--danger-line)] bg-[var(--danger-soft-bg)] px-3 py-2 text-sm text-[var(--danger)]">
                       {error}
                     </div>
                   ) : null}
@@ -641,7 +641,7 @@ export function ImageGenerationModal({
                       type="button"
                       onClick={() => void handleGenerate()}
                       disabled={!canGenerate || generating}
-                      className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="min-h-11 min-w-11 inline-flex shrink-0 items-center gap-2 rounded-xl bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-[var(--editor-accent-ink)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                       {result ? '重新生成' : '开始生成'}
@@ -661,7 +661,7 @@ export function ImageGenerationModal({
                     <button
                       type="button"
                       onClick={() => setHistoryOpen((value) => !value)}
-                      className="inline-flex items-center gap-1 rounded-full border border-[var(--editor-line)] px-2.5 py-1 text-xs text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
+                      className="min-h-11 min-w-11 inline-flex items-center gap-1 rounded-full border border-[var(--editor-line)] px-2.5 py-1 text-xs text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
                     >
                       <History className="h-3.5 w-3.5" />
                       {historyOpen ? '返回结果' : '最近生成'}
@@ -675,7 +675,7 @@ export function ImageGenerationModal({
                       {historyItems.map((item) => {
                         const previewUrl = item.image.variants?.content || item.image.url
                         return (
-                          <div key={item.id} className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white">
+                          <div key={item.id} className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]">
                             <Tooltip label="预览这张历史图片">
                               <button
                                 type="button"
@@ -684,7 +684,7 @@ export function ImageGenerationModal({
                                   setHistoryOpen(false)
                                   setShowRevisedPrompt(false)
                                 }}
-                                className="block w-full"
+                                className="min-h-11 min-w-11 block w-full"
                                 aria-label="预览这张历史图片"
                               >
                               <img
@@ -695,7 +695,7 @@ export function ImageGenerationModal({
                             </button>
                             </Tooltip>
                             <div className="space-y-2 px-3 py-3">
-                              <div className="line-clamp-2 text-sm font-medium text-[var(--editor-ink)]">
+                              <div className="font-serif line-clamp-2 text-sm font-medium text-[var(--editor-ink)]">
                                 {item.promptLabel}
                               </div>
                               <div className="text-[11px] leading-5 text-[var(--editor-muted)]">
@@ -708,7 +708,7 @@ export function ImageGenerationModal({
                                 <button
                                   type="button"
                                   onClick={() => onInsert(item.image.url, item.image.alt, placementMode)}
-                                  className="inline-flex items-center gap-1 rounded-lg border border-[var(--editor-line)] px-2.5 py-1.5 text-xs font-medium text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
+                                  className="min-h-11 min-w-11 inline-flex items-center gap-1 rounded-lg border border-[var(--editor-line)] px-2.5 py-1.5 text-xs font-medium text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
                                 >
                                   <Check className="h-3.5 w-3.5" />
                                   {placementMode === 'replace' ? '替换' : '插入'}
@@ -728,7 +728,7 @@ export function ImageGenerationModal({
                     </div>
                   ) : result ? (
                     <div className="flex h-full min-h-0 flex-col gap-4">
-                      <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-white">
+                      <div className="overflow-hidden rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]">
                         <img
                           src={result.variants?.content || result.url}
                           alt={result.alt}
@@ -741,9 +741,9 @@ export function ImageGenerationModal({
                         <div className="mt-1 text-sm leading-6 text-[var(--editor-ink)]">{result.alt}</div>
 
                         <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[var(--editor-muted)]">
-                          <span className="rounded-full bg-white px-2.5 py-1">比例：{getAiImageAspectRatioLabel(result.aspectRatio)}</span>
-                          <span className="rounded-full bg-white px-2.5 py-1">分辨率：{getAiImageResolutionLabel(result.resolution)}</span>
-                          <span className="rounded-full bg-white px-2.5 py-1">模型：{`${result.profileName} · ${result.model}`}</span>
+                          <span className="rounded-full bg-[var(--editor-panel)] px-2.5 py-1">比例：{getAiImageAspectRatioLabel(result.aspectRatio)}</span>
+                          <span className="rounded-full bg-[var(--editor-panel)] px-2.5 py-1">分辨率：{getAiImageResolutionLabel(result.resolution)}</span>
+                          <span className="rounded-full bg-[var(--editor-panel)] px-2.5 py-1">模型：{`${result.profileName} · ${result.model}`}</span>
                         </div>
 
                         {result.revisedPrompt ? (
@@ -751,13 +751,13 @@ export function ImageGenerationModal({
                             <button
                               type="button"
                               onClick={() => setShowRevisedPrompt((value) => !value)}
-                              className="inline-flex items-center gap-1 text-xs font-medium text-[var(--editor-muted)] transition hover:text-[var(--editor-ink)]"
+                              className="min-h-11 min-w-11 inline-flex items-center gap-1 text-xs font-medium text-[var(--editor-muted)] transition hover:text-[var(--editor-ink)]"
                             >
                               {showRevisedPrompt ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                               查看模型润色后的提示词
                             </button>
                             {showRevisedPrompt ? (
-                              <div className="mt-2 whitespace-pre-wrap rounded-xl border border-[var(--editor-line)] bg-white px-3 py-3 text-xs leading-6 text-[var(--editor-ink)]">
+                              <div className="mt-2 whitespace-pre-wrap rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-3 text-xs leading-6 text-[var(--editor-ink)]">
                                 {result.revisedPrompt}
                               </div>
                             ) : null}
@@ -769,21 +769,21 @@ export function ImageGenerationModal({
                         <button
                           type="button"
                           onClick={onClose}
-                          className="rounded-xl border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
+                          className="min-h-11 min-w-11 rounded-xl border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] transition hover:bg-[var(--editor-soft)]"
                         >
                           关闭
                         </button>
                         <button
                           type="button"
                           onClick={() => onInsert(result.url, result.alt, placementMode)}
-                          className="rounded-xl bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105"
+                          className="min-h-11 min-w-11 rounded-xl bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-[var(--editor-accent-ink)] transition hover:brightness-105"
                         >
                           {placementMode === 'replace' ? '替换当前图' : '插入正文'}
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-[var(--editor-line)]/70 bg-white/35">
+                    <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-[var(--editor-line)]/70 bg-[var(--editor-panel)]/35">
                       <div className="flex flex-col items-center gap-3 text-[var(--editor-muted)] opacity-60">
                         <ImageIcon className="h-11 w-11" />
                       </div>

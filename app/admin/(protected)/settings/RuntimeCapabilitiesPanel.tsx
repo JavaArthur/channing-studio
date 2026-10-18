@@ -7,8 +7,8 @@ function StatusBadge({ active }: { active: boolean }) {
     <span
       className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${
         active
-          ? 'bg-emerald-500/10 text-emerald-700'
-          : 'bg-slate-500/10 text-slate-600'
+          ? 'bg-[var(--success-soft-bg)] text-[var(--success)]'
+          : 'bg-[var(--editor-soft)] text-[var(--editor-muted)]'
       }`}
     >
       {active ? '可用' : '未绑定'}
@@ -22,7 +22,7 @@ function FeatureBadge({ enabled }: { enabled: boolean }) {
       className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${
         enabled
           ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
-          : 'bg-amber-500/10 text-amber-700'
+          : 'bg-[var(--warning-soft-bg)] text-[var(--warning)]'
       }`}
     >
       {enabled ? '已启用' : '已降级'}
@@ -74,7 +74,7 @@ export function RuntimeCapabilitiesPanel({ capabilities }: { capabilities: Runti
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
-        <div className="mb-3 text-sm font-semibold text-[var(--editor-ink)]">运行时绑定探测</div>
+        <div className="font-serif mb-3 text-sm font-medium text-[var(--editor-ink)]">运行时绑定探测</div>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {bindingItems.map((item) => (
             <div key={item.key} className="flex items-center justify-between rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2">
@@ -86,12 +86,12 @@ export function RuntimeCapabilitiesPanel({ capabilities }: { capabilities: Runti
       </div>
 
       <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
-        <div className="mb-3 text-sm font-semibold text-[var(--editor-ink)]">增强能力与回退策略</div>
+        <div className="font-serif mb-3 text-sm font-medium text-[var(--editor-ink)]">增强能力与回退策略</div>
         <div className="space-y-3">
           {featureItems.map((item) => (
             <div key={item.key} className="rounded-lg border border-[var(--editor-line)] bg-[var(--background)] p-3">
               <div className="flex items-center justify-between gap-3">
-                <div className="text-sm font-medium text-[var(--editor-ink)]">{item.label}</div>
+                <div className="font-serif text-sm font-medium text-[var(--editor-ink)]">{item.label}</div>
                 <FeatureBadge enabled={item.enabled} />
               </div>
               <div className="mt-1 text-xs text-[var(--editor-muted)]">当前策略：`{item.strategy}`</div>
