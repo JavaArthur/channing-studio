@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   Home,
+  Send,
   Inbox,
   BookOpen,
   Layers,
@@ -24,6 +25,7 @@ const groups = [
       ['知识笔记', '/admin/notes', BookOpen],
       ['项目', '/admin/projects', Layers],
       ['写作与发布', '/admin/posts', FilePenLine],
+      ['X 短帖草稿', '/admin/x-drafts', Send],
     ],
   },
   {
