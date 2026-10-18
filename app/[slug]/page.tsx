@@ -221,7 +221,7 @@ export default async function PostPage({
                     {activeCategorySlug ? (
                       <Link
                         href={`/category/${activeCategorySlug}`}
-                        className="min-h-11 min-w-11 inline-flex items-center px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors"
+                        className="hit-area-44 px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15 hover:bg-[var(--editor-accent)]/12 transition-colors"
                       >
                         {post.category}
                       </Link>

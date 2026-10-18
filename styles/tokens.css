@@ -19,7 +19,13 @@
   --cta-bg: #c96442;
   --cta-ink: #141413;
   --cta-bg-hover: #d97757;
-  --focus-ring: #3898ec;
+  --cta-divider: #a9502f;
+  --cta-disabled-bg: var(--editor-sand);
+  --cta-disabled-ink: var(--stone-gray);
+  /* change only these two lines; pending decision on #2b80cc for light */
+  --focus-ring-light: #3898ec;
+  --focus-ring-dark: #3898ec;
+  --focus-ring: var(--focus-ring-light);
   --danger: #b53333;
   --danger-soft-bg: #f6e7e2;
   --danger-line: #e9c8bf;
@@ -44,7 +50,7 @@
   --shadow-ring: 0 0 0 1px var(--editor-line-strong);
   --shadow-ring-subtle: 0 0 0 1px var(--editor-line);
   --shadow-whisper: 0 0 0 1px var(--editor-line), rgba(20,20,19,0.05) 0 4px 24px;
-  --font-serif: Georgia, "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  --font-serif: Georgia, "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
   --logo-font: var(--font-geist-sans), sans-serif;
 }
 :root[data-color-mode="dark"] {
@@ -68,7 +74,10 @@
   --cta-bg: #c96442;
   --cta-ink: #141413;
   --cta-bg-hover: #d97757;
-  --focus-ring: #3898ec;
+  --cta-divider: #a9502f;
+  --cta-disabled-bg: var(--editor-sand);
+  --cta-disabled-ink: var(--stone-gray);
+  --focus-ring: var(--focus-ring-dark);
   --danger: #e07a6a;
   --danger-soft-bg: #3a2320;
   --danger-line: #6b3a33;
@@ -93,7 +102,7 @@
   --shadow-ring: 0 0 0 1px var(--editor-line-strong);
   --shadow-ring-subtle: 0 0 0 1px var(--editor-line);
   --shadow-whisper: 0 0 0 1px var(--editor-line), rgba(20,20,19,0.05) 0 4px 24px;
-  --font-serif: Georgia, "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  --font-serif: Georgia, "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
   --logo-font: var(--font-geist-sans), sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -118,7 +127,10 @@
   --cta-bg: #c96442;
   --cta-ink: #141413;
   --cta-bg-hover: #d97757;
-  --focus-ring: #3898ec;
+  --cta-divider: #a9502f;
+  --cta-disabled-bg: var(--editor-sand);
+  --cta-disabled-ink: var(--stone-gray);
+  --focus-ring: var(--focus-ring-dark);
   --danger: #e07a6a;
   --danger-soft-bg: #3a2320;
   --danger-line: #6b3a33;
@@ -143,7 +155,7 @@
   --shadow-ring: 0 0 0 1px var(--editor-line-strong);
   --shadow-ring-subtle: 0 0 0 1px var(--editor-line);
   --shadow-whisper: 0 0 0 1px var(--editor-line), rgba(20,20,19,0.05) 0 4px 24px;
-  --font-serif: Georgia, "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "STSong", serif;
+  --font-serif: Georgia, "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
   --logo-font: var(--font-geist-sans), sans-serif;
 }
 }

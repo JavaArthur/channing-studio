@@ -117,7 +117,7 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
   return (
     <div className="space-y-8">
       <p className="text-sm text-[var(--editor-muted)]">提示词只在你的浏览器中复制，不会发送给第三方服务。新收藏默认私密。</p>
-      <button className="min-h-11 min-w-11 brain-button" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
+      <button className="min-h-11 min-w-11 brain-button brain-cta" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
       <section className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-5">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-serif font-medium text-sm text-[var(--editor-ink)]">{editing ? '编辑提示词' : '添加提示词'}</h2>
@@ -137,7 +137,7 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
 
             <label className="flex items-center gap-2">排序<input className={`min-h-11 min-w-11 ${inputClass} w-20`} type="number" value={form.sort_order} onChange={(event) => setField('sort_order', Number(event.target.value) || 0)} /></label>
           </div>
-          <button type="button" onClick={() => void save()} disabled={saving} className="min-h-11 min-w-11 rounded-lg bg-cta px-5 py-2.5 text-sm font-semibold text-cta-ink hover:bg-cta-hover disabled:opacity-50">{saving ? '保存中…' : editing ? '更新提示词' : '添加提示词'}</button>
+          <button type="button" onClick={() => void save()} disabled={saving} className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--editor-accent-ink)] hover:brightness-105 disabled:opacity-50">{saving ? '保存中…' : editing ? '更新提示词' : '添加提示词'}</button>
         </div>
         {message && <p className="mt-4 text-sm text-[var(--success)]">{message}</p>}
         {error && <p className="mt-4 text-sm text-[var(--danger)]">{error}</p>}

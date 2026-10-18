@@ -165,7 +165,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
   return (
     <div className="space-y-8">
       <p className="text-sm text-[var(--editor-muted)]">新收藏默认私密。保存只修改工作版本，点击“保存并公开”才更新公开内容。</p>
-      <button className="min-h-11 min-w-11 brain-button" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
+      <button className="min-h-11 min-w-11 brain-button brain-cta" disabled={saving} onClick={() => void save(true)}>保存并公开</button>
       {/* 录入表单 */}
       <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-5 space-y-4">
         <div className="flex items-center justify-between">
@@ -253,7 +253,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
           <button
             onClick={() => void save()}
             disabled={saving}
-            className="min-h-11 min-w-11 px-5 py-2 rounded-lg bg-cta text-cta-ink text-sm font-medium hover:bg-cta-hover transition-all disabled:opacity-50"
+            className="min-h-11 min-w-11 px-5 py-2 rounded-lg bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] text-sm font-medium hover:brightness-105 transition-all disabled:opacity-50"
           >
             {saving ? '保存中…' : isEditing ? '更新' : '添加'}
           </button>

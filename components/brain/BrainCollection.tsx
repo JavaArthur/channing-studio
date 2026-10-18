@@ -218,7 +218,7 @@ export function BrainCollection({
               <LockKeyhole size={14} />
               仅自己可见
             </span>
-            <button className="min-h-11 min-w-11 brain-button brain-cta" disabled={busy}>
+            <button className="min-h-11 min-w-11 brain-button" disabled={busy}>
               保存
             </button>
           </div>
@@ -265,7 +265,7 @@ export function BrainCollection({
             />
           </label>
           <div className="flex gap-3">
-            <button className="min-h-11 min-w-11 brain-button brain-cta" disabled={busy}>
+            <button className="min-h-11 min-w-11 brain-button" disabled={busy}>
               确认发布这份内容
             </button>
             <button type="button" className="min-h-11 min-w-11 brain-secondary" onClick={() => setPublishing(null)}>

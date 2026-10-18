@@ -96,7 +96,7 @@ function AdminLoginForm() {
             <button
               type="submit"
               disabled={loading || !password}
-              className="min-h-11 min-w-11 w-full bg-cta text-cta-ink rounded-lg py-2.5 text-sm font-semibold hover:bg-cta-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-11 min-w-11 w-full bg-cta text-cta-ink rounded-lg py-2.5 text-sm font-semibold hover:bg-cta-hover transition disabled:bg-cta-disabled disabled:text-cta-disabled-ink disabled:cursor-not-allowed"
             >
               {loading ? '登录中…' : '登录'}
             </button>

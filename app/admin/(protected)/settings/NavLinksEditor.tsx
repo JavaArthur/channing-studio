@@ -85,7 +85,7 @@ export function NavLinksEditor({ initialValue, onSave, saving }: Props) {
         <button
           onClick={() => onSave(JSON.stringify(links))}
           disabled={saving}
-          className={`min-h-11 min-w-11 ${btnCls} bg-cta text-cta-ink hover:bg-cta-hover disabled:opacity-60`}
+          className={`min-h-11 min-w-11 ${btnCls} bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] hover:brightness-105 disabled:opacity-60`}
         >
           {saving ? '保存中…' : '保存导航'}
         </button>

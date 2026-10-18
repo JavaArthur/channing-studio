@@ -80,7 +80,7 @@ export function StudioManager({ initialContent, initialRevision }: StudioManager
           <h1 className="font-serif font-medium text-xl text-[var(--editor-ink)]">工作室内容</h1>
           <p className="mt-1 text-sm text-[var(--editor-muted)]">在这里编辑公开页面的内容。私人项目的展示摘要在“项目”中单独管理。</p>
         </div>
-        <button onClick={save} disabled={saving} className="min-h-11 min-w-11 rounded-lg bg-cta px-4 py-2.5 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover disabled:opacity-50">
+        <button onClick={save} disabled={saving} className="min-h-11 min-w-11 rounded-lg bg-cta px-4 py-2.5 text-sm font-semibold text-cta-ink transition hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-cta-disabled-ink disabled:cursor-not-allowed">
           {saving ? '保存中…' : '保存工作室内容'}
         </button>
       </div>

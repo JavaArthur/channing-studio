@@ -143,8 +143,8 @@ export function ApiTokensManager() {
         <button
           onClick={createToken}
           disabled={creating || !newName.trim()}
-          className="min-h-11 min-w-11 px-4 py-2 text-sm bg-cta text-cta-ink rounded-lg font-medium
- hover:bg-cta-hover disabled:opacity-50"
+          className="min-h-11 min-w-11 px-4 py-2 text-sm bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] rounded-lg font-medium
+ hover:brightness-105 disabled:opacity-50"
         >
           {creating ? '创建中...' : '生成 Token'}
         </button>

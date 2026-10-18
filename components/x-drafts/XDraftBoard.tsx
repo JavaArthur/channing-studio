@@ -10,9 +10,9 @@ import { countXChars, isHttpUrl, SOURCE_TYPES, X_CHAR_LIMIT } from '@/lib/x-draf
 const statuses = { pending: '待发', posted: '已发', discarded: '放弃', all: '全部' }
 const ranges = [['today', '今天'], ['7', '近 7 天'], ['30', '近 30 天'], ['all', '全部']] as const
 const inputClass = 'w-full min-w-0 rounded-lg border border-[var(--editor-line)] bg-transparent p-2'
-const tabClass = (selected: boolean) => `brain-secondary min-h-[44px] ${selected ? 'border-[var(--editor-accent)]! text-[var(--editor-accent)]! bg-[var(--editor-soft)] font-medium' : ''}`
+const tabClass = (selected: boolean) => `brain-secondary min-h-[44px] ${selected ? 'bg-[var(--editor-accent)]! text-[var(--editor-accent-ink)]! border-[var(--editor-accent)]! font-medium' : ''}`
 function CharacterCount({ count }: { count: number }) {
-  return <p aria-live="polite" className={`text-sm ${count > X_CHAR_LIMIT ? 'text-red-600 dark:text-red-400' : 'text-[var(--editor-muted)]'}`}>
+  return <p aria-live="polite" className={`text-sm ${count > X_CHAR_LIMIT ? 'text-[var(--danger)]' : 'text-[var(--editor-muted)]'}`}>
     {count} / {X_CHAR_LIMIT}{count > X_CHAR_LIMIT && ` · 超出 ${count - X_CHAR_LIMIT} · 按 X 规则计数（中文算 2，链接算 23）`}
   </p>
 }
@@ -102,11 +102,11 @@ function DraftCard({ draft }: { draft: XDraft }) {
       setUrlError(''); void update({ status: 'posted', posted_url: url || null })
     }}>
       <label className="block space-y-2"><span>帖子链接（可选）</span><input autoFocus className={inputClass} type="url" value={postedUrl} aria-invalid={!!urlError} aria-describedby={urlError ? urlErrorId : undefined} onChange={event => { setPostedUrl(event.target.value); setUrlError('') }} placeholder="https://x.com/…" /></label>
-      {urlError && <p id={urlErrorId} role="alert" className="text-sm text-red-600 dark:text-red-400">{urlError}</p>}
+      {urlError && <p id={urlErrorId} role="alert" className="text-sm text-[var(--danger)]">{urlError}</p>}
       <button className="brain-button min-h-[44px]" disabled={busy}>确认已发</button>
     </form>}
     {feedback && <p role="status" className="text-sm">{feedback}</p>}
-    {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+    {error && <p role="alert" className="text-sm text-[var(--danger)]">{error}</p>}
   </article>
 }
 export function XDraftBoard({ items, total, page, has_more, status, range, query }: {
@@ -136,7 +136,7 @@ export function XDraftBoard({ items, total, page, has_more, status, range, query
   return <div className="min-w-0 space-y-6">
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div><p className="brain-kicker">Personal workspace</p><h1 className="mt-3 text-3xl font-semibold tracking-tight">X 短帖草稿</h1><p className="mt-3 text-[var(--editor-muted)]">收集短帖灵感，复制后发布，记录每一次分享。</p></div>
-      <button className="brain-button min-h-[44px]" onClick={() => setCreating(!creating)}>{creating ? '取消新建' : '新建草稿'}</button>
+      <button className="brain-button brain-cta min-h-[44px]" onClick={() => setCreating(!creating)}>{creating ? '取消新建' : '新建草稿'}</button>
     </header>
     {creating && <form onSubmit={create} className="brain-panel min-w-0 space-y-4 p-5">
       <label className="block space-y-2"><span>正文</span><textarea className={inputClass} rows={6} required maxLength={10000} value={content} onChange={event => setContent(event.target.value)} /></label>
@@ -144,7 +144,7 @@ export function XDraftBoard({ items, total, page, has_more, status, range, query
       <label className="block space-y-2"><span>来源链接</span><input className={inputClass} type="url" value={sourceUrl} onChange={event => setSourceUrl(event.target.value)} /></label>
       <label className="block space-y-2"><span>来源类型</span><select className={inputClass} value={sourceType} onChange={event => setSourceType(event.target.value)}>{Object.entries(SOURCE_TYPES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
       <button className="brain-button min-h-[44px]" disabled={busy}>保存草稿</button>
-      {error && <p role="alert" className="text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p role="alert" className="text-[var(--danger)]">{error}</p>}
     </form>}
     <nav aria-label="草稿状态" className="flex flex-wrap gap-2">{Object.entries(statuses).map(([value, label]) => <Link key={value} href={href({ status: value })} aria-current={status === value ? 'page' : undefined} className={tabClass(status === value)}>{label}</Link>)}</nav>
     <nav aria-label="创建时间" className="flex flex-wrap gap-2">{ranges.map(([value, label]) => <Link key={value} href={href({ range: value })} aria-current={range === value ? 'page' : undefined} className={tabClass(range === value)}>{label}</Link>)}</nav>

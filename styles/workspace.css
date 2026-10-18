@@ -25,6 +25,7 @@ a, button, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 /* Primary actions opt in; active tabs and ordinary filled controls stay charcoal. */
 .brain-cta { background:var(--cta-bg); color:var(--cta-ink); }
 .brain-cta:hover { background:var(--cta-bg-hover); }
+.brain-cta:disabled { background:var(--cta-disabled-bg); color:var(--cta-disabled-ink); opacity:1; cursor:not-allowed; }
 
 /* Header controls fit the 390px canvas with full 44px touch targets. */
 @media (max-width: 639px) {

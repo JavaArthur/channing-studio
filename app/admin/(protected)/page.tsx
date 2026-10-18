@@ -30,7 +30,7 @@ export default async function AdminPage() {
             收集、整理、推进，把值得分享的部分带到外面。
           </p>
         </div>
-        <Link className="min-h-11 min-w-11 brain-button" href="/admin/inbox">
+        <Link className="min-h-11 min-w-11 brain-button brain-cta" href="/admin/inbox">
           <Plus size={16} />
           收集想法
         </Link>

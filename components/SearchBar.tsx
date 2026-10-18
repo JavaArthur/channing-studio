@@ -141,7 +141,7 @@ export function SearchBar() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="搜索文章..."
-                    className="min-h-11 min-w-11 flex-1 text-base bg-transparent outline-none placeholder:text-[var(--stone-gray)]/60 text-[var(--editor-ink)]"
+                    className="min-h-11 min-w-11 flex-1 text-base bg-transparent outline-none placeholder:text-[var(--stone-gray)] text-[var(--editor-ink)]"
                     autoComplete="off"
                     spellCheck={false}
                   />

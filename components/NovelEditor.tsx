@@ -1136,7 +1136,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                   type="button"
                   onClick={() => void handleSave()}
                   disabled={saving || uploadingImage}
-                  className="min-h-11 min-w-11 inline-flex items-center gap-1.5 rounded-l-lg bg-cta pl-3 pr-2 py-1.5 text-sm font-semibold text-cta-ink whitespace-nowrap transition hover:bg-cta-hover disabled:opacity-60"
+                  className="min-h-11 min-w-11 inline-flex items-center gap-1.5 rounded-l-lg bg-cta pl-3 pr-2 py-1.5 text-sm font-semibold text-cta-ink whitespace-nowrap transition hover:bg-cta-hover disabled:bg-cta-disabled disabled:text-cta-disabled-ink disabled:cursor-not-allowed"
                 >
                   <Globe className="h-3.5 w-3.5" />
                   {saving ? '保存中…' : publishStatus === 'draft' ? '存为草稿' : editSlug ? '发布更新' : '发布'}
@@ -1145,7 +1145,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                   <button
                     type="button"
                     onClick={() => setPublishPanelOpen(!publishPanelOpen)}
-                    className="min-h-11 min-w-11 inline-flex items-center rounded-r-lg bg-[var(--editor-accent)] px-1.5 py-1.5 text-[var(--editor-accent-ink)] border-l border-[var(--editor-line)]/25 hover:brightness-105 transition"
+                    className="min-h-11 min-w-11 inline-flex items-center rounded-r-lg bg-cta px-1.5 py-1.5 text-cta-ink border-l border-[var(--cta-divider)] hover:bg-cta-hover transition"
                     aria-label="展开发布选项"
                   >
                     <ChevronUp className={`h-3.5 w-3.5 transition-transform ${publishPanelOpen ? 'rotate-180' : ''}`} />
@@ -1190,7 +1190,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                         type="button"
                         onClick={() => void handleSave()}
                         disabled={saving}
-                        className="min-h-11 min-w-11 px-3 py-1.5 text-sm font-semibold text-cta-ink bg-cta rounded-lg hover:bg-cta-hover transition disabled:opacity-50"
+                        className="min-h-11 min-w-11 px-3 py-1.5 text-sm font-semibold text-[var(--editor-accent-ink)] bg-[var(--editor-accent)] rounded-lg hover:brightness-105 transition disabled:opacity-50"
                       >
                         {saving ? '保存中…' : editSlug ? '更新文章' : '发布'}
                       </button>

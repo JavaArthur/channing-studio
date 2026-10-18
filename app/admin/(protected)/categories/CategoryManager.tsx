@@ -151,7 +151,7 @@ export function CategoryManager({ initialCategories }: { initialCategories: Cate
           <button
             type="submit"
             disabled={loading || !name.trim() || !slug.trim()}
-            className="min-h-11 min-w-11 px-4 py-2 text-sm rounded-lg bg-cta text-cta-ink font-medium hover:bg-cta-hover transition disabled:opacity-50"
+            className="min-h-11 min-w-11 px-4 py-2 text-sm rounded-lg bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] font-medium hover:brightness-105 transition disabled:opacity-50"
           >
             {loading ? '添加中…' : '添加'}
           </button>

@@ -42,8 +42,8 @@ function buildStandaloneHtml(html: string, fontSize: FontSize): string {
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: #f6f7f9;
-      color: #1f2329;
+      background: #f5f4ed;
+      color: #141413;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
       font-size: ${baseFontSize};
       line-height: 1.6;
@@ -62,17 +62,17 @@ function buildStandaloneHtml(html: string, fontSize: FontSize): string {
       justify-content: space-between;
       gap: 12px;
       padding: 12px 0 16px;
-      background: #f6f7f9;
+      background: #f5f4ed;
     }
     .hint {
       margin: 0;
-      color: #646a73;
+      color: #5e5d59;
       font-size: 14px;
     }
     .copy-button {
       border: 0;
       border-radius: 6px;
-      background: #07c160;
+      background: #07c160; /* #07c160: WeChat brand green, intentionally kept */
       color: #fff;
       cursor: pointer;
       font-size: 14px;
@@ -89,9 +89,9 @@ function buildStandaloneHtml(html: string, fontSize: FontSize): string {
     }
     .preview {
       background: #fff;
-      border: 1px solid #e5e6eb;
+      border: 1px solid #e8e6dc;
       border-radius: 8px;
-      box-shadow: 0 12px 32px rgba(31, 35, 41, .08);
+      box-shadow: 0 0 0 1px #e8e6dc, rgba(20, 20, 19, .05) 0 4px 24px;
       overflow: hidden;
     }
     @media (max-width: 640px) {

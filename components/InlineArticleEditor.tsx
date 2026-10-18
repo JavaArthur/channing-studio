@@ -435,7 +435,7 @@ export function InlineArticleEditor({
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="min-h-11 min-w-11 px-2 py-1 rounded-md bg-cta text-cta-ink font-medium hover:bg-cta-hover transition disabled:opacity-50"
+              className="min-h-11 min-w-11 px-2 py-1 rounded-md bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] font-medium hover:brightness-105 transition disabled:opacity-50"
             >
               {saving ? '保存中…' : '保存'}
             </button>
