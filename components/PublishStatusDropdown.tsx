@@ -82,7 +82,7 @@ export function PublishStatusDropdown({ value, onChange, disabled }: PublishStat
                     onChange(status)
                     setOpen(false)
                   }}
-                  className={`min-h-11 min-w-11 w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--editor-soft)] transition-colors ${
+                  className={`focus-ring-inset min-h-11 min-w-11 w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--editor-soft)] transition-colors ${
                     isActive ? 'bg-[var(--editor-accent)]/5' : ''
                   }`}
                 >

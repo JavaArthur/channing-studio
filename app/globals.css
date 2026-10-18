@@ -229,6 +229,26 @@ body {
   }
 }
 
+/* Menu items inside overflow-hidden / scrolling menus (Dropdown, CategorySelector, publish status):
+   draw the same ring *inside* the item so the container can't clip it and the menu size doesn't change.
+   Dark: 2px #3898ec at the item edge. Light: 2px outer ring (inset shadow, at the edge, against the menu panel)
+   + 2px #3898ec just inside it. */
+.focus-ring-inset:focus-visible {
+  outline-offset: -2px;
+  /* 8px ≥ the menus' inner corner radius, so a first/last item flush with a rounded container keeps its ring corners */
+  border-radius: 8px;
+}
+:root[data-color-mode="light"] .focus-ring-inset:focus-visible:not(.novel-prose) {
+  outline-offset: -4px;
+  box-shadow: inset 0 0 0 2px var(--focus-ring-outer);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-color-mode]) .focus-ring-inset:focus-visible:not(.novel-prose) {
+    outline-offset: -4px;
+    box-shadow: inset 0 0 0 2px var(--focus-ring-outer);
+  }
+}
+
 /* Smooth scrolling */
 @media (prefers-reduced-motion: no-preference) {
   html {
@@ -814,6 +834,20 @@ body {
 .math-editor-input:focus {
   border-color: var(--focus-ring);
   box-shadow: 0 0 0 2px var(--focus-ring);
+}
+/* .math-editor-input sets outline:none, so in light mode the global rule would leave only the dark outer ring.
+   Restore the blue inner ring there to get the same two-tone ring; dark mode keeps the existing blue focus glow. */
+:root[data-color-mode="light"] .math-editor-input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px var(--focus-ring-outer);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-color-mode]) .math-editor-input:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 0;
+    box-shadow: 0 0 0 4px var(--focus-ring-outer);
+  }
 }
 .math-node-rendered {
   margin: 1rem 0;

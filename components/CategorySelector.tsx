@@ -92,7 +92,7 @@ export function CategorySelector({ value, onChange, className = '' }: CategorySe
                 onChange(cat.name)
                 setOpen(false)
               }}
-              className={`min-h-11 min-w-11 w-full text-left px-3 py-2 text-sm transition-colors ${
+              className={`focus-ring-inset min-h-11 min-w-11 w-full text-left px-3 py-2 text-sm transition-colors ${
                 cat.name === value
                   ? 'bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium'
                   : 'text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]'

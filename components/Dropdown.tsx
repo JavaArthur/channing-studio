@@ -143,7 +143,7 @@ export function Dropdown({
                   type="button"
                   onClick={() => handleSelect(option.value)}
                   title={option.title}
-                  className={`min-h-11 min-w-11
+                  className={`focus-ring-inset min-h-11 min-w-11
                     w-full px-3 py-2 text-sm text-left
                     flex items-center justify-between gap-2
                     transition-colors

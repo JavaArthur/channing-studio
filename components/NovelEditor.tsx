@@ -1164,7 +1164,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
                         key={key}
                         type="button"
                         onClick={() => setPublishStatus(key)}
-                        className={`min-h-11 min-w-11 w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--editor-soft)] transition ${active ? 'bg-[var(--editor-accent)]/5' : ''}`}
+                        className={`focus-ring-inset min-h-11 min-w-11 w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-[var(--editor-soft)] transition ${active ? 'bg-[var(--editor-accent)]/5' : ''}`}
                       >
                         <Icon className={`h-5 w-5 mt-0.5 shrink-0 ${active ? 'text-[var(--editor-accent)]' : 'text-[var(--editor-muted)]'}`} />
                         <div className="flex-1 min-w-0">
