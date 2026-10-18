@@ -15,7 +15,7 @@ beforeEach(() => {
 afterEach(() => sqlite.close())
 const create = (content = '第一行\n\nsecond line', source_type = 'other') => createXDraft(db, crypto.randomUUID(), { content, source_type })
 describe('X weighted text', () => {
-  it.each([['abc', 3], ['https://例子.测试/路径', 23], ['中文Ａ！', 8], ['a\nb', 3], ['😀🚀', 4], ['hello https://example.com/a?b=c', 29], ['https://a.co\nhttps://b.co', 47], ['see https://a.co.', 28]])('counts %s', (text, count) => expect(countXChars(text)).toBe(count))
+  it.each([['abc', 3], ['https://例子.测试/路径', 22], ['example.com', 23], ['👨‍👩‍👧‍👦', 2], ['…', 2], ['中文Ａ！', 8], ['a\nb', 3], ['😀🚀', 4], ['hello https://example.com/a?b=c', 29], ['https://a.co\nhttps://b.co', 47], ['see https://a.co.', 28]])('counts %s', (text, count) => expect(countXChars(text)).toBe(count))
   it('warns only above the limit', () => {
     expect(X_CHAR_LIMIT).toBe(280)
     expect(isOverLimit('中'.repeat(140))).toBe(false)
@@ -41,8 +41,8 @@ describe('X drafts repository', () => {
     const c = (await create('third', 'aihot')).draft
     for (const [item, time] of [[a, 100], [b, 200], [c, 300]] as const) sqlite.prepare('UPDATE x_drafts SET created_at=? WHERE id=?').run(time, item.id)
     await updateXDraft(db, b.id, 2, { status: 'posted' })
-    expect((await listXDrafts(db, { status: 'all', page: 1, limit: 2 }))).toMatchObject({ total: 3, has_more: true, items: [{ id: c.id }, { id: b.id }] })
-    expect((await listXDrafts(db, { status: 'all', page: 2, limit: 2 })).items.map(d => d.id)).toEqual([a.id])
+    expect((await listXDrafts(db, { status: 'all', page: 1, limit: 2 }))).toMatchObject({ total: 3, has_more: true, items: [{ id: c.id }, { id: a.id }] })
+    expect((await listXDrafts(db, { status: 'all', page: 2, limit: 2 })).items.map(d => d.id)).toEqual([b.id])
     expect((await listXDrafts(db, { status: 'posted' })).items.map(d => d.id)).toEqual([b.id])
     expect((await listXDrafts(db, { source_type: 'aihot', since: 100, until: 200 })).items.map(d => d.id)).toEqual([a.id])
     expect((await listXDrafts(db, { q: '100%' })).total).toBe(1)
@@ -55,8 +55,29 @@ describe('X drafts repository', () => {
     expect(posted).toMatchObject({ revision: 2, status: 'posted', over_limit: true, char_count: 282 })
     await expect(updateXDraft(db, draft.id, 1, { status: 'discarded' })).rejects.toMatchObject({ status: 412 })
     expect((await createXDraft(db, key, fields)).draft).toEqual(posted)
-    expect(await updateXDraft(db, draft.id, 2, { status: 'pending', posted_url: null })).toMatchObject({ revision: 3, posted_url: null, status: 'pending' })
+    expect(await updateXDraft(db, draft.id, 2, { status: 'pending' })).toMatchObject({ revision: 3, posted_url: null, status: 'pending' })
     expect(await getXDraft(db, draft.id)).toMatchObject({ revision: 3 })
+  })
+  it.each(['pending', 'discarded'] as const)('clears posted URLs when the resulting status is %s, including URL-only changes', async status => {
+    const { draft } = await create()
+    const posted = await updateXDraft(db, draft.id, draft.revision, { status: 'posted', posted_url: 'https://x.com/example/status/123' })
+    const cleared = await updateXDraft(db, draft.id, posted.revision, { status })
+    expect(cleared).toMatchObject({ status, posted_url: null })
+    const ignored = await updateXDraft(db, draft.id, cleared.revision, { status, posted_url: 'https://x.com/example/status/456' })
+    expect(ignored).toMatchObject({ status, posted_url: null })
+    expect(await updateXDraft(db, draft.id, ignored.revision, { posted_url: posted.posted_url })).toMatchObject({ status, posted_url: null })
+    // Undo restores both fields, using the revision returned by the previous operation.
+    const current = await getXDraft(db, draft.id)
+    expect(await updateXDraft(db, draft.id, current.revision, { status: posted.status, posted_url: posted.posted_url })).toMatchObject({ status: 'posted', posted_url: posted.posted_url })
+  })
+  it('orders all drafts by pending first, creation time descending and id for ties', async () => {
+    sqlite.exec(`INSERT INTO x_drafts(id,content,status,created_at) VALUES
+      ('pending-b','draft','pending',100), ('posted-new','draft','posted',300),
+      ('pending-a','draft','pending',100), ('discarded','draft','discarded',200),
+      ('pending-new','draft','pending',150)`)
+    expect((await listXDrafts(db, { status: 'all' })).items.map(d => d.id)).toEqual([
+      'pending-new', 'pending-a', 'pending-b', 'posted-new', 'discarded',
+    ])
   })
   it('validates content, source types, links and patch fields before writing', async () => {
     for (const fields of [{ content: '' }, { content: '  \n' }, { content: 'x'.repeat(10001) }, { content: 'x', source_type: 'Bad Type' }, { content: 'x', source_url: 'javascript:alert(1)' }])

@@ -67,6 +67,26 @@ describe('MCP X drafts', () => {
     expect(await tool(c, 'update_x_draft', { id: first.draft.id, expected_revision: 1, changes: { status: 'posted', posted_url: 'https://x.com/example/status/123' } })).toMatchObject({ draft: { status: 'posted', revision: 2, posted_url: 'https://x.com/example/status/123', char_count: 16 } })
     expect(await c.callTool({ name: 'update_x_draft', arguments: { id: first.draft.id, expected_revision: 1, changes: { status: 'discarded' } } })).toMatchObject({ isError: true, structuredContent: { error: { status: 412 } } })
   })
+  it.each(['pending', 'discarded'])('clears posted URLs when MCP changes status to %s', async status => {
+    const c = await client()
+    const { draft } = await tool(c, 'create_x_draft', { request_key: crypto.randomUUID(), content: 'status transition' })
+    const { draft: posted } = await tool(c, 'update_x_draft', { id: draft.id, expected_revision: draft.revision, changes: { status: 'posted', posted_url: 'https://x.com/example/status/123' } })
+    const { draft: cleared } = await tool(c, 'update_x_draft', { id: draft.id, expected_revision: posted.revision, changes: { status } })
+    expect(cleared).toMatchObject({ status, posted_url: null, revision: posted.revision + 1 })
+    expect(await tool(c, 'get_x_draft', { id: draft.id })).toMatchObject({ draft: { status, posted_url: null } })
+    expect(await tool(c, 'update_x_draft', { id: draft.id, expected_revision: cleared.revision, changes: { status, posted_url: posted.posted_url } })).toMatchObject({ draft: { status, posted_url: null } })
+  })
+  it('lists all drafts with pending first, then creation time and id', async () => {
+    sqlite.exec(`INSERT INTO x_drafts(id,content,status,created_at) VALUES
+      ('pending-b','draft','pending',100), ('posted-new','draft','posted',300),
+      ('pending-a','draft','pending',100), ('discarded','draft','discarded',200),
+      ('pending-new','draft','pending',150)`)
+    const c = await client(readToken)
+    const listed = await tool(c, 'list_x_drafts', { status: 'all' })
+    expect(listed.items.map((draft: { id: string }) => draft.id)).toEqual([
+      'pending-new', 'pending-a', 'pending-b', 'posted-new', 'discarded',
+    ])
+  })
   it('rejects invalid links and strict extra fields at both nesting levels', async () => {
     const c = await client()
     const base = { request_key: crypto.randomUUID(), content: 'draft' }

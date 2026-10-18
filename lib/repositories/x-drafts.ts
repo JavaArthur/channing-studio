@@ -51,8 +51,9 @@ export async function listXDrafts(db: Database, input: z.input<typeof xDraftList
   // D1 caps LIKE patterns at 50 bytes, so literal search uses instr() (case-insensitive for ASCII).
   if (q) { filters.push('instr(lower(content),lower(?))>0'); values.push(q) }
   const where = filters.join(' AND ') || '1=1'
+  const order = status === 'all' ? "(status='pending') DESC,created_at DESC,id" : 'created_at DESC,id'
   const results = await db.batch([
-    db.prepare(`SELECT ${columns} FROM x_drafts WHERE ${where} ORDER BY created_at DESC,id LIMIT ? OFFSET ?`)
+    db.prepare(`SELECT ${columns} FROM x_drafts WHERE ${where} ORDER BY ${order} LIMIT ? OFFSET ?`)
       .bind(...values, limit, (page - 1) * limit),
     db.prepare(`SELECT COUNT(*) AS total FROM x_drafts WHERE ${where}`).bind(...values),
   ]) as Array<{ results?: Array<Record<string, unknown>> }>
@@ -61,8 +62,10 @@ export async function listXDrafts(db: Database, input: z.input<typeof xDraftList
 }
 export async function updateXDraft(db: Database, id: string, expected_revision: number, changes: z.input<typeof xDraftChangesSchema>) {
   const input = parseXDraft(xDraftUpdateSchema, { expected_revision, changes })
-  if ((await getXDraft(db, id)).revision !== expected_revision)
+  const current = await getXDraft(db, id)
+  if (current.revision !== expected_revision)
     throw new BrainApiError(412, 'Revision changed; refresh before retrying')
+  if ((input.changes.status ?? current.status) !== 'posted') input.changes.posted_url = null
   const entries = Object.entries(input.changes).filter(([, value]) => value !== undefined)
   const result = await db.prepare(`UPDATE x_drafts SET ${entries.map(([key]) => `${key}=?`).join(',')},updated_at=strftime('%s','now') WHERE id=? AND revision=?`)
     .bind(...entries.map(([, value]) => value), id, expected_revision).run()
