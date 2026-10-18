@@ -51,6 +51,15 @@ function raw(body: unknown, extra: Record<string,string> = {}, method = 'POST') 
 const rpc = { jsonrpc:'2.0', id:1, method:'tools/list', params:{} }
 
 describe('MCP Streamable HTTP', () => {
+  it('reports the package version and tools.listChanged on initialize for both credentials', async () => {
+    const expected = JSON.parse(readFileSync('package.json', 'utf8')).version
+    expect(expected).toBe('0.2.0')
+    for (const token of [writeToken, readToken]) {
+      const c = await client(token)
+      expect(c.getServerVersion()).toEqual({ name: 'channing-studio', version: expected })
+      expect(c.getServerCapabilities()?.tools?.listChanged).toBe(true)
+    }
+  })
   it('negotiates with the official SDK, discovers schemas, and verifies a connection without reading private contents', async () => {
     const c = await client()
     expect(c.getServerVersion()?.name).toBe('channing-studio')
