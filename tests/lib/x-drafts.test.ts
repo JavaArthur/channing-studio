@@ -112,3 +112,49 @@ describe('X drafts repository', () => {
     } finally { old.close() }
   })
 })
+
+describe('X operations', () => {
+  it('isolates accounts by default, searches working copy and preserves the Agent original', async () => {
+    const a = (await create('Agent 原稿')).draft
+    const b = (await createXDraft(db, crypto.randomUUID(), { content: '娱乐文案', account_id: 'bg' })).draft
+    expect((await listXDrafts(db, {})).items.map(d => d.id)).toEqual([a.id])
+    expect((await listXDrafts(db, { account_id: 'bg' })).items.map(d => d.id)).toEqual([b.id])
+    expect((await listXDrafts(db, { account_id: 'all' })).total).toBe(2)
+    const edited = await updateXDraft(db, a.id, a.revision, { edited_content: '自己的长文案'.repeat(100) })
+    expect(edited).toMatchObject({ content: 'Agent 原稿', edited_content: '自己的长文案'.repeat(100), revision: 2 })
+    expect((await listXDrafts(db, { q: '自己的' })).items[0].id).toBe(a.id)
+    await expect(updateXDraft(db, a.id, a.revision, { edited_content: 'stale' })).rejects.toMatchObject({ status: 412 })
+    const moved = await updateXDraft(db, a.id, edited.revision, { account_id: 'bg', edited_content: null })
+    expect(moved).toMatchObject({ account_id: 'bg', content: 'Agent 原稿', edited_content: null })
+    expect((await listXDrafts(db, {})).total).toBe(0)
+  })
+  it('replays default and bg accounts but rejects switching account under the same key', async () => {
+    const key = crypto.randomUUID(), fields = { content: 'draft' }
+    const first = await createXDraft(db, key, fields)
+    expect(await createXDraft(db, key, { ...fields, account_id: 'ai' })).toMatchObject({ replayed: true, draft: { id: first.draft.id } })
+    await expect(createXDraft(db, key, { ...fields, account_id: 'bg' })).rejects.toMatchObject({ status: 409 })
+    const bgKey = crypto.randomUUID()
+    await createXDraft(db, bgKey, { ...fields, account_id: 'bg' })
+    expect(await createXDraft(db, bgKey, { ...fields, account_id: 'bg' })).toMatchObject({ replayed: true })
+    await expect(createXDraft(db, bgKey, fields)).rejects.toMatchObject({ status: 409 })
+  })
+  it('migrates historical drafts and receipts without changing IDs, revisions or content', async () => {
+    const old = new DatabaseSync(':memory:')
+    try {
+      old.exec(readFileSync('tests/fixtures/pre-brain-schema.sql', 'utf8'))
+      old.exec(readFileSync('db/migrations/2026-10-18-x-drafts.sql', 'utf8'))
+      const digest = async (s: string) => Buffer.from(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))).toString('hex')
+      const key = crypto.randomUUID(), keyHash = await digest(key)
+      const bodyHash = await digest(JSON.stringify(['Original', 'https://x.com/example/status/123', 'other']))
+      old.prepare("INSERT INTO x_drafts(id,content,source_url,status,posted_url,revision) VALUES (?,?,?,'posted',?,7)")
+        .run(`xd-${keyHash}`, 'Original', 'https://x.com/example/status/123', 'https://x.com/example/status/456')
+      old.prepare('INSERT INTO x_draft_creates(key_hash,request_hash,draft_id) VALUES (?,?,?)').run(keyHash, bodyHash, `xd-${keyHash}`)
+      const before = old.prepare('SELECT * FROM x_drafts').get()
+      old.exec(readFileSync('db/migrations/2026-10-25-x-operations.sql', 'utf8'))
+      expect(old.prepare('SELECT * FROM x_drafts').get()).toEqual({ ...before, account_id: 'ai', edited_content: null })
+      const legacyDb = new LocalD1(old) as unknown as Database
+      expect(await createXDraft(legacyDb, key, { content: 'Original', source_url: 'https://x.com/example/status/123' })).toMatchObject({ replayed: true, draft: { revision: 7, status: 'posted' } })
+      expect(old.prepare('PRAGMA foreign_key_check').all()).toEqual([])
+    } finally { old.close() }
+  })
+})

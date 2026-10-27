@@ -1,3 +1,4 @@
+import { createImageOperation } from '@/lib/repositories/content-operations'
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateRequest } from '@/lib/admin-auth'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
@@ -56,6 +57,7 @@ export async function POST(req: NextRequest) {
     quality?: string
     profile_id?: number
     sort_order?: number
+    is_enabled?: number
   }
 
   if (!body.action_key || !body.label || !body.description || !body.prompt) {
@@ -71,26 +73,11 @@ export async function POST(req: NextRequest) {
   const size = deriveLegacySizeFromAspectRatio(aspectRatio, body.size)
   const quality = deriveLegacyQualityFromResolution(resolution, body.quality)
 
-  const maxRow = await db.prepare('SELECT MAX(sort_order) as max_sort FROM ai_image_actions').first<{ max_sort: number | null }>()
-  const sortOrder = body.sort_order ?? ((maxRow?.max_sort ?? 0) + 10)
-
+  if (body.is_enabled !== undefined && body.is_enabled !== 0 && body.is_enabled !== 1)
+    return NextResponse.json({ error: '启用状态无效' }, { status: 400 })
   try {
-    await db.prepare(`
-      INSERT INTO ai_image_actions (
-        action_key, label, description, prompt, aspect_ratio, resolution, size, quality, profile_id, sort_order, is_builtin
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
-    `).bind(
-      body.action_key,
-      body.label,
-      body.description,
-      body.prompt,
-      aspectRatio,
-      resolution,
-      size,
-      quality,
-      profileId ?? null,
-      sortOrder,
-    ).run()
+    await createImageOperation(db, { action_key: body.action_key, label: body.label, description: body.description, prompt: body.prompt,
+      profile_id: profileId ?? null, sort_order: body.sort_order, is_enabled: body.is_enabled ?? 1, aspect_ratio: aspectRatio, resolution, size, quality })
   } catch (error) {
     if (error instanceof Error && /UNIQUE constraint failed: ai_image_actions\\.action_key/i.test(error.message)) {
       return NextResponse.json({ error: '操作标识已存在' }, { status: 409 })

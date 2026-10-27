@@ -53,7 +53,7 @@ const rpc = { jsonrpc:'2.0', id:1, method:'tools/list', params:{} }
 describe('MCP Streamable HTTP', () => {
   it('reports the package version and tools.listChanged on initialize for both credentials', async () => {
     const expected = JSON.parse(readFileSync('package.json', 'utf8')).version
-    expect(expected).toBe('0.2.0')
+    expect(expected).toBe('0.3.1')
     for (const token of [writeToken, readToken]) {
       const c = await client(token)
       expect(c.getServerVersion()).toEqual({ name: 'channing-studio', version: expected })
@@ -64,7 +64,7 @@ describe('MCP Streamable HTTP', () => {
     const c = await client()
     expect(c.getServerVersion()?.name).toBe('channing-studio')
     const { tools } = await c.listTools()
-    expect(tools).toHaveLength(14)
+    expect(tools).toHaveLength(21)
     expect(tools.find(t => t.name === 'organize_inbox')?.inputSchema.required).toContain('project_revision')
     expect(tools.find(t => t.name === 'organize_inbox')?.inputSchema.additionalProperties).toBe(false)
     expect(await tool(c, 'workspace_status')).toMatchObject({ connected: true, access:'write' })
@@ -80,13 +80,30 @@ describe('MCP Streamable HTTP', () => {
     expect((await raw(rpc, {Origin:'https://evil.example'})).status).toBe(403)
     expect((await raw(rpc, {Origin:'http://localhost'})).status).toBe(200)
     const c = await client(readToken)
-    expect((await c.listTools()).tools.map(t=>t.name)).toEqual(['workspace_status','search_workspace','get_item','get_project_context','list_x_drafts','get_x_draft'])
+    expect((await c.listTools()).tools.map(t=>t.name)).toEqual(['workspace_status','search_workspace','get_item','get_project_context','list_x_drafts','get_x_draft','search_library','get_library_item','list_collections'])
     expect(await tool(c,'workspace_status')).toMatchObject({access:'read'})
     const denied = await c.callTool({name:'capture_inbox',arguments:{request_key:crypto.randomUUID(),title:'denied'}})
     expect(denied.isError).toBe(true)
     expect(sqlite.prepare('SELECT count(*) AS n FROM inbox_items').get()).toMatchObject({n:0})
     state.env.MCP_READ_TOKEN = undefined
     expect((await raw(rpc,{Authorization:`Bearer ${readToken}`})).status).toBe(401)
+  })
+  it('captures and retrieves typed library content through MCP while keeping read credentials read-only', async () => {
+    const c = await client()
+    const key = crypto.randomUUID()
+    const saved = await tool(c, 'capture_library_item', { request_key: key, type: 'tool', title: 'SDK tool', source_url: 'https://example.com/sdk', content: 'Private description', topics: ['Testing'] })
+    expect(saved).toMatchObject({ replayed: false, item: { kind: 'tool', submitted_by: 'agent' } })
+    expect(saved.href).toBe(`/admin/library/tool/${saved.item.id}`)
+    expect((await tool(c, 'get_library_item', { kind: 'tool', id: saved.item.id })).item.content).toBe('Private description')
+    expect((await tool(c, 'search_library', { q: 'Private description' })).total).toBe(1)
+    expect((await tool(c, 'capture_library_item', { request_key: key, type: 'tool', title: 'SDK tool', source_url: 'https://example.com/sdk', content: 'Private description', topics: ['Testing'] })).replayed).toBe(true)
+    const read = await client(readToken)
+    expect((await read.callTool({name:'search_library',arguments:{recent:true}})).isError).toBe(true)
+    expect(sqlite.prepare('SELECT COUNT(*) AS n FROM admin_recent_items').get()!.n).toBe(0)
+    for (const name of ['capture_library_item', 'update_library_item', 'create_collection', 'link_library_collection']) {
+      expect((await read.callTool({ name, arguments: {} })).isError).toBe(true)
+    }
+    expect(sqlite.prepare('SELECT is_hidden,published_payload FROM tools').get()).toMatchObject({ is_hidden: 1, published_payload: null })
   })
   it('completes capture → note → project atomically through the SDK, then replays original arguments and archives fixtures', async () => {
     const c = await client()

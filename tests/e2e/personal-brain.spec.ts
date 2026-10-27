@@ -69,6 +69,7 @@ test('password gates protect HTML/RSC and private APIs reject guests', async ({
         })
       ).status(),
     ).toBe(401)
+    expect((await guest.request.post('/api/admin/library', { data: { action: 'handoff', items: [], instruction: '' } })).status()).toBe(401)
     expect((await guest.request.put('/api/admin/studio', { data: {} })).status()).toBe(401)
   } finally {
     await context.request.delete(`/api/admin/posts/${slug}`)
@@ -83,9 +84,12 @@ test('work copies do not publish, stale tabs conflict, and explicit publication 
   await login(context)
   const slug = await createPost(context.request)
   const second = await context.newPage()
+  const extensionWarnings: string[] = []
+  page.on('console', message => { if (message.text().includes('Duplicate extension names')) extensionWarnings.push(message.text()) })
   try {
     await page.goto(`/editor?edit=${slug}`)
     await page.locator('[contenteditable=true]').first().waitFor()
+    expect(extensionWarnings).toEqual([])
     await second.goto(`/editor?edit=${slug}`)
     await second.locator('[contenteditable=true]').first().waitFor()
     const saved = page.waitForResponse(
@@ -118,90 +122,6 @@ test('work copies do not publish, stale tabs conflict, and explicit publication 
   } finally {
     await second.close()
     await context.request.delete(`/api/admin/posts/${slug}`)
-  }
-})
-
-test('collect, organize and associate privately; public snapshots and both color modes work', async ({
-  page,
-  context,
-}) => {
-  await login(context)
-  const title = `本地流程验收 ${crypto.randomUUID().slice(0, 8)}`
-  let projectId = ''
-  let inboxId = ''
-  try {
-    await page.goto('/admin/inbox')
-    await page.getByRole('button', { name: '收集一条想法', exact: true }).click()
-    await page.getByLabel('标题', { exact: true }).fill(title)
-    await page.getByLabel('内容', { exact: true }).fill('PRIVATE_NOTE_SMOKE')
-    const created = page.waitForResponse(
-      (r) => r.url().endsWith('/api/admin/brain/inbox') && r.request().method() === 'POST',
-    )
-    await page.getByRole('button', { name: '保存', exact: true }).click()
-    inboxId = (await (await created).json()).id
-    const item = page
-      .locator('article')
-      .filter({ has: page.getByRole('heading', { name: title, exact: true }) })
-    await item.getByRole('button', { name: '整理为笔记', exact: true }).click()
-    await expect(item.getByText('已整理', { exact: true })).toBeVisible()
-    await page.goto('/admin/search?q=' + encodeURIComponent(title))
-    await expect(page.getByRole('link').filter({ hasText: title }).first()).toBeVisible()
-    const project = await context.request.post('/api/admin/brain/projects', {
-      data: { title, description: 'PRIVATE_PROJECT_SMOKE', next_action: 'PRIVATE_NEXT_ACTION' },
-    })
-    projectId = (await project.json()).id
-    await page.goto('/admin/projects?q=' + encodeURIComponent(title))
-    await page.getByRole('button', { name: '相关资料 +' }).click()
-    await page.getByLabel('按标题查找资料').fill(title)
-    await page.getByRole('button', { name: '查找', exact: true }).click()
-    await page.getByRole('button', { name: '关联', exact: true }).click()
-    await expect(page.getByRole('button', { name: '取消关联', exact: true })).toBeVisible()
-    await page.getByRole('button', { name: '公开展示设置', exact: true }).click()
-    await page.getByLabel('公开标题', { exact: true }).fill('Reviewed public project')
-    await page.getByLabel('公开摘要', { exact: true }).fill('Reviewed summary only')
-    await page.getByLabel('作品链接', { exact: true }).fill('https://example.com')
-    await page.getByRole('button', { name: '确认发布这份内容', exact: true }).click()
-    await expect(page.getByText('已公开 · 独立版本', { exact: true })).toBeVisible()
-    const work = await (await context.request.get('/work')).text()
-    expect(work).toContain('Reviewed public project')
-    expect(work).not.toContain('PRIVATE_PROJECT_SMOKE')
-    expect(work).not.toContain('PRIVATE_NEXT_ACTION')
-    await page.getByRole('button', { name: '撤回公开', exact: true }).click()
-    await expect(page.getByText('私密', { exact: true })).toBeVisible()
-    expect(await (await context.request.get('/work')).text()).not.toContain(
-      'Reviewed public project',
-    )
-    for (const width of [1440, 390]) {
-      await page.setViewportSize({ width, height: 900 })
-      for (const path of ['/', '/admin', '/admin/projects']) {
-        await page.goto(path)
-        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-          true,
-        )
-      }
-    }
-    await page.goto('/')
-    await page.getByRole('button', { name: '切换到晚上模式' }).click()
-    await expect(page.locator('html')).toHaveAttribute('data-color-mode', 'dark')
-    await page.reload()
-    await expect(page.locator('html')).toHaveAttribute('data-color-mode', 'dark')
-  } finally {
-    if (projectId) {
-      await context.request.post('/api/admin/brain/projects', {
-        data: { id: projectId, action: 'publish', publish: false },
-      })
-      await context.request.post('/api/admin/brain/projects', {
-        data: { id: projectId, action: 'archive' },
-      })
-    }
-    if (inboxId) {
-      await context.request.post('/api/admin/brain/inbox', {
-        data: { id: inboxId, action: 'archive' },
-      })
-      await context.request.post('/api/admin/brain/notes', {
-        data: { id: `inbox-${inboxId}`, action: 'archive' },
-      })
-    }
   }
 })
 

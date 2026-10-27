@@ -1,5 +1,7 @@
 'use client'
+import { ManualSheet } from '@/components/admin/ManualSheet'
 
+import { Button, Menu, Modal } from '@/components/admin/ui'
 import type { ReactNode } from 'react'
 import { Dropdown } from '@/components/Dropdown'
 
@@ -117,29 +119,11 @@ export function ProviderListTable<T extends BaseProviderProfile>({
                 {profile.updated_at ? new Date(profile.updated_at * 1000).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) : '-'}
               </td>
               <td className="px-3 py-2 text-right">
-                {profile.id !== defaultProfileId && profile.is_default !== 1 ? (
-                  <button
-                    type="button"
-                    onClick={() => onSetDefault(profile)}
-                    className="min-h-11 min-w-11 text-xs text-[var(--editor-accent)] hover:underline"
-                  >
-                    默认
-                  </button>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() => onEdit(profile)}
-                  className="min-h-11 min-w-11 ml-2 text-xs text-[var(--editor-accent)] hover:underline"
-                >
-                  编辑
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onDelete(profile)}
-                  className="min-h-11 min-w-11 ml-2 text-xs text-[var(--danger)] hover:underline"
-                >
-                  删除
-                </button>
+                <Button variant="ghost" onClick={() => onEdit(profile)}>编辑</Button>
+                <Menu label={`${profile.name}的操作`} items={[
+                  { label: '设为默认', disabled: profile.id === defaultProfileId || profile.is_default === 1, onSelect: () => onSetDefault(profile) },
+                  { label: '删除配置', danger: true, onSelect: () => onDelete(profile) },
+                ]} />
               </td>
             </tr>
           ))}
@@ -159,25 +143,14 @@ export function ProviderListTable<T extends BaseProviderProfile>({
 interface ProviderDialogProps {
   title: string
   onClose: () => void
+  value: unknown
+  onSave: () => Promise<boolean>
   headerAction?: ReactNode
   children: ReactNode
 }
 
-export function ProviderDialog({ title, onClose, headerAction, children }: ProviderDialogProps) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--overlay)]" onClick={onClose}>
-      <div
-        className="mx-4 w-full max-w-2xl rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-6 shadow-xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-serif font-medium text-lg text-[var(--editor-ink)]">{title}</h3>
-          {headerAction}
-        </div>
-        {children}
-      </div>
-    </div>
-  )
+export function ProviderDialog({ title, onClose, headerAction, children, value, onSave }: ProviderDialogProps) {
+  return <ManualSheet title={title} onClose={onClose} value={value} onSave={onSave}><div className="provider-form">{headerAction && <div className="mb-4">{headerAction}</div>}{children}</div></ManualSheet>
 }
 
 interface ProviderTemplateModalProps {
@@ -196,12 +169,7 @@ export function ProviderTemplateModal({
   onSelect,
 }: ProviderTemplateModalProps) {
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[var(--overlay)]" onClick={onClose}>
-      <div
-        className="mx-4 w-full max-w-xl rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-6 shadow-xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h3 className="font-serif font-medium mb-4 text-lg text-[var(--editor-ink)]">快捷模板</h3>
+    <Modal open onOpenChange={open => { if (!open) onClose() }} title="快捷模板">
         <div className="space-y-4">
           {groups.map((group) => (
             <div key={group.category}>
@@ -238,8 +206,7 @@ export function ProviderTemplateModal({
             <div className="mt-1 text-xs text-[var(--editor-muted)]">{customOptionDescription}</div>
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   )
 }
 

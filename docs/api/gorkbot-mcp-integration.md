@@ -1,6 +1,8 @@
-# gorkbot MCP 接入：收集 → 笔记 → 项目
+# Agent MCP 接入：私人资料库
 
-更新：2026-10-18。现有 HTTP API 与 Hermes 同步接口继续保留。
+更新：2026-10-24。现有 HTTP API 与 Hermes 同步接口继续保留。
+
+新客户端优先使用 [Studio 资料库工具与数据流](../2026-10-24-studio-library.md)，工具、文章摘录、笔记和提示词直接入资料库；X 短帖通过 `create_x_draft` 进入[运营工作台](../2026-10-25-x-operations.md)。Hermes 和 Grokbot 都记为 Agent 提交。以下旧整理流程继续兼容，不要求普通收藏先入收集箱再转换。
 
 ## 连接设置
 
@@ -19,8 +21,8 @@
 
 凭据与权限：
 
-- `MCP_READ_TOKEN`：6 个只读工具，可读工作空间与 X 短帖草稿。
-- `MCP_WRITE_TOKEN`：14 个工具，可读写工作空间与 X 短帖草稿，并执行整理流程。
+- `MCP_READ_TOKEN`：9 个只读工具，可读工作空间与 X 短帖草稿。
+- `MCP_WRITE_TOKEN`：21 个工具，可读写工作空间与 X 短帖草稿，并执行整理流程。
 - 现有 Hermes Token、`qm_` Token、后台 Cookie 均不能登录 `/mcp`。更换 MCP secret 不影响这些旧接口。
 - 当前是两个独立静态凭据，按读写分权，没有每个 Bot 独立账号、自动过期或 OAuth 授权流程。不要将其描述为完整 OAuth 授权服务。
 - Token 不进入工具参数、提示词、URL、Git 或日志。仅在可信服务端客户端配置；来自其他站点的浏览器 Origin 会被拒绝，不开放跨站 CORS。
@@ -58,18 +60,18 @@
 
 现有公开发布仍由后台完成。MCP 不提供永久删除、项目公开发布、文章管理、私人附件或原始 Flomo 数据导入。
 
-X 短帖草稿工具（只保存草稿和人工发布状态，不代发到 X）：
+X 运营工具（不代发到 X；账号分区与人工处理状态由运营工作台管理）：
 
 | 工具 | 权限与行为 |
 |---|---|
-| `list_x_drafts` | 只读；status/source_type/q/since/until/page/limit 筛选，默认待发 |
+| `list_x_drafts` | 只读；account_id/status/source_type/q/since/until/page/limit 筛选，默认 ai 与 pending；跨账号需显式传 all |
 | `get_x_draft` | 只读；按 id 读取正文、revision、char_count 和 over_limit |
-| `create_x_draft` | 写入；request_key 幂等创建，正文必填，来源链接与类型可选 |
-| `update_x_draft` | 写入；expected_revision 乐观锁，支持正文、来源、状态和 posted_url |
+| `create_x_draft` | 写入；request_key 幂等创建，已处理的原创文案必填，account_id 默认 ai，娱乐账号传 bg；来源链接与类型可选 |
+| `update_x_draft` | 写入；expected_revision 乐观锁，支持 account_id、edited_content、正文、来源、状态和 posted_url；人工修改写 edited_content，保留 Agent 正文 |
 
-超出 280 加权字符仅提示，不阻止保存。来源类型支持自定义小写标识。链接仅限 HTTP(S)；版本冲突返回 412，同一请求键换正文返回 409。部署前先备份 D1，再应用可重复运行的 `db/migrations/2026-10-18-x-drafts.sql`。
+超出 280 加权字符仅提示，不阻止保存。来源类型支持自定义小写标识。链接仅限 HTTP(S)；版本冲突返回 412，同一请求键换正文返回 409。pending/posted/discarded 在运营界面分别表示待处理/已处理/忽略，复制与跳转不改变状态。历史请求键继续可重试；同一键换账号返回 409。已有库先备份 D1，再仅应用一次 `db/migrations/2026-10-25-x-operations.sql`，不要重放历史迁移。旧 `capture_library_item(type=inspiration)` 继续进入默认账号，详情链接指向运营页。
 
-## 整理完整流程
+## 旧接口整理流程（兼容）
 
 1. `workspace_status` 确认 connected=true、access=write。
 2. 用 `search_workspace` 找项目与收集项。项目重名时确认真实目标，不能猜测 ID。
@@ -116,7 +118,7 @@ X 短帖草稿工具（只保存草稿和人工发布状态，不代发到 X）�
 
 ## 部署与回归
 
-本站生产已完成此迁移，不能重复执行；验收结果见 [上线记录](../2026-10-18-mcp-release.md)。
+2026-10-18 的旧 MCP 迁移已完成，不能重复执行；其验收结果见 [上线记录](../2026-10-18-mcp-release.md)。
 
 新增 `db/migrations/2026-10-18-mcp-workflows.sql` 创建仅含哈希、ID 与结果标志的回执表。新库 schema 已同步。已有库先备份，隔离恢复并演练后只应用一次增量，不能重放历史 migrations。
 

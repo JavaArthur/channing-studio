@@ -73,6 +73,8 @@ export function RuntimeCapabilitiesPanel({ capabilities }: { capabilities: Runti
 
   return (
     <div className="space-y-6">
+      <div className="runtime-capability-summary"><div>私人资料保存 <strong>{capabilities.bindings.d1?'已配置':'尚未配置'}</strong></div><div>图片上传 <strong>{capabilities.bindings.images?'已配置':'尚未配置'}</strong></div><div>文章智能处理 <strong>{capabilities.features.aiInference.enabled?'已启用':'按模型配置启用'}</strong></div></div>
+      <details className="runtime-technical"><summary>技术详情</summary>
       <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
         <div className="font-serif mb-3 text-sm font-medium text-[var(--editor-ink)]">运行时绑定探测</div>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -104,6 +106,7 @@ export function RuntimeCapabilitiesPanel({ capabilities }: { capabilities: Runti
       <div className="rounded-lg border border-dashed border-[var(--editor-line)] bg-[var(--background)] px-4 py-3 text-sm text-[var(--editor-muted)]">
         开源部署建议：默认只要求 `D1 + R2` 即可运行，`Queues / Workers AI / Vectorize` 都应作为可选增强，通过环境变量显式开启。
       </div>
+      </details>
     </div>
   )
 }

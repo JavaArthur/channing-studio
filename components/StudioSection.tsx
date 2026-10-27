@@ -28,7 +28,7 @@ export function StudioShell({
       <SiteHeader initialTheme={initialTheme} navLinks={navLinks} studioMode />
       <main className="studio-page-main mx-auto w-full max-w-6xl flex-1 px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
         <header className="studio-page-heading border-b border-[var(--editor-line)] pb-10 sm:pb-14">
-          <p className="studio-eyebrow">{eyebrow}</p>
+          <p className="studio-eyebrow">{{ WORK: '作品', 'SELECTED WORK': '作品', LAB: '实验室', ABOUT: '关于', TOOLS: '工具', PROMPTS: '提示词' }[eyebrow.split('/')[0].trim()] || 'Channing Studio'}</p>
           <h1 className="font-serif font-medium studio-page-title mt-4 max-w-4xl">{title}</h1>
           <p className="studio-page-description mt-5 max-w-2xl">{description}</p>
         </header>

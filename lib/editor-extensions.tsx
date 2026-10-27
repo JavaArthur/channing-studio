@@ -12,7 +12,6 @@ import {
   EditorCommandItem,
   EditorCommandList,
   EditorInstance,
-  StarterKit,
   TaskItem,
   TaskList,
   TextStyle,
@@ -26,11 +25,10 @@ import {
   type SuggestionItem,
   useEditor,
 } from 'novel'
-import { Table, TableRow, TableCell, TableHeader } from '@tiptap/extension-table'
+import { createDocumentCore } from './document-editor'
 import Youtube from '@tiptap/extension-youtube'
 import GlobalDragHandle from 'tiptap-extension-global-drag-handle'
 import AutoJoiner from 'tiptap-extension-auto-joiner'
-import { Markdown } from 'tiptap-markdown'
 import { DOMParser as PMDOMParser } from '@tiptap/pm/model'
 import type { EditorView } from '@tiptap/pm/view'
 import markdownit from 'markdown-it'
@@ -386,7 +384,7 @@ export interface EditorExtensionOptions {
 
 export function createEditorExtensions(options: EditorExtensionOptions = {}) {
   return [
-    StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
+    ...createDocumentCore({ html: true, privateLinks: false }),
     TextStyle,
     Color,
     HighlightExtension,
@@ -396,10 +394,6 @@ export function createEditorExtensions(options: EditorExtensionOptions = {}) {
     TiptapLink.configure({ openOnClick: false, autolink: true, linkOnPaste: true }),
     TaskList,
     TaskItem.configure({ nested: true }),
-    Table.configure({ resizable: false, HTMLAttributes: { class: 'tiptap-table' } }),
-    TableRow,
-    TableCell,
-    TableHeader,
     Youtube.configure({
       inline: false,
       ccLanguage: 'zh',
@@ -409,7 +403,6 @@ export function createEditorExtensions(options: EditorExtensionOptions = {}) {
     MathNode,
     AudioNode,
     VideoNode,
-    Markdown.configure({ html: true, transformPastedText: true, transformCopiedText: true }),
     GlobalDragHandle.configure({
       dragHandleWidth: 24,
       scrollTreshold: 100,

@@ -23,7 +23,7 @@ export async function PATCH(
     const payload = await parseJsonBody<Record<string, unknown>>(req)
     const updates: Record<string, unknown> = {}
     if (payload.title !== undefined) updates.title = typeof payload.title === 'string' ? payload.title.trim() : ''
-    if (payload.prompt !== undefined) updates.prompt = typeof payload.prompt === 'string' ? payload.prompt.trim() : ''
+    if (payload.prompt !== undefined) updates.prompt = typeof payload.prompt === 'string' ? payload.prompt : ''
     if (payload.description !== undefined) updates.description = typeof payload.description === 'string' ? payload.description.trim() || null : null
     if (payload.category !== undefined) updates.category = typeof payload.category === 'string' ? payload.category.trim() || null : null
     if (payload.tags !== undefined) updates.tags = normalizePromptTags(payload.tags)
@@ -35,7 +35,7 @@ export async function PATCH(
     if (payload.is_pinned !== undefined) updates.is_pinned = payload.is_pinned === 1 ? 1 : 0
     if (payload.is_hidden !== undefined) updates.is_hidden = payload.is_hidden === 1 ? 1 : 0
     if (typeof payload.sort_order === 'number') updates.sort_order = payload.sort_order
-    if (updates.title === '' || updates.prompt === '') return jsonError('标题和提示词正文不能为空', 400)
+    if (updates.title === '' || (typeof updates.prompt === 'string' && !updates.prompt.trim())) return jsonError('标题和提示词正文不能为空', 400)
 
     await updatePrompt(route.db, id, updates)
     return jsonOk({ success: true })

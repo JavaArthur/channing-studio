@@ -51,19 +51,19 @@ function AdminLoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--editor-app-bg)] flex items-center justify-center px-4">
+    <div className="studio-login min-h-screen bg-[var(--editor-app-bg)] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="text-center mb-10">
+        <div className="text-left mb-6">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] text-xl font-bold mb-4">
               C
             </div>
           <h1 className="font-serif font-medium text-2xl text-[var(--editor-ink)]">Channing Studio</h1>
-          <p className="text-sm text-[var(--editor-muted)] mt-1">我的大脑</p>
+          <p className="text-sm text-[var(--editor-muted)] mt-1">登录私人资料库</p>
         </div>
 
         {/* 登录表单 */}
-        <div className="bg-[var(--editor-panel)] rounded-2xl border border-[var(--editor-line)] shadow-whisper p-8">
+        <div className="bg-[var(--editor-panel)] rounded-xl border border-[var(--editor-line)] p-6">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label
@@ -88,7 +88,7 @@ function AdminLoginForm() {
             </div>
 
             {error && (
-              <p className="text-sm text-[var(--danger)] bg-[var(--danger-soft-bg)] border border-[var(--danger-line)] rounded-md px-3 py-2">
+              <p role="alert" className="text-sm text-[var(--danger)] bg-[var(--danger-soft-bg)] border border-[var(--danger-line)] rounded-md px-3 py-2">
                 {error}
               </p>
             )}
@@ -96,9 +96,9 @@ function AdminLoginForm() {
             <button
               type="submit"
               disabled={loading || !password}
-              className="min-h-11 min-w-11 w-full bg-cta text-cta-ink rounded-lg py-2.5 text-sm font-semibold hover:bg-cta-hover transition disabled:bg-cta-disabled disabled:text-cta-disabled-ink disabled:cursor-not-allowed"
+              className="min-h-11 min-w-11 w-full bg-cta text-cta-ink rounded-md py-2.5 text-sm font-semibold hover:bg-cta-hover transition disabled:bg-cta-disabled disabled:text-cta-disabled-ink disabled:cursor-not-allowed"
             >
-              {loading ? '登录中…' : '登录'}
+              {loading ? '正在进入…' : '进入我的 Studio'}
             </button>
           </form>
         </div>

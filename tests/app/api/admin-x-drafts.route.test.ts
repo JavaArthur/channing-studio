@@ -75,3 +75,19 @@ describe('admin X drafts', () => {
       expect((await GET(request('GET', undefined, query))).status).toBe(400)
   })
 })
+
+it('validates accounts and working copies and filters the default account', async () => {
+  const response = await POST(request('POST', { content: 'Original', account_id: 'bg' }))
+  expect(response.status).toBe(200)
+  const { draft } = await response.json()
+  expect(await (await GET(request('GET'))).json()).toMatchObject({ total: 0 })
+  expect(await (await GET(request('GET', undefined, '?account_id=bg'))).json()).toMatchObject({ total: 1 })
+  expect(await (await GET(request('GET', undefined, '?account_id=all'))).json()).toMatchObject({ total: 1 })
+  expect((await POST(request('POST', { content: 'x', account_id: 'invalid' }))).status).toBe(400)
+  expect((await GET(request('GET', undefined, '?account_id=invalid'))).status).toBe(400)
+  const params = { params: Promise.resolve({ id: draft.id }) }
+  for (const edited_content of [' ', 'x'.repeat(10001), 1])
+    expect((await PATCH(request('PATCH', { expected_revision: 1, changes: { edited_content } }), params)).status).toBe(400)
+  const patched = await PATCH(request('PATCH', { expected_revision: 1, changes: { edited_content: 'Edited', account_id: 'ai' } }), params)
+  expect(await patched.json()).toMatchObject({ draft: { content: 'Original', edited_content: 'Edited', account_id: 'ai', revision: 2 } })
+})

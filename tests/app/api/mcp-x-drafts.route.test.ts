@@ -100,3 +100,34 @@ describe('MCP X drafts', () => {
     expect((await c.callTool({ name: 'get_x_draft', arguments: { id: draft.id, extra: 1 } })).isError).toBe(true)
   })
 })
+
+it('routes MCP content by account and preserves working copy on retries', async () => {
+  const c = await client()
+  const args = { request_key: crypto.randomUUID(), content: 'Agent bg copy', account_id: 'bg' }
+  const { draft } = await tool(c, 'create_x_draft', args)
+  expect(await tool(c, 'list_x_drafts')).toMatchObject({ total: 0 })
+  expect(await tool(c, 'list_x_drafts', { account_id: 'bg' })).toMatchObject({ total: 1 })
+  await tool(c, 'update_x_draft', { id: draft.id, expected_revision: draft.revision, changes: { edited_content: 'Human working copy' } })
+  expect(await tool(c, 'create_x_draft', args)).toMatchObject({ replayed: true, draft: { content: args.content, edited_content: 'Human working copy' } })
+  expect(await c.callTool({ name: 'create_x_draft', arguments: { ...args, account_id: 'ai' } })).toMatchObject({ isError: true, structuredContent: { error: { status: 409 } } })
+  for (const account_id of ['unknown', 'all'])
+    expect((await c.callTool({ name: 'create_x_draft', arguments: { ...args, account_id } })).isError).toBe(true)
+  const reader = await client(readToken)
+  expect((await reader.callTool({ name: 'update_x_draft', arguments: { id: draft.id, expected_revision: 2, changes: { edited_content: 'denied' } } })).isError).toBe(true)
+})
+
+it('returns concise ai/bg parameter examples on status, listing and creation', async () => {
+  const c = await client()
+  const expected = {
+    accounts: { ai: 'AI Agent 开发', bg: '娱乐八卦闲聊' },
+    default_account_id: 'ai',
+    create_example: { tool: 'create_x_draft', arguments: { account_id: 'bg', content: '已整理好的文案' } },
+    list_example: { tool: 'list_x_drafts', arguments: { account_id: 'bg' } },
+  }
+  expect(await tool(c, 'workspace_status')).toMatchObject({ x_account_help: expected })
+  expect(await tool(c, 'list_x_drafts')).toMatchObject({ x_account_help: expected })
+  expect(await tool(c, 'create_x_draft', { request_key: crypto.randomUUID(), content: 'Default AI copy' }))
+    .toMatchObject({ draft: { account_id: 'ai' }, x_account_help: expected })
+  const listed = (await c.listTools()).tools.find(t => t.name === 'create_x_draft')!
+  expect(listed.inputSchema.properties?.account_id).toMatchObject({ enum: ['ai', 'bg'] })
+})

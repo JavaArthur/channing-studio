@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test'
-const baseURL = process.env.E2E_BASE_URL || 'http://127.0.0.1:3000'
+const baseURL = process.env.E2E_BASE_URL || 'http://localhost:3000'
 if (!['127.0.0.1', 'localhost', '[::1]'].includes(new URL(baseURL).hostname)) {
   throw new Error('Smoke tests create local fixtures and only run against a loopback address.')
 }

@@ -265,11 +265,11 @@ export function AiProviderManager() {
   }
 
   const handleSave = async () => {
-    if (!editing) return
+    if (!editing) return false
 
     if (!editing.name.trim() || !editing.base_url.trim() || !editing.model.trim()) {
       toast.error('请填写名称、Base URL、模型')
-      return
+      return false
     }
 
     setSaving(true)
@@ -304,8 +304,10 @@ export function AiProviderManager() {
       toast.success('配置已保存')
       setEditing(null)
       await loadProfiles()
+      return true
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '保存失败')
+      return false
     } finally {
       setSaving(false)
     }
@@ -393,6 +395,8 @@ export function AiProviderManager() {
 
       {editing && (
         <ProviderDialog
+          value={editing}
+          onSave={handleSave}
           title={editing.id ? '编辑配置' : '新增配置'}
           onClose={() => setEditing(null)}
           headerAction={(
@@ -478,13 +482,7 @@ export function AiProviderManager() {
               >
                 {testing ? '测试中…' : '测试连接'}
               </button>
-              <button
-                type="button"
-                onClick={() => setEditing(null)}
-                className="min-h-11 min-w-11 rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
-              >
-                取消
-              </button>
+
               <button
                 type="button"
                 onClick={handleSave}

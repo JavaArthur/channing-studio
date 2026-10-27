@@ -34,8 +34,8 @@ export async function POST(req: NextRequest) {
   try {
     const payload = await parseJsonBody<Record<string, unknown>>(req)
     const title = text(payload.title)
-    const prompt = text(payload.prompt)
-    if (!title || !prompt) return jsonError('标题和提示词正文不能为空', 400)
+    const prompt = typeof payload.prompt === 'string' ? payload.prompt : ''
+    if (!title || !prompt.trim()) return jsonError('标题和提示词正文不能为空', 400)
 
     const sourceUrl = payload.source_url === undefined ? null : normalizePromptUrl(payload.source_url)
     if (payload.source_url && !sourceUrl) return jsonError('来源链接必须是 http 或 https 地址', 400)

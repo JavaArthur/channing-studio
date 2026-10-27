@@ -55,6 +55,7 @@ export async function createAgentBrainItem(db: Database, kind: BrainKind, key: s
     db.prepare(`INSERT INTO ${tables[kind]} (id,${keys.join(',')}) SELECT ${['?', ...keys.map(() => '?')].join(',')}
       WHERE NOT EXISTS (SELECT 1 FROM agent_brain_creates WHERE key_hash=?)`)
       .bind(id, ...keys.map(k => fields[k]), keyHash),
+    ...(kind === 'projects' ? [] : [db.prepare("UPDATE library_metadata SET submitted_by='agent' WHERE kind=? AND item_id=? AND NOT EXISTS (SELECT 1 FROM agent_brain_creates WHERE key_hash=?)").bind(kind === 'notes' ? 'note' : 'inbox', id, keyHash)]),
     db.prepare('INSERT OR IGNORE INTO agent_brain_creates(key_hash,kind,request_hash,item_id) VALUES (?,?,?,?)')
       .bind(keyHash, kind, requestHash, id),
   ])

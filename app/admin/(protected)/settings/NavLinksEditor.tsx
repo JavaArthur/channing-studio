@@ -1,95 +1,126 @@
 'use client'
-
+import { useUnsavedChanges } from '@/components/admin/UnsavedChanges'
 import { useState } from 'react'
-import { Tooltip } from '@/components/Tooltip'
-
+import { Button, Input, Menu } from '@/components/admin/ui'
 interface NavLink {
   label: string
   url: string
   openInNewTab: boolean
 }
-
-interface Props {
-  initialValue: string
-  onSave: (value: string) => void
-  saving: boolean
-}
-
 const defaultLinks: NavLink[] = [
   { label: '作品', url: '/work', openInNewTab: false },
   { label: '文章', url: '/writing', openInNewTab: false },
   { label: '资源', url: '/tools', openInNewTab: false },
   { label: '关于我', url: '/about', openInNewTab: false },
 ]
-
-export function NavLinksEditor({ initialValue, onSave, saving }: Props) {
-  const parsed = initialValue ? (() => { try { return JSON.parse(initialValue) } catch { return null } })() : null
-  const [links, setLinks] = useState<NavLink[]>(parsed && Array.isArray(parsed) ? parsed : defaultLinks)
-
-  const update = (idx: number, field: keyof NavLink, value: string | boolean) => {
-    setLinks((prev) => prev.map((l, i) => (i === idx ? { ...l, [field]: value } : l)))
+export function NavLinksEditor({
+  initialValue,
+  onSave,
+  saving,
+}: {
+  initialValue: string
+  onSave: (value: string) => Promise<boolean>
+  saving: boolean
+}) {
+  const [links, setLinks] = useState<NavLink[]>(() => {
+    try {
+      const parsed = JSON.parse(initialValue)
+      return Array.isArray(parsed) ? parsed : defaultLinks
+    } catch {
+      return defaultLinks
+    }
+  })
+  const [saved,setSaved] = useState(()=>JSON.stringify(links))
+  async function save() { const value=JSON.stringify(links); const ok=await onSave(value); if(ok)setSaved(value); return ok }
+  useUnsavedChanges(JSON.stringify(links)!==saved,save,()=>setLinks(JSON.parse(saved)))
+  function update(index: number, patch: Partial<NavLink>) {
+    setLinks(links.map((link, i) => (i === index ? { ...link, ...patch } : link)))
   }
-
-  const remove = (idx: number) => setLinks((prev) => prev.filter((_, i) => i !== idx))
-
-  const add = () => setLinks((prev) => [...prev, { label: '', url: '', openInNewTab: false }])
-
-  const moveUp = (idx: number) => {
-    if (idx <= 0) return
-    setLinks((prev) => { const n = [...prev]; [n[idx - 1], n[idx]] = [n[idx], n[idx - 1]]; return n })
+  function move(index: number, step: number) {
+    const next = [...links]
+    ;[next[index], next[index + step]] = [next[index + step], next[index]]
+    setLinks(next)
   }
-
-  const moveDown = (idx: number) => {
-    if (idx >= links.length - 1) return
-    setLinks((prev) => { const n = [...prev]; [n[idx], n[idx + 1]] = [n[idx + 1], n[idx]]; return n })
-  }
-
-  const inputCls = 'h-9 rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 text-sm text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] outline-none focus:border-[var(--focus-ring)] transition-colors'
-  const btnCls = 'h-9 px-3 rounded-lg text-sm font-medium transition-colors'
-
   return (
-    <div className="space-y-3">
-      {links.map((link, idx) => (
-        <div key={idx} className="flex items-center gap-2 flex-wrap">
-          <input
-            className={`min-h-11 min-w-11 ${inputCls} w-24`}
-            placeholder="名称"
-            value={link.label}
-            onChange={(e) => update(idx, 'label', e.target.value)}
-          />
-          <input
-            className={`min-h-11 min-w-11 ${inputCls} flex-1 min-w-[180px]`}
-            placeholder="URL"
-            value={link.url}
-            onChange={(e) => update(idx, 'url', e.target.value)}
-          />
-          <label className="flex items-center gap-1.5 text-xs text-[var(--editor-muted)] cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={link.openInNewTab}
-              onChange={(e) => update(idx, 'openInNewTab', e.target.checked)}
-              className="min-h-11 min-w-11 accent-[var(--editor-accent)]"
-            />
-            新窗口
-          </label>
-          <Tooltip label="上移此链接"><button onClick={() => moveUp(idx)} disabled={idx === 0} className={`min-h-11 min-w-11 ${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`} aria-label="上移此链接">↑</button></Tooltip>
-          <Tooltip label="下移此链接"><button onClick={() => moveDown(idx)} disabled={idx === links.length - 1} className={`min-h-11 min-w-11 ${btnCls} bg-[var(--editor-soft)] text-[var(--editor-muted)] hover:text-[var(--editor-ink)] disabled:opacity-30`} aria-label="下移此链接">↓</button></Tooltip>
-          <Tooltip label="删除此链接"><button onClick={() => remove(idx)} className={`min-h-11 min-w-11 ${btnCls} text-[var(--danger)] hover:bg-[var(--danger-soft-bg)]`} aria-label="删除此链接">删除</button></Tooltip>
-        </div>
-      ))}
-
-      <div className="flex items-center gap-3 pt-2">
-        <button onClick={add} className={`min-h-11 min-w-11 ${btnCls} bg-[var(--editor-soft)] text-[var(--editor-ink)] hover:bg-[var(--border-warm)]`}>
-          + 添加链接
-        </button>
-        <button
-          onClick={() => onSave(JSON.stringify(links))}
-          disabled={saving}
-          className={`min-h-11 min-w-11 ${btnCls} bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] hover:brightness-105 disabled:opacity-60`}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        void save()
+      }}
+    >
+      <table className="nav-link-table">
+        <thead>
+          <tr>
+            <th scope="col">名称</th>
+            <th scope="col">地址</th>
+            <th scope="col">新窗口</th>
+            <th scope="col">
+              <span className="sr-only">操作</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {links.map((link, index) => (
+            <tr key={index}>
+              <td>
+                <Input
+                  required
+                  aria-label={`链接 ${index + 1} 名称`}
+                  value={link.label}
+                  onChange={(e) => update(index, { label: e.target.value })}
+                />
+              </td>
+              <td>
+                <Input
+                  required
+                  aria-label={`链接 ${index + 1} 地址`}
+                  value={link.url}
+                  onChange={(e) => update(index, { url: e.target.value })}
+                />
+              </td>
+              <td>
+                <label>
+                  <input
+                    type="checkbox"
+                    aria-label={`链接 ${index + 1} 在新窗口打开`}
+                    checked={link.openInNewTab}
+                    onChange={(e) => update(index, { openInNewTab: e.target.checked })}
+                  />
+                </label>
+              </td>
+              <td>
+                <Menu
+                  label={`链接 ${index + 1} 操作`}
+                  items={[
+                    { label: '上移', disabled: index === 0, onSelect: () => move(index, -1) },
+                    {
+                      label: '下移',
+                      disabled: index === links.length - 1,
+                      onSelect: () => move(index, 1),
+                    },
+                    {
+                      label: '删除链接',
+                      danger: true,
+                      onSelect: () => setLinks(links.filter((_, i) => i !== index)),
+                    },
+                  ]}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="nav-link-actions">
+        <Button
+          variant="ghost"
+          onClick={() => setLinks([...links, { label: '', url: '', openInNewTab: false }])}
         >
+          ＋ 添加链接
+        </Button>
+        <Button type="submit" variant="primary" disabled={saving}>
           {saving ? '保存中…' : '保存导航'}
-        </button>
+        </Button>
       </div>
-    </div>
+    </form>
   )
 }

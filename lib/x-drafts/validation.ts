@@ -6,16 +6,18 @@ const content = z.string().refine(isValidContent, '正文不能为空，且最�
 const url = z.string().trim().max(2000).refine(value => value === '' || isHttpUrl(value), '链接必须是 HTTP(S) URL')
   .transform(value => value || null).nullable()
 const sourceType = z.string().regex(SOURCE_TYPE_PATTERN)
+export const xAccountId = z.enum(['ai', 'bg'])
 export const xDraftStatus = z.enum(['pending', 'posted', 'discarded'])
-export const xDraftCreateSchema = z.object({ content, source_url: url.optional(), source_type: sourceType.optional() }).strict()
+export const xDraftCreateSchema = z.object({ content, account_id: xAccountId.optional(), source_url: url.optional(), source_type: sourceType.optional() }).strict()
 export const xDraftChangesSchema = z.object({
-  content: content.optional(), source_url: url.optional(), source_type: sourceType.optional(),
+  content: content.optional(), account_id: xAccountId.optional(), edited_content: content.nullable().optional(), source_url: url.optional(), source_type: sourceType.optional(),
   status: xDraftStatus.optional(), posted_url: url.optional(),
 }).strict().refine(value => Object.values(value).some(v => v !== undefined), 'No writable fields')
 export const xDraftUpdateSchema = z.object({
   expected_revision: z.number().int().positive().max(Number.MAX_SAFE_INTEGER), changes: xDraftChangesSchema,
 }).strict()
 export const xDraftListSchema = z.object({
+  account_id: z.enum(['ai', 'bg', 'all']).optional(),
   status: z.enum(['pending', 'posted', 'discarded', 'all']).optional(), source_type: sourceType.optional(),
   q: z.string().trim().max(200).optional(),
   since: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).optional(),

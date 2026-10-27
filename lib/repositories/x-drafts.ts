@@ -1,16 +1,18 @@
 import { BrainApiError, creationKey, itemId } from '@/lib/agent-brain/validation'
+import type { XAccountId } from '@/lib/x-drafts/accounts'
 import { countXChars, X_CHAR_LIMIT } from '@/lib/x-drafts/text'
 import { parseXDraft, xDraftChangesSchema, xDraftCreateSchema, xDraftListSchema, xDraftUpdateSchema } from '@/lib/x-drafts/validation'
 import type { z } from 'zod'
 import type { Database } from './schema'
 
 interface XDraftRow {
+  account_id: XAccountId; edited_content: string | null
   id: string; content: string; source_url: string | null; source_type: string
   status: 'pending' | 'posted' | 'discarded'; posted_url: string | null
   revision: number; created_at: number; updated_at: number
 }
 export type XDraft = XDraftRow & { char_count: number; over_limit: boolean }
-const columns = 'id,content,source_url,source_type,status,posted_url,revision,created_at,updated_at'
+const columns = 'id,account_id,edited_content,content,source_url,source_type,status,posted_url,revision,created_at,updated_at'
 function decorate(row: XDraftRow): XDraft {
   const char_count = countXChars(row.content)
   return { ...row, char_count, over_limit: char_count > X_CHAR_LIMIT }
@@ -28,11 +30,13 @@ export async function createXDraft(db: Database, requestKey: string, fields: z.i
   const parsed = parseXDraft(xDraftCreateSchema, fields)
   const values = [parsed.content, parsed.source_url ?? null, parsed.source_type ?? 'other']
   const keyHash = await hash(creationKey(requestKey))
-  const requestHash = await hash(JSON.stringify(values))
+  // Keep the original default-account fingerprint so pre-migration receipts still replay.
+  const account = parsed.account_id ?? 'ai'
+  const requestHash = await hash(JSON.stringify(account === 'ai' ? values : [...values, account]))
   const id = `xd-${keyHash}`
   const result = await db.batch([
-    db.prepare(`INSERT INTO x_drafts(id,content,source_url,source_type) SELECT ?,?,?,?
-      WHERE NOT EXISTS (SELECT 1 FROM x_draft_creates WHERE key_hash=?)`).bind(id, ...values, keyHash),
+    db.prepare(`INSERT INTO x_drafts(id,content,source_url,source_type,account_id) SELECT ?,?,?,?,?
+      WHERE NOT EXISTS (SELECT 1 FROM x_draft_creates WHERE key_hash=?)`).bind(id, ...values, account, keyHash),
     db.prepare('INSERT OR IGNORE INTO x_draft_creates(key_hash,request_hash,draft_id) VALUES (?,?,?)')
       .bind(keyHash, requestHash, id),
   ])
@@ -42,14 +46,15 @@ export async function createXDraft(db: Database, requestKey: string, fields: z.i
   return { draft: await getXDraft(db, id), replayed: result[0].meta?.changes === 0 }
 }
 export async function listXDrafts(db: Database, input: z.input<typeof xDraftListSchema>) {
-  const { status = 'pending', source_type, q = '', since, until, page = 1, limit = 30 } = parseXDraft(xDraftListSchema, input)
+  const { account_id = 'ai', status = 'pending', source_type, q = '', since, until, page = 1, limit = 30 } = parseXDraft(xDraftListSchema, input)
   const filters: string[] = []; const values: Array<string | number> = []
+  if (account_id !== 'all') { filters.push('account_id=?'); values.push(account_id) }
   if (status !== 'all') { filters.push('status=?'); values.push(status) }
   if (source_type !== undefined) { filters.push('source_type=?'); values.push(source_type) }
   if (since !== undefined) { filters.push('created_at>=?'); values.push(since) }
   if (until !== undefined) { filters.push('created_at<=?'); values.push(until) }
   // D1 caps LIKE patterns at 50 bytes, so literal search uses instr() (case-insensitive for ASCII).
-  if (q) { filters.push('instr(lower(content),lower(?))>0'); values.push(q) }
+  if (q) { filters.push("instr(lower(content || char(10) || COALESCE(edited_content,'')),lower(?))>0"); values.push(q) }
   const where = filters.join(' AND ') || '1=1'
   const order = status === 'all' ? "(status='pending') DESC,created_at DESC,id" : 'created_at DESC,id'
   const results = await db.batch([
