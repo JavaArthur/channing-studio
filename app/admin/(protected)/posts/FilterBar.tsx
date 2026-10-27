@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Dropdown } from '@/components/Dropdown'
@@ -93,12 +94,13 @@ export function FilterBar({
   ] as const
 
   return (
-    <div className="mb-5 rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4 sm:p-5">
+    <div className="posts-filter"><header className="workspace-page-heading"><h1>文章管理</h1><Link className="admin-button admin-button-primary" href="/editor?new=1">新建文章</Link></header>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <form onSubmit={handleSearch} className="flex-1">
             <div className="relative">
               <input
+                aria-label="搜索文章"
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

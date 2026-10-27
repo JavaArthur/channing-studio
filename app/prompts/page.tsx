@@ -37,7 +37,6 @@ export default async function PromptsPage() {
 
   return (
     <StudioShell
-      eyebrow="PROMPTS / 07"
       title="把好用的提示词留下来。"
       description="不是收集越多越好，而是记录那些真正改变过工作结果的提问方式。"
       navLinks={navLinks}

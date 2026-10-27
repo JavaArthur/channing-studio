@@ -1,5 +1,6 @@
 import type { Prompt } from '@/lib/repositories/prompts'
 import { PromptCopyButton } from '@/components/PromptCopyButton'
+import { ArrowUpRight } from 'lucide-react'
 import { StudioCardLabel, StudioLink } from '@/components/StudioSection'
 
 export function PromptCard({ prompt }: { prompt: Prompt }) {
@@ -7,7 +8,7 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
     <article className="studio-card">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <StudioCardLabel>{prompt.category || 'PROMPT'}</StudioCardLabel>
+          {prompt.category && <StudioCardLabel>{prompt.category}</StudioCardLabel>}
           <h2 className="font-serif font-medium studio-card-title mt-3">{prompt.title}</h2>
         </div>
         <PromptCopyButton prompt={prompt.prompt} />
@@ -24,7 +25,7 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
       </details>
       {prompt.source_url && (
         <div className="mt-5 text-sm">
-          <StudioLink href={prompt.source_url} className="min-h-11 min-w-11 inline-flex items-center">查看来源 ↗</StudioLink>
+          <StudioLink href={prompt.source_url} className="min-h-11 min-w-11 inline-flex items-center">查看来源<ArrowUpRight aria-hidden size={14} /></StudioLink>
         </div>
       )}
     </article>

@@ -40,8 +40,6 @@ export function BrainCollection({
   const [form, setForm] = useState(blank)
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState('')
-  const [publishing, setPublishing] = useState<BrainItem | null>(null)
-  const [publicForm, setPublicForm] = useState({ title: '', description: '', href: '' })
   const [title, description, action] = labels[kind]
   const set = (key: keyof typeof blank, value: string) => setForm((f) => ({ ...f, [key]: value }))
   const open = (item?: BrainItem) => {
@@ -71,9 +69,8 @@ export function BrainCollection({
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || '保存失败')
-      setFeedback(body.action === 'publish' ? '公开内容已更新。' : '已保存。')
+      setFeedback('已保存。')
       setEditing(undefined)
-      setPublishing(null)
       router.refresh()
       if (data.target?.kind === 'post')
         router.push(`/editor?edit=${encodeURIComponent(data.target.id)}`)
@@ -82,14 +79,6 @@ export function BrainCollection({
     } finally {
       setBusy(false)
     }
-  }
-  function openPublication(item: BrainItem) {
-    let existing = { title: '', description: '', href: '' }
-    try {
-      if (item.published_payload) existing = JSON.parse(item.published_payload)
-    } catch {}
-    setPublicForm(existing)
-    setPublishing(item)
   }
   const base = `/admin/${kind}`
   return (
@@ -224,56 +213,6 @@ export function BrainCollection({
           </div>
         </form>
       )}
-      {publishing && (
-        <form
-          className="brain-panel space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault()
-            void mutate({ id: publishing.id, action: 'publish', publish: true, ...publicForm })
-          }}
-        >
-          <h2 className="font-serif font-medium">编辑公开版本</h2>
-          <p className="text-sm text-[var(--editor-muted)]">
-            仅以下三个字段对外展示。私人说明和下一步不会公开。
-          </p>
-          <label className="block text-sm">
-            公开标题
-            <input
-              required
-              className="min-h-11 min-w-11 brain-input mt-2"
-              value={publicForm.title}
-              onChange={(e) => setPublicForm((f) => ({ ...f, title: e.target.value }))}
-            />
-          </label>
-          <label className="block text-sm">
-            公开摘要
-            <textarea
-              required
-              className="min-h-11 min-w-11 brain-input mt-2 min-h-24"
-              value={publicForm.description}
-              onChange={(e) => setPublicForm((f) => ({ ...f, description: e.target.value }))}
-            />
-          </label>
-          <label className="block text-sm">
-            作品链接
-            <input
-              required
-              type="url"
-              className="min-h-11 min-w-11 brain-input mt-2"
-              value={publicForm.href}
-              onChange={(e) => setPublicForm((f) => ({ ...f, href: e.target.value }))}
-            />
-          </label>
-          <div className="flex gap-3">
-            <button className="min-h-11 min-w-11 brain-button" disabled={busy}>
-              确认发布这份内容
-            </button>
-            <button type="button" className="min-h-11 min-w-11 brain-secondary" onClick={() => setPublishing(null)}>
-              取消
-            </button>
-          </div>
-        </form>
-      )}
       <div className={kind === 'projects' ? 'grid gap-4 lg:grid-cols-2' : 'space-y-3'}>
         {items.length === 0 && (
           <div className="brain-panel col-span-full py-14 text-center">
@@ -295,9 +234,7 @@ export function BrainCollection({
             <div className="flex justify-between gap-4">
               <h2 className="font-serif font-medium">{item.title}</h2>
               <span className="shrink-0 text-xs text-[var(--editor-muted)]">
-                {item.published_payload
-                  ? '已公开 · 独立版本'
-                  : item.status === 'organized'
+                {item.status === 'organized'
                     ? '已整理'
                     : '私密'}
               </span>
@@ -362,23 +299,6 @@ export function BrainCollection({
                 >
                   转为文章草稿
                 </button>
-              )}
-              {kind === 'projects' && (
-                <>
-                  <button disabled={busy} onClick={() => openPublication(item)} className="min-h-11 min-w-11">
-                    公开展示设置
-                  </button>
-                  {item.published_payload && (
-                    <button
-                      disabled={busy}
-                      onClick={() =>
-                        void mutate({ id: item.id, action: 'publish', publish: false })
-                      } className="min-h-11 min-w-11"
-                    >
-                      撤回公开
-                    </button>
-                  )}
-                </>
               )}
               <button
                 disabled={busy}

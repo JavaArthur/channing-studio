@@ -1,7 +1,9 @@
 'use client'
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Tabs } from '@/components/Tabs'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { Palette, Globe, KeyRound, MessageSquare, Image, SlidersHorizontal } from 'lucide-react'
 import { ThemeDropdown } from '@/components/ThemeDropdown'
 import { NavLinksEditor } from './NavLinksEditor'
 import { ApiTokensManager } from './ApiTokensManager'
@@ -20,25 +22,61 @@ const AiImageActionsManager = dynamic(() =>
 const AiPostGeneratorsManager = dynamic(() =>
   import('./AiPostGeneratorsManager').then((m) => m.AiPostGeneratorsManager),
 )
-function AdvancedPanel({ label, children }: { label: string; children: ReactNode }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <details className="brain-panel" onToggle={(event) => setOpen(event.currentTarget.open)}>
-      <summary className="font-serif min-h-11 min-w-11 cursor-pointer font-medium">{label}</summary>
-      {open && <div className="mt-6">{children}</div>}
-    </details>
-  )
-}
-interface Props {
+const categories = [
+  {
+    id: 'appearance',
+    label: '外观',
+    Icon: Palette,
+    description: '调整你阅读和整理资料时的显示方式。',
+  },
+  {
+    id: 'site',
+    label: '公开站点',
+    Icon: Globe,
+    description: '管理访客看到的导航。修改后点击保存生效。',
+  },
+  {
+    id: 'connections',
+    label: '连接与访问',
+    Icon: KeyRound,
+    description: '管理外部发布工具的访问凭据和服务连接。',
+  },
+  {
+    id: 'text',
+    label: '文本模型',
+    Icon: MessageSquare,
+    description: '配置按需调用的文本模型。普通收录不会调用模型。',
+  },
+  {
+    id: 'image',
+    label: '图片模型',
+    Icon: Image,
+    description: '配置文章创作中使用的图片生成模型。',
+  },
+  {
+    id: 'actions',
+    label: '内容操作',
+    Icon: SlidersHorizontal,
+    description: '调整编辑器里的文本操作、图片提示与文章生成方式。',
+  },
+]
+export function SettingsManager({
+  initialNavLinks,
+  initialRuntimeCapabilities,
+}: {
   initialNavLinks: string
   initialRuntimeCapabilities: RuntimeCapabilities
-}
-export function SettingsManager({ initialNavLinks, initialRuntimeCapabilities }: Props) {
+}) {
+  const actionTab = useSearchParams().get('tab') || 'text'
+  const current = useSearchParams().get('section') || 'appearance'
+  const category = categories.find((c) => c.id === current) || categories[0]
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [failed, setFailed] = useState(false)
   async function save(value: string) {
     setSaving(true)
     setMessage('')
+    setFailed(false)
     try {
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
@@ -47,78 +85,78 @@ export function SettingsManager({ initialNavLinks, initialRuntimeCapabilities }:
       })
       if (!res.ok) throw new Error('导航格式不正确或保存失败')
       setMessage('导航已保存。')
+      return true
     } catch (e) {
+      setFailed(true)
       setMessage(e instanceof Error ? e.message : '保存失败')
+      return false
     } finally {
       setSaving(false)
     }
   }
   return (
-    <Tabs
-      defaultTab="general"
-      tabs={[
-        {
-          id: 'general',
-          label: '基础设置',
-          content: (
-            <div className="space-y-7">
-              <section className="brain-panel">
-                <h2 className="font-serif font-medium">白天与晚上</h2>
-                <div className="mt-4 flex items-center justify-between gap-5">
-                  <p className="text-sm text-[var(--editor-muted)]">
-                    全站共用日夜配色，首次跟随系统。手动选择只保存在当前浏览器。
-                  </p>
-                  <ThemeDropdown />
-                </div>
-              </section>
-              <section className="brain-panel">
-                <h2 className="font-serif font-medium mb-5">公开导航</h2>
-                <NavLinksEditor initialValue={initialNavLinks} onSave={save} saving={saving} />
-                {message && (
-                  <p role="status" className="mt-3 text-sm">
-                    {message}
-                  </p>
-                )}
-              </section>
+    <div className="settings-layout">
+      <nav className="settings-nav" aria-label="设置分类">
+        {categories.map(({ id, label, Icon }) => (
+          <Link
+            key={id}
+            href={`/admin/settings?section=${id}`}
+            aria-current={category.id === id ? 'page' : undefined}
+            scroll={false}
+          >
+            <Icon size={15} />
+            {label}
+          </Link>
+        ))}
+      </nav>
+      <section className="settings-content" key={category.id}>
+        <header>
+          <h2>{category.label}</h2>
+          <p>{category.description}</p>
+        </header>
+        {category.id === 'appearance' && (
+          <div className="settings-field-row">
+            <div>
+              <h3>显示主题</h3>
+              <p>跟随系统或手动选择，仅保存于当前浏览器。</p>
             </div>
-          ),
-        },
-        {
-          id: 'connections',
-          label: '连接与访问',
-          content: (
-            <div className="space-y-6">
-              <p className="text-sm text-[var(--editor-muted)]">
-                为实际使用的发布工具创建独立 Token。私人笔记与项目 API 仅接受后台会话。
+            <ThemeDropdown />
+          </div>
+        )}
+        {category.id === 'site' && (
+          <>
+            <NavLinksEditor initialValue={initialNavLinks} onSave={save} saving={saving} />
+            {message && (
+              <p role={failed ? 'alert' : 'status'} className="library-feedback">
+                {message}
               </p>
-              <ApiTokensManager />
-              <RuntimeCapabilitiesPanel capabilities={initialRuntimeCapabilities} />
+            )}
+            <div className="settings-field-row">
+              <div>
+                <h3>首页与作品</h3>
+                <p>编辑个人介绍、代表作品和精选内容。</p>
+              </div>
+              <Link className="admin-button" href="/admin/studio">
+                管理站点内容
+              </Link>
             </div>
-          ),
-        },
-        {
-          id: 'advanced',
-          label: '高级功能',
-          content: (
-            <div className="space-y-4">
-              <p className="text-sm text-[var(--editor-muted)]">
-                AI 功能按需使用。普通收集与保存不会自动调用外部模型。
-              </p>
-              {[
-                ['文本模型', <AiProviderManager key="provider" />],
-                ['文本操作', <AiActionsManager key="actions" />],
-                ['图片模型', <AiImageProviderManager key="images" />],
-                ['图片提示', <AiImageActionsManager key="image-actions" />],
-                ['文章生成', <AiPostGeneratorsManager key="generators" />],
-              ].map(([label, content]) => (
-                <AdvancedPanel label={String(label)} key={String(label)}>
-                  {content}
-                </AdvancedPanel>
-              ))}
-            </div>
-          ),
-        },
-      ]}
-    />
+          </>
+        )}
+        {category.id === 'connections' && (
+          <div className="space-y-6">
+            <ApiTokensManager />
+            <RuntimeCapabilitiesPanel capabilities={initialRuntimeCapabilities} />
+          </div>
+        )}
+        {category.id === 'text' && <AiProviderManager />}
+        {category.id === 'image' && <AiImageProviderManager />}
+        {category.id === 'actions' && (
+          <div className="space-y-6">
+            <nav className="settings-action-tabs" aria-label="内容操作分类">{[['text','文本操作'],['image','图片提示'],['generators','文章生成']].map(([id,label])=><Link key={id} href={`/admin/settings?section=actions&tab=${id}`} aria-current={actionTab===id?'page':undefined}>{label}</Link>)}</nav>
+            {actionTab==='image'?<AiImageActionsManager/>:actionTab==='generators'?<AiPostGeneratorsManager/>:<AiActionsManager/>}
+          </div>
+        )}
+      </section>
+    </div>
   )
 }

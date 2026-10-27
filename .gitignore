@@ -66,3 +66,6 @@ backup-*.sql
 
 /playwright-report/
 /test-results/
+
+# Local-only seed data (private repos, local paths)
+*.local.sql

@@ -173,46 +173,6 @@ export async function draftFromNote(db: Database, id: string) {
   if (post.deleted_at) throw new Error('对应文章在回收站，请先恢复文章')
   return { kind: 'post', id: post.slug }
 }
-export async function publishProject(db: Database, id: string, input: Record<string, unknown>) {
-  if (input.publish === false) {
-    await db.prepare('UPDATE projects SET published_payload=NULL WHERE id=?').bind(id).run()
-    return
-  }
-  const title = typeof input.title === 'string' ? input.title.trim() : ''
-  const description = typeof input.description === 'string' ? input.description.trim() : ''
-  const href = typeof input.href === 'string' ? input.href.trim() : ''
-  if (!title || title.length > 200 || !description || description.length > 2000 || !isHttpUrl(href))
-    throw new Error('请填写公开标题、摘要和 http/https 项目链接')
-  const payload = { id, title, description, href, visible: true, tags: [] }
-  const result = await db
-    .prepare('UPDATE projects SET published_payload=?,public_url=? WHERE id=?')
-    .bind(JSON.stringify(payload), href, id)
-    .run()
-  if (!result.meta.changes) throw new Error('项目不存在')
-}
-export async function getPublishedProjects(db: Database) {
-  const { results } = await db
-    .prepare(
-      'SELECT published_payload FROM projects WHERE published_payload IS NOT NULL ORDER BY updated_at DESC LIMIT 30',
-    )
-    .all<{ published_payload: string }>()
-  return results.flatMap((row) => {
-    try {
-      return [
-        JSON.parse(row.published_payload) as {
-          id: string
-          title: string
-          description: string
-          href: string
-          visible: boolean
-          tags: string[]
-        },
-      ]
-    } catch {
-      return []
-    }
-  })
-}
 export async function searchBrain(db: Database, query: string) {
   if (!query.trim()) return []
   const term = `%${query.trim().slice(0, 200)}%`

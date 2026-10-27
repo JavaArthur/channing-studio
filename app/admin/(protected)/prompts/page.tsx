@@ -11,10 +11,10 @@ export default async function AdminPromptsPage() {
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="workspace-page-heading"><div>
         <h1 className="font-serif font-medium text-xl text-[var(--editor-ink)]">提示词管理</h1>
         <p className="mt-0.5 text-sm text-[var(--editor-muted)]">收藏、整理和发布真正复用过的提示词 · 共 {prompts.length} 条</p>
-      </div>
+      </div></div>
       <PromptsManager initialPrompts={prompts} />
     </div>
   )

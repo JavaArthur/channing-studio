@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Button, Input, Menu, Modal } from '@/components/admin/ui'
+import { useUnsavedChanges } from '@/components/admin/UnsavedChanges'
 import { useToast } from '@/components/Toast'
 
 interface Token {
@@ -22,6 +24,7 @@ interface CreateTokenResponse {
 
 export function ApiTokensManager() {
   const [tokens, setTokens] = useState<Token[]>([])
+  const [open, setOpen] = useState(false)
   const [newName, setNewName] = useState('')
   const [creating, setCreating] = useState(false)
   const [newToken, setNewToken] = useState<string | null>(null)
@@ -40,7 +43,7 @@ export function ApiTokensManager() {
   useEffect(() => { loadTokens() }, [])
 
   const createToken = async () => {
-    if (!newName.trim()) return
+    if (!newName.trim()) return false
     setCreating(true)
     try {
       const res = await fetch('/api/admin/tokens', {
@@ -54,12 +57,16 @@ export function ApiTokensManager() {
       setNewName('')
       toast.success('Token 已创建')
       loadTokens()
+      return true
     } catch {
       toast.error('创建 Token 失败')
+      return false
     } finally {
       setCreating(false)
     }
   }
+
+  const guard = useUnsavedChanges(open && !!newName.trim(), async () => { if(await createToken()) throw new Error('Token 已生成，请选择继续编辑，复制保存后再离开。'); return false }, () => setNewName(''))
 
   const deleteToken = async (id: number, name: string) => {
     if (!confirm(`确定删除 Token "${name}"？`)) return
@@ -103,52 +110,10 @@ export function ApiTokensManager() {
         API Token 用于 Obsidian 插件、Chrome 插件、Claude Skill 等外部工具发布文章。
       </p>
 
-      {/* 新 Token 提示（只显示一次） */}
-      {newToken && (
-        <div className="rounded-lg border border-[var(--warning-line)] bg-[var(--warning-soft-bg)] p-4 space-y-2">
-          <p className="text-sm font-medium text-[var(--warning)]">
-            Token 已创建！请立即复制保存，此后不再显示完整 Token。
-          </p>
-          <div className="flex items-center gap-2">
-            <code className="flex-1 text-sm bg-[var(--background)] border border-[var(--warning-line)] rounded-md px-3 py-2 break-all font-mono text-[var(--editor-ink)]">
-              {newToken}
-            </code>
-            <button
-              onClick={() => copyToken(newToken)}
-              className="min-h-11 min-w-11 shrink-0 px-3 py-2 text-sm bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] rounded-lg hover:brightness-105"
-            >
-              复制
-            </button>
-          </div>
-          <button
-            onClick={() => setNewToken(null)}
-            className="min-h-11 min-w-11 text-xs text-[var(--warning)] hover:underline"
-          >
-            我已保存，关闭此提示
-          </button>
-        </div>
-      )}
-
-      {/* 创建新 Token */}
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && createToken()}
-          placeholder="Token 用途，如 Obsidian插件"
-          className="min-h-11 min-w-11 flex-1 px-3 py-2 text-sm border border-[var(--editor-line)] rounded-lg bg-[var(--background)] text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)]
- focus:outline-none focus:border-[var(--focus-ring)]"
-        />
-        <button
-          onClick={createToken}
-          disabled={creating || !newName.trim()}
-          className="min-h-11 min-w-11 px-4 py-2 text-sm bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] rounded-lg font-medium
- hover:brightness-105 disabled:opacity-50"
-        >
-          {creating ? '创建中...' : '生成 Token'}
-        </button>
-      </div>
+      <div className="flex justify-between items-center"><h3>访问 Token</h3><Button variant="primary" onClick={() => setOpen(true)}>新增 Token</Button></div>
+      <Modal open={open} onOpenChange={value => value ? setOpen(true) : guard(() => setOpen(false))} title="新增 Token" sheet><div className="admin-form">
+        {newToken ? <><p>Token 只显示一次，请复制保存。</p><code className="break-all">{newToken}</code><Button onClick={() => copyToken(newToken)}>复制 Token</Button><Button onClick={() => { setNewToken(null); setOpen(false) }}>我已保存</Button></> : <form className="admin-form" onSubmit={e => { e.preventDefault(); void createToken() }}><label>用途名称<Input value={newName} onChange={e => setNewName(e.target.value)} required placeholder="例如：Obsidian 发布" /></label><Button type="submit" variant="primary" disabled={creating || !newName.trim()}>{creating ? '创建中…' : '生成 Token'}</Button></form>}
+      </div></Modal>
 
       {/* Token 列表 */}
       {tokens.length === 0 ? (
@@ -175,12 +140,7 @@ export function ApiTokensManager() {
                   创建于 {formatDate(t.created_at)} · 最后使用 {formatDate(t.last_used_at)}
                 </div>
               </div>
-              <button
-                onClick={() => deleteToken(t.id, t.name)}
-                className="min-h-11 min-w-11 text-xs text-[var(--danger)] hover:text-[var(--danger)] shrink-0 ml-4"
-              >
-                删除
-              </button>
+              <Menu label={`${t.name}的操作`} items={[{ label: '删除 Token', danger: true, onSelect: () => void deleteToken(t.id, t.name) }]} />
             </div>
           ))}
         </div>

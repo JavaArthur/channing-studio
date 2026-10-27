@@ -3,6 +3,7 @@ import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { type Theme } from '@/lib/appearance'
 import type { SiteNavLink } from '@/lib/site'
 import { getSiteHeaderData } from '@/lib/site'
+import { ArrowUpRight } from 'lucide-react'
 import { StudioCardLabel, StudioLink, StudioShell } from '@/components/StudioSection'
 import { Pagination } from '@/components/Pagination'
 import { formatDate } from '@/lib/format-date'
@@ -53,7 +54,6 @@ export default async function WritingPage({
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
   return (
     <StudioShell
-      eyebrow="WRITING / ARCHIVE"
       title="持续记录"
       description="把实践、判断和还没想透的部分写下来。"
       navLinks={navLinks}
@@ -68,17 +68,17 @@ export default async function WritingPage({
         <>
           <div className="divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
             {posts.map((post) => (
-              <StudioLink key={post.slug} href={`/${post.slug}`} className="min-h-11 min-w-11 inline-flex items-center">
+              <StudioLink key={post.slug} href={`/${post.slug}`} className="block">
                 <article className="studio-writing-row group">
                   <div className="min-w-0">
-                    <StudioCardLabel>{post.category || 'NOTE'}</StudioCardLabel>
+                    <StudioCardLabel>{post.category || '随笔'}</StudioCardLabel>
                     <h2 className="font-serif font-medium studio-writing-title mt-2">{post.title}</h2>
                     {post.description && <p className="studio-writing-description mt-2">{post.description}</p>}
                     <time className="studio-writing-date" dateTime={new Date(post.published_at * 1000).toISOString()}>
                       {formatDate(post.published_at)}
                     </time>
                   </div>
-                  <span aria-hidden className="studio-card-arrow">↗</span>
+                  <ArrowUpRight aria-hidden className="studio-card-arrow" size={20} />
                 </article>
               </StudioLink>
             ))}

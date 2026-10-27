@@ -5,15 +5,16 @@ import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 import type { NextConfig } from "next";
 
 function initCloudflareForDev() {
-  const wranglerConfigPath = existsSync(resolve(process.cwd(), "wrangler.local.toml"))
+  const wranglerConfigPath = process.env.CF_CONFIG_PATH ? resolve(process.env.CF_CONFIG_PATH) : existsSync(resolve(process.cwd(), "wrangler.local.toml"))
     ? resolve(process.cwd(), "wrangler.local.toml")
     : resolve(process.cwd(), "wrangler.toml");
 
-  void initOpenNextCloudflareForDev({ configPath: wranglerConfigPath });
+  void initOpenNextCloudflareForDev({ configPath: wranglerConfigPath, ...(process.env.CF_LOCAL_PERSIST_PATH ? { persist: { path: resolve(process.env.CF_LOCAL_PERSIST_PATH) } } : {}) });
 }
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  devIndicators: false,
 
   images: {
     unoptimized: true,

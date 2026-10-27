@@ -7,15 +7,6 @@ export interface StudioCapability {
   description: string
 }
 
-export interface StudioProject {
-  id: string
-  title: string
-  description: string
-  href: string
-  tags: string[]
-  visible: boolean
-}
-
 export interface StudioLab {
   id: string
   title: string
@@ -36,14 +27,12 @@ export interface StudioProfile {
 
 export interface StudioContent {
   profile: StudioProfile
-  projects: StudioProject[]
   labs: StudioLab[]
   featuredPostSlugs: string[]
 }
 
 export const STUDIO_SETTING_KEYS = [
   'studio_profile',
-  'studio_projects',
   'studio_labs',
   'studio_featured_posts',
 ] as const
@@ -67,24 +56,6 @@ export const DEFAULT_STUDIO_CONTENT: StudioContent = {
       { title: '产品化交付', description: '先解决用户真正要完成的事，再决定系统应该长什么样。' },
     ],
   },
-  projects: [
-    {
-      id: 'channing-blog',
-      title: '晨启AI博客',
-      description: '基于 Next.js、Cloudflare、D1/R2 的自托管内容系统。',
-      href: 'https://note.aichanning.cn',
-      tags: ['Next.js', 'Cloudflare', 'D1/R2'],
-      visible: true,
-    },
-    {
-      id: 'content-pipeline',
-      title: '内容发布工具链',
-      description: 'Chrome Clipper、Obsidian Publisher 与发布 Skill 汇聚到同一个后台。',
-      href: '/labs',
-      tags: ['Clipper', 'Obsidian', 'Skill'],
-      visible: true,
-    },
-  ],
   labs: [
     {
       id: 'chrome-clipper',
@@ -121,7 +92,6 @@ function cloneDefaultContent(): StudioContent {
       contactLinks: DEFAULT_STUDIO_CONTENT.profile.contactLinks.map((link) => ({ ...link })),
       capabilities: DEFAULT_STUDIO_CONTENT.profile.capabilities.map((capability) => ({ ...capability })),
     },
-    projects: DEFAULT_STUDIO_CONTENT.projects.map((project) => ({ ...project, tags: [...project.tags] })),
     labs: DEFAULT_STUDIO_CONTENT.labs.map((lab) => ({ ...lab })),
     featuredPostSlugs: [...DEFAULT_STUDIO_CONTENT.featuredPostSlugs],
   }
@@ -167,21 +137,6 @@ function parseCapabilities(value: unknown, fallback: StudioCapability[]): Studio
     .filter((capability) => capability.title && capability.description)
 }
 
-function parseProjects(value: unknown, fallback: StudioProject[]): StudioProject[] {
-  if (!Array.isArray(value)) return fallback.map((project) => ({ ...project, tags: [...project.tags] }))
-  return value
-    .filter(isRecord)
-    .map((project) => ({
-      id: typeof project.id === 'string' ? project.id.trim() : '',
-      title: typeof project.title === 'string' ? project.title.trim() : '',
-      description: typeof project.description === 'string' ? project.description.trim() : '',
-      href: typeof project.href === 'string' ? project.href.trim() : '',
-      tags: Array.isArray(project.tags) ? project.tags.filter((tag): tag is string => typeof tag === 'string').map((tag) => tag.trim()).filter(Boolean) : [],
-      visible: project.visible !== false,
-    }))
-    .filter((project) => project.id && project.title && project.description && project.href)
-}
-
 function parseLabs(value: unknown, fallback: StudioLab[]): StudioLab[] {
   if (!Array.isArray(value)) return fallback.map((lab) => ({ ...lab }))
   return value
@@ -222,7 +177,6 @@ export function parseStudioSettings(values: StudioSettingValues): StudioContent 
 
   return {
     profile,
-    projects: parseProjects(parseJson(values.studio_projects), defaults.projects),
     labs: parseLabs(parseJson(values.studio_labs), defaults.labs),
     featuredPostSlugs: parseFeaturedPosts(parseJson(values.studio_featured_posts)),
   }
@@ -231,7 +185,6 @@ export function parseStudioSettings(values: StudioSettingValues): StudioContent 
 export function serializeStudioSettings(content: StudioContent): Record<StudioSettingKey, string> {
   return {
     studio_profile: JSON.stringify(content.profile),
-    studio_projects: JSON.stringify(content.projects),
     studio_labs: JSON.stringify(content.labs),
     studio_featured_posts: JSON.stringify(content.featuredPostSlugs),
   }

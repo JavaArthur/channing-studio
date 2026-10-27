@@ -79,10 +79,10 @@ type SaveState = 'saved' | 'dirty' | 'saving' | 'error'
 
 const SIDEBAR_KEY = 'qmblog:sidebar-open'
 const SIDEBAR_WIDTH_KEY = 'channing.editor.sidebar.width'
-const DEFAULT_SIDEBAR_WIDTH = 280
+const DEFAULT_SIDEBAR_WIDTH = 320
 const MIN_SIDEBAR_WIDTH = 280
 const MAX_SIDEBAR_WIDTH = 600
-const AUTOSAVE_DEBOUNCE_MS = 1500
+const AUTOSAVE_DEBOUNCE_MS = 800
 const AUTOSAVE_MAX_RETRY_DELAY_MS = 10000
 const SITE_DISPLAY_URL = getSiteDisplayUrl()
 
@@ -597,6 +597,14 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
     }
   }, [buildAutosaveSnapshot, draftReady, syncPersistedSlug])
 
+  useEffect(() => {
+    const guard = (event: BeforeUnloadEvent) => {
+      if (saveState !== 'saved' || pendingSaveRef.current) { event.preventDefault(); event.returnValue = '' }
+    }
+    window.addEventListener('beforeunload', guard)
+    return () => window.removeEventListener('beforeunload', guard)
+  }, [saveState])
+
   // ── Draft save ──
   const scheduleDraftSave = useCallback((
     nextTitle = latestTitleRef.current,
@@ -979,7 +987,7 @@ export function NovelEditor({ initialData }: NovelEditorProps = {}) {
   const currentPreviewMarkdown = title.trim() ? `# ${title.trim()}\n\n${currentEditorMarkdown}` : currentEditorMarkdown
 
   return (
-    <div className="min-h-screen bg-[var(--editor-app-bg)]">
+    <div className="article-editor-shell min-h-screen bg-[var(--editor-app-bg)]">
       {/* ── Sticky Header ── */}
       <header className="sticky top-0 z-40 border-b border-[var(--editor-line)] bg-[color-mix(in_srgb,var(--background)_90%,transparent)] backdrop-blur-lg">
         <div className="flex min-h-14 flex-wrap items-center gap-2 px-4 py-2 sm:flex-nowrap">

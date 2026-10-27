@@ -213,11 +213,11 @@ export function AiImageProviderManager() {
   }
 
   const handleSave = async () => {
-    if (!editing) return
+    if (!editing) return false
 
     if (!editing.name.trim() || !editing.base_url.trim() || !editing.model.trim()) {
       toast.error('请填写名称、Base URL、模型')
-      return
+      return false
     }
 
     setSaving(true)
@@ -250,8 +250,10 @@ export function AiImageProviderManager() {
       toast.success('图片模型配置已保存')
       setEditing(null)
       await loadProfiles()
+      return true
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '保存失败')
+      return false
     } finally {
       setSaving(false)
     }
@@ -338,6 +340,8 @@ export function AiImageProviderManager() {
 
       {editing && (
         <ProviderDialog
+          value={editing}
+          onSave={handleSave}
           title={editing.id ? '编辑图片模型' : '新增图片模型'}
           onClose={() => setEditing(null)}
           headerAction={(
@@ -374,13 +378,7 @@ export function AiImageProviderManager() {
           </div>
 
           <div className="mt-5 flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setEditing(null)}
-              className="min-h-11 min-w-11 rounded-lg border border-[var(--editor-line)] px-4 py-2 text-sm text-[var(--editor-ink)] hover:bg-[var(--editor-soft)]"
-            >
-              取消
-            </button>
+
             <button
               type="button"
               onClick={handleSave}

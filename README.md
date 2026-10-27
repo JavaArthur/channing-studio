@@ -6,7 +6,7 @@ Channing 的个人工作室、技术写作和内容工具箱。
 
 在线站点：<https://note.aichanning.cn>
 
-Bot 接入：[MCP 指南（收集 → 笔记 → 项目）](docs/api/gorkbot-mcp-integration.md) · [现有 HTTP API](docs/api/gorkbot-workspace-integration.md) · [OpenAPI](docs/api/gorkbot-workspace.openapi.json) · [原 Flomo 同步](docs/api/gorkbot-hermes-integration.md)。MCP 使用独立读写凭据；现有 Agent API 沿用 Hermes Token，后台登录与公开发布仍由管理员控制。
+Bot 接入：[MCP 指南（Agent 收录 → 私人取用）](docs/api/gorkbot-mcp-integration.md) · [现有 HTTP API](docs/api/gorkbot-workspace-integration.md) · [OpenAPI](docs/api/gorkbot-workspace.openapi.json) · [原 Flomo 同步](docs/api/gorkbot-hermes-integration.md)。MCP 使用独立读写凭据；现有 Agent API 沿用 Hermes Token，后台登录与公开发布仍由管理员控制。
 
 独立仓库：<https://github.com/JavaArthur/channing-studio>
 
@@ -22,7 +22,12 @@ Bot 接入：[MCP 指南（收集 → 笔记 → 项目）](docs/api/gorkbot-mcp
 | `/labs` | 实验室、生态工具和正在验证的工作流 |
 | `/tools` | 工具、仓库和软件收藏 |
 | `/prompts` | 可复制的提示词收藏 |
-| `/admin` | 私人知识工作台 |
+| `/admin` | 直接进入私人资料库 |
+| `/admin/library` | 统一资料库与阅读详情 |
+| `/admin/operations` | 多账号 X 运营：挑选文案、润色、跳转互动与手动处理 |
+| `/admin/x-drafts` | 兼容旧链接，跳转运营工作台 |
+| `/admin/collections` | 跨类型主题资料集 |
+| `/admin/publish` | 公开内容管理 |
 | `/admin/login` | 后台登录 |
 | `/admin/studio` | 工作室身份、项目和实验室配置 |
 | `/admin/tools` | 工具收藏管理 |
@@ -35,7 +40,7 @@ Bot 接入：[MCP 指南（收集 → 笔记 → 项目）](docs/api/gorkbot-mcp
 
 1. 文章进入 `/admin/posts`，或者打开 `/editor?new=1` 新建。
 2. 首页身份、项目、实验室和精选文章在 `/admin/studio` 修改。
-3. 工具收藏在 `/admin/tools` 管理，保存后会出现在 `/tools` 和首页工具箱。
+3. 工具先保存为私人资料；在资料详情或 `/admin/tools` 明确确认公开版本后，才出现在 `/tools` 和首页。
 4. 提示词在 `/admin/prompts` 管理，公开内容出现在 `/prompts`；复制操作只发生在浏览器，不会把正文发送到第三方服务。
 
 后台密码只存在 Cloudflare secret `ADMIN_PASSWORD`，不写进仓库。
@@ -115,3 +120,11 @@ MIT
 公开网站与私人工作台已分开，统一使用白天/晚上配色。后台新增收件箱、私人笔记、项目、关联资料和统一搜索；文章保存工作稿与对外发布分离，工具/提示词通过公开快照发布。
 
 详细变更、数据迁移、验证与上线顺序见 [交付与上线说明](docs/2026-10-17-personal-brain-implementation.md)。`npm run dev` 默认本地开发；`npm run deploy` 需要显式设置 `CF_CONFIG_PATH`，不会执行 schema 或 seed。已有数据库必须先备份、盘点并演练增量 migration。
+
+## Studio 资料库重构（2026-10-24）
+
+Agent 直接保存工具、文章摘录、笔记和提示词；普通收录不产生待办。X 短帖统一进入[多账号运营工作台](docs/2026-10-25-x-operations.md)，不进入资料库搜索。资料支持跨类型搜索、多个主题资料集关联，以及多选复制给助手。公开内容继续使用明确确认后的独立版本。
+
+数据流、新 MCP 工具、兼容边界与增量迁移步骤见 [实现与部署说明](docs/2026-10-24-studio-library.md)。此代码版本的生产迁移需单独执行，部署脚本不会自动修改 D1。
+
+第二轮后台已改为紧凑列表、按需阅读详情、正文富文本自动保存与属性抽屉；设置按 URL 分类。说明、保存边界和实际截图见 [内容优先后台](docs/2026-10-24-admin-content-first.md)。

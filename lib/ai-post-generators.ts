@@ -584,3 +584,25 @@ export async function generatePostCover(
 
   return { generator, image }
 }
+
+/** Resolve configuration only: never sends a prompt or invokes a model. */
+export async function getPostGeneratorAvailability(db: D1Database, env: Partial<CloudflareEnv>) {
+  const rows = await listAiPostGenerators(db, env)
+  const result: Record<string, boolean> = {}
+  for (const generator of rows) {
+    try {
+      if (generator.target_key !== 'cover') await resolveTextRuntime(generator, env, db)
+      else if (generator.provider_mode === 'workers_ai') {
+        if (!(env.WORKERS_AI && readFlag(env.ENABLE_WORKERS_AI))) {
+          const secret = resolveAiConfigSecret(env as Record<string, unknown>)
+          if (!await resolveWorkersAiProfile(db, secret)) throw new Error('unconfigured')
+        }
+      } else {
+        const secret = resolveAiConfigSecret(env as Record<string, unknown>)
+        if (!await resolveAiImageProfileConfig(db, secret, generator.image_profile_id ?? undefined)) throw new Error('unconfigured')
+      }
+      result[generator.target_key] = true
+    } catch { result[generator.target_key] = false }
+  }
+  return result
+}

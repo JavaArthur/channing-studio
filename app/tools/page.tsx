@@ -47,18 +47,14 @@ export default async function ToolsPage() {
 
   return (
     <StudioShell
-      eyebrow="TOOLBOX / 05"
       title="值得留下的工具。"
-      description={`我在工作中使用和推荐的 ${tools.length} 件工具。`}
+      description={tools.length ? `我在工作中使用并推荐的 ${tools.length} 件工具。` : '我在工作中使用并推荐的工具。'}
       navLinks={headerData.navLinks}
       initialTheme={requestTheme}
     >
       <ResourceTabs active="tools" />
       <section>
-        <div className="mb-8">
-          <p className="studio-eyebrow">TOOLS</p>
-          <h2 className="font-serif font-medium studio-section-title mt-3">工具收藏</h2>
-        </div>
+        <h2 className="sr-only">工具收藏</h2>
         {tools.length === 0 ? (
           <div className="studio-empty-state">
             <p>工具箱还是空的</p>
@@ -66,7 +62,7 @@ export default async function ToolsPage() {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
-            {tools.map((tool, index) => {
+            {tools.map((tool) => {
               const h = host(tool.url)
               const safeUrl = tool.url && isHttpUrl(tool.url) ? tool.url : null
               const Wrapper = safeUrl ? 'a' : 'div'
@@ -77,7 +73,6 @@ export default async function ToolsPage() {
                     ? { href: safeUrl, target: '_blank', rel: 'noopener noreferrer nofollow' }
                     : {})}
                   className="group flex flex-col gap-2 rounded-2xl border border-[var(--editor-line)] bg-[var(--editor-panel)]/55 p-4 transition-colors hover:border-[var(--editor-accent)]/35 hover:bg-[var(--editor-panel)]"
-                  style={{ animation: `fadeInUp 0.4s ease-out ${index * 0.04}s both` }}
                 >
                   <div className="flex items-start gap-3">
                     {tool.icon && isSafeLink(tool.icon) ? (
