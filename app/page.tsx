@@ -2,7 +2,9 @@ import { getPosts } from '@/lib/db'
 import { getTools, type Tool } from '@/lib/repositories/tools'
 import { getPrompts, type Prompt } from '@/lib/repositories/prompts'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
-import { getPublicStudioContent } from '@/lib/public-studio'
+import { getStudioContent } from '@/lib/studio-settings'
+import { getPublicPortfolio } from '@/lib/repositories/portfolio'
+import type { PublicPortfolioProject } from '@/lib/portfolio'
 import { getFeaturedPosts } from '@/lib/repositories/posts'
 import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
 import { selectFeaturedPosts } from '@/lib/studio-home'
@@ -26,6 +28,7 @@ export const metadata = {
 
 export default async function Home() {
   let content = DEFAULT_STUDIO_CONTENT
+  let portfolio: PublicPortfolioProject[] = []
   let posts: PostWithTags[] = []
   let navLinks: SiteNavLink[] = []
   let tools: Tool[] = []
@@ -35,14 +38,16 @@ export default async function Home() {
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, studioContent, recentPosts, toolRows, promptRows] = await Promise.all([
+      const [headerData, studioContent, portfolioRows, recentPosts, toolRows, promptRows] = await Promise.all([
         getSiteHeaderData(env.DB),
-        getPublicStudioContent(env.DB),
+        getStudioContent(env.DB),
+        getPublicPortfolio(env.DB),
         getPosts(env.DB, 25, 0, false, false, false, false, 'post'),
         getTools(env.DB),
         getPrompts(env.DB).catch(() => []),
       ])
       content = studioContent
+      portfolio = portfolioRows
       const featured = await getFeaturedPosts(env.DB, content.featuredPostSlugs)
       posts = selectFeaturedPosts([...featured, ...recentPosts], content.featuredPostSlugs)
       tools = toolRows
@@ -87,6 +92,7 @@ export default async function Home() {
       />
       <StudioHome
         content={content}
+        portfolio={portfolio}
         posts={posts}
         tools={tools}
         prompts={prompts}

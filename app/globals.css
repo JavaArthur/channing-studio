@@ -4,6 +4,7 @@
 @import "../styles/tokens.css";
 @import "../styles/workspace.css";
 @import "../styles/studio-library.css";
+@import "../styles/portfolio.css";
 @import "../styles/operations.css";
 @custom-variant dark (&:where([data-color-mode="dark"], [data-color-mode="dark"] *));
 @theme inline {
@@ -879,20 +880,22 @@ body {
 }
 
 /* Channing Studio */
+.keep-word {
+  white-space: nowrap;
+}
+
 .site-header[data-site-header-mode="studio"] .site-header-inner {
   max-width: 72rem;
 }
 
+/* Category labels carry information (post category, lab type); quiet sans, not a mono costume. */
 .studio-eyebrow,
 .studio-card-label,
 .studio-index {
-  color: var(--editor-accent);
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  color: var(--stone-gray);
+  font-size: 0.78rem;
+  font-weight: 500;
   line-height: 1.4;
-  text-transform: none;
 }
 
 .studio-hero-title,

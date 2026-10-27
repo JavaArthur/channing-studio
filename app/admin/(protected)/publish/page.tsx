@@ -1,7 +1,7 @@
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getPublicationSummary } from '@/lib/repositories/library'
 import Link from 'next/link'
-import { ArrowUpRight, FileText, Layout, Wrench, MessageSquare } from 'lucide-react'
+import { ArrowUpRight, FileText, FolderKanban, Layout, Wrench, MessageSquare } from 'lucide-react'
 const links = [
   {
     href: '/admin/posts',
@@ -10,9 +10,15 @@ const links = [
     Icon: FileText,
   },
   {
+    href: '/admin/portfolio',
+    label: '作品集',
+    description: '在项目导航里挑选公开的项目，确认后更新作品页。',
+    Icon: FolderKanban,
+  },
+  {
     href: '/admin/studio',
-    label: '首页与代表作品',
-    description: '更新个人介绍、作品与精选文章。',
+    label: '首页与个人介绍',
+    description: '更新个人介绍、实验室与精选文章。',
     Icon: Layout,
   },
   {
@@ -35,6 +41,7 @@ export default async function Page() {
     '/admin/posts': `${stats?.posts ?? 0} 篇已发布 · ${stats?.drafts ?? 0} 篇草稿`,
     '/admin/tools': `${stats?.tools ?? 0} 件已公开`,
     '/admin/prompts': `${stats?.prompts ?? 0} 条已公开`,
+    '/admin/portfolio': `${stats?.portfolio ?? 0} 个项目已公开`,
     '/admin/studio': '编辑站点内容',
   }
   return (
@@ -66,7 +73,6 @@ export default async function Page() {
         ))}
       </div>
       <div className="publish-secondary">
-        <Link href="/admin/projects">管理历史项目的公开版本</Link>
         <Link href="/admin/categories">文章分类</Link>
       </div>
     </div>

@@ -631,3 +631,25 @@ CREATE TABLE library_member_preferences (
   kind TEXT NOT NULL, item_id TEXT NOT NULL, pinned INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY(collection_id,kind,item_id)
 );
+-- Portfolio projects: public /work source and private project hub (separate from library collections).
+CREATE TABLE IF NOT EXISTS portfolio_projects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  summary TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','maintained','paused','archived')),
+  tags TEXT,
+  site_url TEXT,
+  repo_url TEXT,
+  repo_public INTEGER NOT NULL DEFAULT 0,
+  -- Private quick links (staging, consoles, docs) and the local checkout path never enter the public payload.
+  links TEXT,
+  local_path TEXT,
+  is_pinned INTEGER NOT NULL DEFAULT 0,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  published_payload TEXT,
+  published_at INTEGER,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s','now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now'))
+);
+CREATE INDEX IF NOT EXISTS idx_portfolio_projects_order ON portfolio_projects(is_pinned DESC, sort_order, updated_at DESC);

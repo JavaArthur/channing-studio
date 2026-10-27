@@ -2,7 +2,7 @@
 import { useWorkspace } from '@/components/library/WorkspaceState'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { BookOpen, Folder, Globe, Settings, Sparkles, Link2, Star, CircleHelp } from 'lucide-react'
+import { BookOpen, Folder, FolderKanban, Globe, Settings, Sparkles, Link2, Star, CircleHelp } from 'lucide-react'
 export function BrainNav({ decisions = 0 }: { decisions?: number }) {
   const { usage } = useWorkspace()
   const path = usePathname()
@@ -32,6 +32,12 @@ export function BrainNav({ decisions = 0 }: { decisions?: number }) {
       href: '/admin/operations',
       Icon: Sparkles,
       active: path.startsWith('/admin/operations'),
+    },
+    {
+      title: '项目导航',
+      href: '/admin/portfolio',
+      Icon: FolderKanban,
+      active: path.startsWith('/admin/portfolio'),
     },
     {
       title: '主题资料集',

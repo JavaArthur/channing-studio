@@ -11,7 +11,6 @@ import {
   convertInboxItem,
   draftFromNote,
   isBrainKind,
-  publishProject,
   saveBrainItem,
 } from '@/lib/repositories/brain'
 export async function POST(req: NextRequest, { params }: { params: Promise<{ kind: string }> }) {
@@ -53,9 +52,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ kin
       )
         return jsonError('无效关联', 400)
       await setProjectLink(route.db, id, input.kind, input.target_id, input.remove === true)
-    } else if (input.action === 'publish') {
-      if (kind !== 'projects' || !id) return jsonError('无效项目', 400)
-      await publishProject(route.db, id, input)
     } else if (input.action === 'save' || input.action === undefined) {
       return jsonOk({ success: true, id: await saveBrainItem(route.db, kind, input, id) })
     } else return jsonError('无效操作', 400)

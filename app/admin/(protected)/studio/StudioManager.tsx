@@ -10,7 +10,6 @@ import {
   type StudioCapability,
   type StudioContent,
   type StudioLab,
-  type StudioProject,
 } from '@/lib/studio-content'
 
 interface StudioManagerProps {
@@ -36,7 +35,7 @@ function moveAt<T>(items: T[], index: number, offset: -1 | 1): T[] {
 export function StudioManager({ initialContent, initialRevision }: StudioManagerProps) {
   const router = useRouter()
   const search = useSearchParams()
-  const tabs = [{ id: 'profile', label: '个人介绍' }, { id: 'capabilities', label: '能力' }, { id: 'projects', label: '代表作品' }, { id: 'labs', label: '实验室' }, { id: 'contacts', label: '联系链接' }, { id: 'writing', label: '精选文章' }]
+  const tabs = [{ id: 'profile', label: '个人介绍' }, { id: 'capabilities', label: '能力' }, { id: 'labs', label: '实验室' }, { id: 'contacts', label: '联系链接' }, { id: 'writing', label: '精选文章' }]
   const tab = tabs.some(t => t.id === search.get('section')) ? search.get('section')! : 'profile'
   const [draft, setDraft] = useState<StudioContent>(initialContent)
   const [savedDraft,setSavedDraft] = useState(()=>JSON.stringify(initialContent))
@@ -53,16 +52,11 @@ export function StudioManager({ initialContent, initialRevision }: StudioManager
     setDraft((current) => ({ ...current, profile: { ...current.profile, capabilities: updateAt(current.profile.capabilities, index, patch) } }))
   }
 
-  const updateProject = (index: number, patch: Partial<StudioProject>) => {
-    setDraft((current) => ({ ...current, projects: updateAt(current.projects, index, patch) }))
-  }
-
   const updateLab = (index: number, patch: Partial<StudioLab>) => {
     setDraft((current) => ({ ...current, labs: updateAt(current.labs, index, patch) }))
   }
 
   const removeCapability = (index: number) => setDraft((current) => ({ ...current, profile: { ...current.profile, capabilities: current.profile.capabilities.filter((_, itemIndex) => itemIndex !== index) } }))
-  const removeProject = (index: number) => setDraft((current) => ({ ...current, projects: current.projects.filter((_, itemIndex) => itemIndex !== index) }))
   const removeLab = (index: number) => setDraft((current) => ({ ...current, labs: current.labs.filter((_, itemIndex) => itemIndex !== index) }))
 
   const save = async () => {
@@ -120,29 +114,6 @@ export function StudioManager({ initialContent, initialRevision }: StudioManager
               <input className={`min-h-11 min-w-11 ${inputClass}`} placeholder="能力名称" value={capability.title} onChange={(event) => updateCapability(index, { title: event.target.value })} />
               <textarea className={`min-h-11 min-w-11 ${inputClass} min-h-16 resize-y`} placeholder="能力说明" value={capability.description} onChange={(event) => updateCapability(index, { description: event.target.value })} />
               <button type="button" onClick={() => removeCapability(index)} className="min-h-11 min-w-11 text-xs text-[var(--danger)] hover:underline">删除</button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section hidden={tab !== 'projects'} className="space-y-4">
-        <div className="flex items-end justify-between gap-3"><div><h2 className="font-serif font-medium text-base text-[var(--editor-ink)]">作品</h2><p className="mt-1 text-xs text-[var(--editor-muted)]">数组顺序就是首页和作品页的展示顺序。</p></div><button type="button" onClick={() => setDraft((current) => ({ ...current, projects: [...current.projects, { id: crypto.randomUUID(), title: '', description: '', href: '/', tags: [], visible: true }] }))} className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-soft)] px-3 py-2 text-xs font-medium text-[var(--editor-ink)]">+ 添加作品</button></div>
-        <div className="space-y-3">
-          {draft.projects.map((project, index) => (
-            <div key={`${index}-${project.id}`} className={cardClass}>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <input className={`min-h-11 min-w-11 ${inputClass}`} placeholder="内部 ID" value={project.id} onChange={(event) => updateProject(index, { id: event.target.value })} />
-                <input className={`min-h-11 min-w-11 ${inputClass}`} placeholder="作品名称" value={project.title} onChange={(event) => updateProject(index, { title: event.target.value })} />
-                <input className={`min-h-11 min-w-11 ${inputClass}`} placeholder="链接" value={project.href} onChange={(event) => updateProject(index, { href: event.target.value })} />
-                <input className={`min-h-11 min-w-11 ${inputClass}`} placeholder="技术标签，用逗号分隔" value={project.tags.join(', ')} onChange={(event) => updateProject(index, { tags: event.target.value.split(',').map((tag) => tag.trim()).filter(Boolean) })} />
-                <textarea className={`min-h-11 min-w-11 ${inputClass} min-h-20 resize-y sm:col-span-2`} placeholder="作品说明" value={project.description} onChange={(event) => updateProject(index, { description: event.target.value })} />
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-[var(--editor-muted)]">
-                <label className="flex items-center gap-2"><input type="checkbox" checked={project.visible} onChange={(event) => updateProject(index, { visible: event.target.checked })} className="min-h-11 min-w-11" />公开显示</label>
-                <button type="button" onClick={() => setDraft((current) => ({ ...current, projects: moveAt(current.projects, index, -1) }))} className="min-h-11 min-w-11 hover:text-[var(--editor-ink)]">上移</button>
-                <button type="button" onClick={() => setDraft((current) => ({ ...current, projects: moveAt(current.projects, index, 1) }))} className="min-h-11 min-w-11 hover:text-[var(--editor-ink)]">下移</button>
-                <button type="button" onClick={() => removeProject(index)} className="min-h-11 min-w-11 text-[var(--danger)] hover:underline">删除</button>
-              </div>
             </div>
           ))}
         </div>

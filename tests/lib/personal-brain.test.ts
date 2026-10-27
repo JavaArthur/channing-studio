@@ -13,8 +13,6 @@ import {
   draftFromNote,
   archiveBrainItem,
   convertInboxItem,
-  publishProject,
-  getPublishedProjects,
   searchBrain,
 } from '@/lib/repositories/brain'
 import { setProjectLink, getProjectLinks } from '@/lib/repositories/project-links'
@@ -89,24 +87,6 @@ describe('publication boundaries and working versions', () => {
     expect(await getTools(db)).toHaveLength(0)
     expect(await getPrompts(db)).toHaveLength(0)
   })
-  it('projects expose only reviewed public fields and withdrawal is immediate', async () => {
-    const id = await saveBrainItem(db, 'projects', {
-      title: 'PRIVATE TITLE',
-      description: 'PRIVATE DETAIL',
-      next_action: 'PRIVATE ACTION',
-    })
-    expect(await getPublishedProjects(db)).toEqual([])
-    await publishProject(db, id, {
-      title: 'Public title',
-      description: 'Public summary',
-      href: 'https://example.com',
-    })
-    expect(JSON.stringify(await getPublishedProjects(db))).not.toContain('PRIVATE')
-    await saveBrainItem(db, 'projects', { title: 'NEW PRIVATE' }, id)
-    expect((await getPublishedProjects(db))[0].title).toBe('Public title')
-    await publishProject(db, id, { publish: false })
-    expect(await getPublishedProjects(db)).toEqual([])
-  })
   it('rechecks public visibility after withdrawal even if KV has an old copy', async () => {
     const id = post()
     const old = await getPostBySlug(db, 'public-post')
@@ -170,13 +150,6 @@ describe('collect, organize and find', () => {
   it('rejects executable and non-web source URLs', async () => {
     await expect(
       saveBrainItem(db, 'notes', { title: 'bad', source_url: 'javascript:alert(1)' }),
-    ).rejects.toThrow()
-    await expect(
-      publishProject(db, 'missing', {
-        title: 'bad',
-        description: 'bad',
-        href: 'file:///etc/passwd',
-      }),
     ).rejects.toThrow()
   })
 })

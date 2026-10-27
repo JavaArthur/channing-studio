@@ -641,7 +641,8 @@ export async function getPublicationSummary(db: Database) {
     (SELECT COUNT(*) FROM posts WHERE deleted_at IS NULL AND status='published') AS posts,
     (SELECT COUNT(*) FROM posts WHERE deleted_at IS NULL AND status='draft') AS drafts,
     (SELECT COUNT(*) FROM tools WHERE is_hidden=0 AND published_payload IS NOT NULL) AS tools,
-    (SELECT COUNT(*) FROM prompts WHERE is_hidden=0 AND published_payload IS NOT NULL) AS prompts`,
+    (SELECT COUNT(*) FROM prompts WHERE is_hidden=0 AND published_payload IS NOT NULL) AS prompts,
+    (SELECT COUNT(*) FROM portfolio_projects WHERE published_payload IS NOT NULL AND status!='archived') AS portfolio`,
     )
-    .first<{ posts: number; drafts: number; tools: number; prompts: number }>()
+    .first<{ posts: number; drafts: number; tools: number; prompts: number; portfolio: number }>()
 }

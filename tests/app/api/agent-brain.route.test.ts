@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LocalD1 } from '../../helpers/local-d1'
 import * as routes from '@/lib/agent-brain/routes'
-import { saveBrainItem, publishProject, getPublishedProjects } from '@/lib/repositories/brain'
+import { saveBrainItem } from '@/lib/repositories/brain'
 import { setProjectLink } from '@/lib/repositories/project-links'
 import type { Database } from '@/lib/repositories/schema'
 
@@ -116,13 +116,9 @@ describe('general Agent workspace HTTP API', () => {
     expect((await call('noteDELETE','DELETE','projects',undefined,project.id,{'If-Match':'"2"'},'',note.id)).headers.get('etag')).toBe('"3"')
     await setProjectLink(db,project.id,'note',note.id)
     expect((await (await call('itemGET','GET','projects',undefined,project.id)).json()).item.revision).toBe(4)
-    expect(await getPublishedProjects(db)).toEqual([])
-    await publishProject(db,project.id,{title:'public',description:'reviewed',href:'https://example.com'})
     const current = (await (await call('itemGET','GET','projects',undefined,project.id)).json()).item
     expect(current).not.toHaveProperty('published_payload')
     expect((await call('itemPATCH','PATCH','projects',{published_payload:'leak'},project.id,{'If-Match':`"${current.revision}"`})).status).toBe(400)
-    await call('itemPATCH','PATCH','projects',{description:'secret'},project.id,{'If-Match':`"${current.revision}"`})
-    expect((await getPublishedProjects(db))[0].description).toBe('reviewed')
   })
   it('rejects unsupported fields, URLs, malformed bodies, invalid targets, and missing records', async () => {
     for(const body of [{title:'x',source_url:'javascript:alert(1)'},{title:'x',source_url:'https://user:password@example.com'},{title:'x',source:'flomo'},{title:'x',id:'overwrite'},{title:'x',content:'x'.repeat(50001)}])

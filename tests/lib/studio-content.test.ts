@@ -11,12 +11,11 @@ describe('parseStudioSettings', () => {
     const result = parseStudioSettings({})
 
     expect(result.profile.title).toBe(DEFAULT_STUDIO_CONTENT.profile.title)
-    expect(result.projects).toEqual(DEFAULT_STUDIO_CONTENT.projects)
     expect(result.labs).toEqual(DEFAULT_STUDIO_CONTENT.labs)
     expect(result.featuredPostSlugs).toEqual([])
   })
 
-  it('parses valid profile, projects, labs, and featured posts', () => {
+  it('parses valid profile, labs, and featured posts (projects live in portfolio_projects)', () => {
     const result = parseStudioSettings({
       studio_profile: JSON.stringify({
         eyebrow: 'AI Platform',
@@ -26,16 +25,6 @@ describe('parseStudioSettings', () => {
         contactLinks: [{ label: 'GitHub', url: 'https://github.com/JavaArthur' }],
         capabilities: [{ title: '平台工程', description: '从架构到交付。' }],
       }),
-      studio_projects: JSON.stringify([
-        {
-          id: 'blog',
-          title: '晨启AI博客',
-          description: '自托管内容系统。',
-          href: 'https://note.aichanning.cn',
-          tags: ['Next.js'],
-          visible: true,
-        },
-      ]),
       studio_labs: JSON.stringify([
         {
           id: 'clipper',
@@ -50,7 +39,7 @@ describe('parseStudioSettings', () => {
     })
 
     expect(result.profile.title).toBe('Channing')
-    expect(result.projects[0]?.id).toBe('blog')
+    expect(result).not.toHaveProperty('projects')
     expect(result.labs[0]?.id).toBe('clipper')
     expect(result.featuredPostSlugs).toEqual(['one', 'two'])
   })
@@ -58,16 +47,11 @@ describe('parseStudioSettings', () => {
   it('drops malformed entries and falls back for invalid JSON', () => {
     const result = parseStudioSettings({
       studio_profile: '{bad json',
-      studio_projects: JSON.stringify([
-        { id: 'valid', title: '有效', description: '说明', href: '/work', tags: [], visible: true },
-        { id: 42, title: '无效' },
-      ]),
       studio_labs: JSON.stringify({ id: 'not-an-array' }),
       studio_featured_posts: JSON.stringify([1, 'valid-slug', '']),
     })
 
     expect(result.profile).toEqual(DEFAULT_STUDIO_CONTENT.profile)
-    expect(result.projects).toHaveLength(1)
     expect(result.labs).toEqual(DEFAULT_STUDIO_CONTENT.labs)
     expect(result.featuredPostSlugs).toEqual(['valid-slug'])
   })
@@ -82,13 +66,12 @@ describe('parseStudioSettings', () => {
     expect(DEFAULT_STUDIO_CONTENT).toEqual(before)
   })
 
-  it('serializes the four editable sections to settings payloads', () => {
+  it('serializes the three editable sections to settings payloads', () => {
     const content = structuredClone(DEFAULT_STUDIO_CONTENT)
     content.profile.title = 'New title'
 
     expect(serializeStudioSettings(content)).toEqual({
       studio_profile: JSON.stringify(content.profile),
-      studio_projects: JSON.stringify(content.projects),
       studio_labs: JSON.stringify(content.labs),
       studio_featured_posts: JSON.stringify(content.featuredPostSlugs),
     })

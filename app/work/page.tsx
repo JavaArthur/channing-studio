@@ -1,12 +1,13 @@
 export const dynamic = 'force-dynamic'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getSiteHeaderData } from '@/lib/site'
-import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
-import { getPublicStudioContent } from '@/lib/public-studio'
-import { StudioCardLabel, StudioLink, StudioShell } from '@/components/StudioSection'
+import { getPublicPortfolio } from '@/lib/repositories/portfolio'
+import { PortfolioIndex } from '@/components/PortfolioIndex'
+import { StudioShell } from '@/components/StudioSection'
 import { getSiteUrl } from '@/lib/site-config'
 import type { Theme } from '@/lib/appearance'
 import type { SiteNavLink } from '@/lib/site'
+import type { PublicPortfolioProject } from '@/lib/portfolio'
 
 export const metadata = {
   title: '作品 · Channing Studio',
@@ -15,16 +16,16 @@ export const metadata = {
 }
 
 export default async function WorkPage() {
-  let content = DEFAULT_STUDIO_CONTENT
+  let projects: PublicPortfolioProject[] = []
   let navLinks: SiteNavLink[] = []
   let defaultTheme: Theme = 'light'
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, studioContent] = await Promise.all([getSiteHeaderData(env.DB), getPublicStudioContent(env.DB)])
+      const [headerData, portfolio] = await Promise.all([getSiteHeaderData(env.DB), getPublicPortfolio(env.DB)])
       navLinks = headerData.navLinks
       defaultTheme = headerData.defaultTheme
-      content = studioContent
+      projects = portfolio
     }
   } catch (error) {
     console.error('Studio work: failed to fetch content', error)
@@ -32,26 +33,19 @@ export default async function WorkPage() {
 
   return (
     <StudioShell
-      eyebrow="SELECTED WORK / 03"
       title="把判断变成可以继续运行的东西。"
-      description="这里放可以公开说明的系统、工具链和工程方法，重点是约束、取舍和交付结果。"
+      description="这些项目都在真实使用：有的每天自动更新，有的只服务家人或少数读者。每一项都写明它在哪里运行。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
-      <div className="grid gap-5 md:grid-cols-2">
-        {content.projects.filter((project) => project.visible).map((project) => (
-          <StudioLink className="min-h-11 min-w-11 block" key={project.id} href={project.href}>
-            <article className="studio-card h-full">
-              <StudioCardLabel>PROJECT / {project.id}</StudioCardLabel>
-              <h2 className="font-serif font-medium studio-card-title mt-8">{project.title}</h2>
-              <p className="studio-card-description mt-4">{project.description}</p>
-              <div className="mt-7 flex flex-wrap gap-2">
-                {project.tags.map((tag) => <span key={tag} className="studio-tag">{tag}</span>)}
-              </div>
-            </article>
-          </StudioLink>
-        ))}
-      </div>
+      {projects.length ? (
+        <PortfolioIndex projects={projects} />
+      ) : (
+        <div className="studio-empty-state">
+          <p>作品整理中</p>
+          <span>可以先去看看文章和实验室。</span>
+        </div>
+      )}
     </StudioShell>
   )
 }
