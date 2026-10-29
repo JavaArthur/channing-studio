@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { Button, Input, Modal } from '@/components/admin/ui'
-import { useUnsavedChanges } from '@/components/admin/UnsavedChanges'
+import { useUnsavedChanges, type SaveContext } from '@/components/admin/UnsavedChanges'
 import type { LibraryItem } from '@/lib/library/types'
 import type { PublicLibraryFields } from '@/lib/repositories/library'
 import { libraryRequest } from './client'
@@ -45,7 +45,8 @@ export function PublicationEditor({
       alive = false
     }
   }, [kind, id])
-  async function save(publish = true) {
+  async function save(publish = true, context?: SaveContext) {
+    if (busy) return false
     if (
       !fields ||
       !base ||
@@ -66,9 +67,11 @@ export function PublicationEditor({
         publish,
         fields,
       })
-      setBase({ ...base, fields, published: publish })
-      onSaved(result.item)
-      onClose()
+      setBase({ ...base, fields, revision: result.item.revision, published: publish, has_snapshot: true })
+      if (!context || context.isCurrent()) {
+        onSaved(result.item)
+        onClose()
+      }
       return true
     } catch (e) {
       setError(e instanceof Error ? e.message : '发布失败')
@@ -86,7 +89,7 @@ export function PublicationEditor({
   }
   const guard = useUnsavedChanges(
     !!fields && !!base && JSON.stringify(fields) !== JSON.stringify(base.fields),
-    () => save(),
+    (context) => save(true, context),
   )
   const patch = (value: Partial<PublicLibraryFields>) => setFields((f) => f && { ...f, ...value })
   return (

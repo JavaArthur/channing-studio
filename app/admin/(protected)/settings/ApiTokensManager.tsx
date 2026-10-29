@@ -43,7 +43,7 @@ export function ApiTokensManager() {
   useEffect(() => { loadTokens() }, [])
 
   const createToken = async () => {
-    if (!newName.trim()) return false
+    if (creating || newToken || !newName.trim()) return false
     setCreating(true)
     try {
       const res = await fetch('/api/admin/tokens', {
@@ -54,7 +54,7 @@ export function ApiTokensManager() {
       if (!res.ok) throw new Error('创建失败')
       const data = (await res.json()) as CreateTokenResponse
       setNewToken(data.token)
-      setNewName('')
+      setNewName((current) => current === newName ? '' : current)
       toast.success('Token 已创建')
       loadTokens()
       return true
@@ -66,7 +66,18 @@ export function ApiTokensManager() {
     }
   }
 
-  const guard = useUnsavedChanges(open && !!newName.trim(), async () => { if(await createToken()) throw new Error('Token 已生成，请选择继续编辑，复制保存后再离开。'); return false }, () => setNewName(''))
+  const tokenNotice = 'Token 已生成，请选择继续编辑，复制保存并确认「我已保存」后再离开。'
+  const guard = useUnsavedChanges(
+    !!newToken || (open && !!newName.trim()),
+    async () => {
+      if (newToken || await createToken()) throw new Error(tokenNotice)
+      return false
+    },
+    () => {
+      if (newToken) throw new Error(tokenNotice)
+      setNewName('')
+    },
+  )
 
   const deleteToken = async (id: number, name: string) => {
     if (!confirm(`确定删除 Token "${name}"？`)) return
@@ -112,7 +123,7 @@ export function ApiTokensManager() {
 
       <div className="flex justify-between items-center"><h3>访问 Token</h3><Button variant="primary" onClick={() => setOpen(true)}>新增 Token</Button></div>
       <Modal open={open} onOpenChange={value => value ? setOpen(true) : guard(() => setOpen(false))} title="新增 Token" sheet><div className="admin-form">
-        {newToken ? <><p>Token 只显示一次，请复制保存。</p><code className="break-all">{newToken}</code><Button onClick={() => copyToken(newToken)}>复制 Token</Button><Button onClick={() => { setNewToken(null); setOpen(false) }}>我已保存</Button></> : <form className="admin-form" onSubmit={e => { e.preventDefault(); void createToken() }}><label>用途名称<Input value={newName} onChange={e => setNewName(e.target.value)} required placeholder="例如：Obsidian 发布" /></label><Button type="submit" variant="primary" disabled={creating || !newName.trim()}>{creating ? '创建中…' : '生成 Token'}</Button></form>}
+        {newToken ? <><p>Token 只显示一次，请复制保存。</p><code className="break-all">{newToken}</code><Button onClick={() => copyToken(newToken)}>复制 Token</Button><Button onClick={() => { setNewToken(null); if (!newName.trim()) setOpen(false) }}>我已保存</Button></> : null}{(!newToken || !!newName.trim()) && <form className="admin-form" onSubmit={e => { e.preventDefault(); void createToken() }}><label>用途名称<Input value={newName} onChange={e => setNewName(e.target.value)} required placeholder="例如：Obsidian 发布" /></label><Button type="submit" variant="primary" disabled={creating || !!newToken || !newName.trim()}>{creating ? '创建中…' : '生成 Token'}</Button></form>}
       </div></Modal>
 
       {/* Token 列表 */}

@@ -16,6 +16,7 @@ const geistSans = localFont({
   ],
   variable: "--font-geist-sans",
   display: "swap",
+  preload: false,
   fallback: ["system-ui", "Arial", "Helvetica", "sans-serif"],
 });
 
@@ -28,6 +29,7 @@ const geistMono = localFont({
   ],
   variable: "--font-geist-mono",
   display: "swap",
+  preload: false,
   fallback: ["SFMono-Regular", "Consolas", "Monaco", "monospace"],
 });
 

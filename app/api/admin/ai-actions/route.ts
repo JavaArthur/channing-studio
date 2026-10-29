@@ -73,8 +73,9 @@ export async function POST(req: NextRequest) {
   if (body.is_enabled !== undefined && body.is_enabled !== 0 && body.is_enabled !== 1)
     return NextResponse.json({ error: '启用状态无效' }, { status: 400 })
   try {
-    await createTextOperation(db, { action_key: body.action_key, label: body.label, description: body.description, prompt: body.prompt,
+    const result = await createTextOperation(db, { action_key: body.action_key, label: body.label, description: body.description, prompt: body.prompt,
       profile_id: profileId ?? null, sort_order: body.sort_order, is_enabled: body.is_enabled ?? 1, temperature })
+    return NextResponse.json({ success: true, id: result.meta.last_row_id })
   } catch (error) {
     if (error instanceof Error && /UNIQUE constraint failed: ai_actions\\.action_key/i.test(error.message)) {
       return NextResponse.json({ error: '操作标识已存在' }, { status: 409 })
@@ -82,7 +83,6 @@ export async function POST(req: NextRequest) {
     throw error
   }
 
-  return NextResponse.json({ success: true })
 }
 
 export async function PUT(req: NextRequest) {

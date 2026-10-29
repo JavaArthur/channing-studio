@@ -1,4 +1,5 @@
 'use client'
+import type { SaveContext } from '@/components/admin/UnsavedChanges'
 
 import { Button, Input, Select, Menu } from '@/components/admin/ui'
 import { ManualSheet } from '@/components/admin/ManualSheet'
@@ -86,7 +87,8 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
     }
   }
 
-  async function save() {
+  async function save(context?: SaveContext) {
+    if (saving) return false
     if (!form.name.trim()) {
       toast.warning('名称不能为空')
       return false
@@ -120,8 +122,10 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
       if (!form.id && json.id) setForm((current) => ({ ...current, id: json.id! }))
 
       toast.success('已保存工作版本')
-      setForm(EMPTY)
-      setOpen(false)
+      if (!context || context.isCurrent()) {
+        setForm(EMPTY)
+        setOpen(false)
+      }
       router.refresh()
       return true
     } catch {
@@ -203,7 +207,7 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
         ))}
       </div>
       {!initialTools.length && <div className="library-empty">还没有工具，添加第一件收藏。</div>}
-      {open && <ManualSheet value={form} onSave={save} onClose={()=>setOpen(false)} title={isEditing ? '编辑工具' : '添加工具'}>
+      {open && <ManualSheet value={{ ...form, id: undefined }} onSave={save} onClose={()=>setOpen(false)} title={isEditing ? '编辑工具' : '添加工具'}>
         <div className="admin-form">
           <label>
             名称

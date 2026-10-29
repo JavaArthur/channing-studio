@@ -31,7 +31,7 @@ export function NavLinksEditor({
     }
   })
   const [saved,setSaved] = useState(()=>JSON.stringify(links))
-  async function save() { const value=JSON.stringify(links); const ok=await onSave(value); if(ok)setSaved(value); return ok }
+  async function save() { if (saving) return false; const value=JSON.stringify(links); const ok=await onSave(value); if(ok)setSaved(value); return ok }
   useUnsavedChanges(JSON.stringify(links)!==saved,save,()=>setLinks(JSON.parse(saved)))
   function update(index: number, patch: Partial<NavLink>) {
     setLinks(links.map((link, i) => (i === index ? { ...link, ...patch } : link)))

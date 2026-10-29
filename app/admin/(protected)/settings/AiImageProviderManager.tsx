@@ -1,4 +1,5 @@
 'use client'
+import type { SaveContext } from '@/components/admin/UnsavedChanges'
 
 import { useEffect, useMemo, useState } from 'react'
 import { useToast } from '@/components/Toast'
@@ -212,8 +213,8 @@ export function AiImageProviderManager() {
     }
   }
 
-  const handleSave = async () => {
-    if (!editing) return false
+  const handleSave = async (context?: SaveContext) => {
+    if (saving || !editing) return false
 
     if (!editing.name.trim() || !editing.base_url.trim() || !editing.model.trim()) {
       toast.error('请填写名称、Base URL、模型')
@@ -244,12 +245,13 @@ export function AiImageProviderManager() {
         body: JSON.stringify(payload),
       })
 
-      const data = await res.json().catch(() => ({})) as { error?: string }
+      const data = await res.json().catch(() => ({})) as { error?: string; profile?: { id: number } }
       if (!res.ok) throw new Error(data.error || '保存失败')
 
       toast.success('图片模型配置已保存')
-      setEditing(null)
+      if (data.profile?.id) setEditing((current) => current && { ...current, id: data.profile!.id })
       await loadProfiles()
+      if (!context || context.isCurrent()) setEditing(null)
       return true
     } catch (error) {
       toast.error(error instanceof Error ? error.message : '保存失败')
@@ -340,7 +342,7 @@ export function AiImageProviderManager() {
 
       {editing && (
         <ProviderDialog
-          value={editing}
+          value={{ ...editing, id: undefined }}
           onSave={handleSave}
           title={editing.id ? '编辑图片模型' : '新增图片模型'}
           onClose={() => setEditing(null)}
@@ -381,7 +383,7 @@ export function AiImageProviderManager() {
 
             <button
               type="button"
-              onClick={handleSave}
+              onClick={() => void handleSave()}
               disabled={saving}
               className="min-h-11 min-w-11 rounded-lg bg-[var(--editor-accent)] px-4 py-2 text-sm font-semibold text-[var(--editor-accent-ink)] hover:brightness-105 disabled:opacity-50"
             >

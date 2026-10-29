@@ -1,9 +1,9 @@
 'use client'
-import { useUnsavedChanges } from '@/components/admin/UnsavedChanges'
+import { useUnsavedChanges, type SaveContext } from '@/components/admin/UnsavedChanges'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
-import { libraryLabels } from '@/lib/library/types'
+import { libraryLabels, type LibraryItem } from '@/lib/library/types'
 import { libraryRequest } from './client'
 export function CaptureForm({
   collection,
@@ -25,32 +25,41 @@ export function CaptureForm({
   })
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
-  const [requestKey] = useState(() => crypto.randomUUID())
+  const [requestKey, setRequestKey] = useState(() => crypto.randomUUID())
+  const [savedForm, setSavedForm] = useState(() => JSON.stringify(form))
+  const [savedCapture, setSavedCapture] = useState<{ item: LibraryItem; type: string } | null>(null)
   const guard = useUnsavedChanges(
-    Object.entries(form).some(([key, value]) => key !== 'type' && !!value),
+    JSON.stringify(form) !== savedForm,
     save,
   )
-  async function save() {
+  async function save(context?: SaveContext) {
+    if (busy) return false
     setBusy(true)
     setError('')
     try {
       if (!(await beforeSave())) throw new Error('请先处理当前资料未保存的修改')
-      const result = await libraryRequest({
-        action: 'capture',
-        input: {
-          ...form,
-          source_url: form.source_url || null,
-          topics: form.topics
-            .split(/[、,，]/)
-            .map((x) => x.trim())
-            .filter(Boolean),
-          request_key: requestKey,
-          collection_ids: collection ? [collection] : [],
-        },
-      })
-      onClose()
-      router.push(result.href)
-      router.refresh()
+      if (context && !context.isCurrent()) return false
+      const changes = {
+        title: form.title,
+        content: form.content,
+        summary: form.summary,
+        source_url: form.source_url || null,
+        topics: form.topics.split(/[、,，]/).map((x) => x.trim()).filter(Boolean),
+      }
+      const result = await libraryRequest(savedCapture && savedCapture.type === form.type
+        ? { action: 'update', kind: savedCapture.item.kind, id: savedCapture.item.id,
+            expected_revision: savedCapture.item.revision, changes }
+        : { action: 'capture', input: { ...changes, type: form.type, request_key: requestKey,
+            collection_ids: collection ? [collection] : [] } })
+      setSavedCapture({ item: result.item, type: form.type })
+      setSavedForm(JSON.stringify(form))
+      setRequestKey(crypto.randomUUID())
+      if (!context || context.isCurrent()) {
+        onClose()
+        // Guarded saves let the provider execute the requested destination exactly once.
+        if (!context) router.push(result.href || result.item.href)
+        router.refresh()
+      }
       return true
     } catch (e) {
       setError(e instanceof Error ? e.message : '保存失败')

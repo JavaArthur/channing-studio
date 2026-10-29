@@ -1,4 +1,5 @@
 'use client'
+import type { SaveContext } from '@/components/admin/UnsavedChanges'
 
 import { Button, Input, Menu } from '@/components/admin/ui'
 import { ManualSheet } from '@/components/admin/ManualSheet'
@@ -46,7 +47,8 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((current) => ({ ...current, [key]: value }))
 
-  async function save() {
+  async function save(context?: SaveContext) {
+    if (saving) return false
     if (!form.title.trim() || !form.prompt.trim()) {
       setError('标题和提示词正文不能为空')
       return false
@@ -81,8 +83,10 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
       if (!response.ok || !result.success) throw new Error(result.error || '保存失败')
       if (!form.id && result.id) setForm((current) => ({ ...current, id: result.id! }))
 
-      setForm(EMPTY)
-      setOpen(false)
+      if (!context || context.isCurrent()) {
+        setForm(EMPTY)
+        setOpen(false)
+      }
       setMessage('已保存工作版本，公开内容保持不变。')
       router.refresh()
       return true
@@ -165,7 +169,7 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
       {!initialPrompts.length && (
         <div className="library-empty">还没有提示词，添加第一条收藏。</div>
       )}
-      {open && <ManualSheet value={form} onSave={save} onClose={()=>setOpen(false)} title={editing ? '编辑提示词' : '添加提示词'}>
+      {open && <ManualSheet value={{ ...form, id: undefined }} onSave={save} onClose={()=>setOpen(false)} title={editing ? '编辑提示词' : '添加提示词'}>
         <div className="admin-form">
           <label>
             标题

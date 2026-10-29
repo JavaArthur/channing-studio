@@ -1,4 +1,5 @@
 'use client'
+import type { SaveContext } from '@/components/admin/UnsavedChanges'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -126,7 +127,7 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
     )
     .map(({ project }) => project)
 
-  async function send(body: Record<string, unknown>, success: string) {
+  async function send(body: Record<string, unknown>, success: string, onSaved?: (data: { id?: number }) => void) {
     setBusy(true)
     try {
       const response = await fetch('/api/admin/portfolio', {
@@ -134,11 +135,12 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      const data = (await response.json().catch(() => ({}))) as { error?: string }
+      const data = (await response.json().catch(() => ({}))) as { error?: string; id?: number }
       if (!response.ok) {
         toast.error(data.error || '操作失败，请稍后重试')
         return false
       }
+      onSaved?.(data)
       toast.success(success)
       router.refresh()
       return true
@@ -150,8 +152,8 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
     }
   }
 
-  async function save() {
-    if (!form) return false
+  async function save(context?: SaveContext) {
+    if (busy || !form) return false
     const project = {
       slug: form.slug,
       title: form.title,
@@ -169,8 +171,11 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
     const saved = await send(
       form.id ? { action: 'update', id: form.id, project } : { action: 'create', project },
       form.id ? '项目已保存' : '项目已创建',
+      (data) => {
+        if (data.id) setForm((current) => current && { ...current, id: data.id! })
+      },
     )
-    if (saved) setForm(null)
+    if (saved && (!context || context.isCurrent())) setForm(null)
     return saved
   }
 
@@ -345,7 +350,7 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
       {form && (
         <ManualSheet
           title={form.id ? '编辑项目' : '新建项目'}
-          value={form}
+          value={{ ...form, id: undefined }}
           onSave={save}
           onClose={() => setForm(null)}
         >

@@ -1,4 +1,5 @@
 'use client'
+import type { SaveContext } from '@/components/admin/UnsavedChanges'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button, Input, Select, Menu, Modal } from '@/components/admin/ui'
@@ -76,7 +77,8 @@ export function ContentOperationsManager({ kind }: { kind: 'text' | 'image' | 'g
   useEffect(() => {
     void load()
   }, [load])
-  async function save() {
+  async function save(context?: SaveContext) {
+    if (busy) return false
     if (
       !edit ||
       !edit.label.trim() ||
@@ -89,13 +91,15 @@ export function ContentOperationsManager({ kind }: { kind: 'text' | 'image' | 'g
     setBusy(true)
     setError('')
     try {
-      await request(
+      const result = await request(
         kind === 'generators' ? endpoint : edit.id ? `${endpoint}/${edit.id}` : endpoint,
         kind === 'generators' || edit.id ? 'PUT' : 'POST',
         edit,
       )
-      setEdit(null)
+      // Record the committed identity before unrelated list/profile refreshes can fail.
+      if (result.id) setEdit((current) => current && { ...current, id: result.id })
       await load()
+      if (!context || context.isCurrent()) setEdit(null)
       return true
     } catch (e) {
       setError((e as Error).message)
@@ -223,7 +227,7 @@ export function ContentOperationsManager({ kind }: { kind: 'text' | 'image' | 'g
       {edit && (
         <ManualSheet
           title={`编辑${kind === 'generators' ? '文章生成' : kind === 'image' ? '图片提示' : '文本操作'}`}
-          value={edit}
+          value={{ ...edit, id: undefined }}
           onSave={save}
           onClose={() => setEdit(null)}
         >

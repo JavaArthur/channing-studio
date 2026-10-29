@@ -60,6 +60,7 @@ export function StudioManager({ initialContent, initialRevision }: StudioManager
   const removeLab = (index: number) => setDraft((current) => ({ ...current, labs: current.labs.filter((_, itemIndex) => itemIndex !== index) }))
 
   const save = async () => {
+    if (saving) return false
     setSaving(true)
     setMessage('')
     setError('')

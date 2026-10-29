@@ -1,5 +1,6 @@
 'use client'
 import { ManualSheet } from '@/components/admin/ManualSheet'
+import type { SaveHandler } from '@/components/admin/UnsavedChanges'
 
 import { Button, Menu, Modal } from '@/components/admin/ui'
 import type { ReactNode } from 'react'
@@ -144,7 +145,7 @@ interface ProviderDialogProps {
   title: string
   onClose: () => void
   value: unknown
-  onSave: () => Promise<boolean>
+  onSave: SaveHandler
   headerAction?: ReactNode
   children: ReactNode
 }

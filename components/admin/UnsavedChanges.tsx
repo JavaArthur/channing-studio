@@ -11,7 +11,11 @@ import {
 } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Modal } from './ui'
-type Entry = { dirty: boolean; save: () => Promise<boolean>; discard: () => void }
+// Persisted data must still be reconciled after cancellation; only UI exits are conditional.
+export type SaveContext = { isCurrent: () => boolean }
+export type SaveHandler = (context?: SaveContext) => Promise<boolean>
+type Entry = { dirty: boolean; save: SaveHandler; discard: () => void }
+type NavigationRequest = { next: () => void }
 type Guard = {
   register: (id: string, entry: Entry | null) => void
   request: (next: () => void) => void
@@ -20,21 +24,34 @@ const Context = createContext<Guard>({ register: () => {}, request: (next) => ne
 export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const entries = useRef(new Map<string, Entry>())
-  const [pending, setPending] = useState<(() => void) | null>(null)
+  const [pending, setPending] = useState<NavigationRequest | null>(null)
+  const pendingRequest = useRef<NavigationRequest | null>(null)
+  // Keep the save lock after dismissing the dialog until the active request settles.
+  const saving = useRef(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const register = useCallback((id: string, entry: Entry | null) => {
     if (entry) entries.current.set(id, entry)
     else entries.current.delete(id)
   }, [])
+  const cancelNavigation = useCallback(() => {
+    pendingRequest.current = null
+    setPending(null)
+    setError('')
+  }, [])
   const request = useCallback((next: () => void) => {
-    if ([...entries.current.values()].some((e) => e.dirty)) {
+    if (saving.current || [...entries.current.values()].some((e) => e.dirty)) {
+      const navigation = { next }
+      pendingRequest.current = navigation
       setError('')
-      setPending(() => next)
+      setPending(navigation)
     } else next()
   }, [])
+  useEffect(() => () => {
+    pendingRequest.current = null
+  }, [])
   useEffect(() => {
-    const dirty = () => [...entries.current.values()].some((e) => e.dirty)
+    const dirty = () => saving.current || [...entries.current.values()].some((e) => e.dirty)
     const beforeUnload = (e: BeforeUnloadEvent) => {
       if (dirty()) {
         e.preventDefault()
@@ -108,25 +125,34 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
     }
   }, [request, router])
   async function leave(save: boolean) {
-    if (busy) return
+    const navigation = pendingRequest.current
+    if (saving.current || !navigation) return
+    saving.current = true
     setBusy(true)
     setError('')
     try {
-      for (const entry of entries.current.values())
-        if (entry.dirty) {
-          if (save) {
-            if (!(await entry.save())) {
-              setError('尚未保存成功，请检查表单后重试。')
-              return
-            }
-          } else entry.discard()
-        }
-      const next = pending
-      setPending(null)
-      next?.()
+      for (const entry of entries.current.values()) {
+        if (pendingRequest.current !== navigation) return
+        if (!entry.dirty) continue
+        if (save) {
+          const saved = await entry.save({ isCurrent: () => pendingRequest.current === navigation })
+          // Dismissal or a new navigation intent must not inherit this save's result.
+          if (pendingRequest.current !== navigation) return
+          if (!saved) {
+            setError('尚未保存成功，请检查表单后重试。')
+            return
+          }
+        } else entry.discard()
+      }
+      if (pendingRequest.current !== navigation) return
+      cancelNavigation()
+      navigation.next()
     } catch (e) {
-      setError(e instanceof Error ? e.message : '保存失败，修改仍保留在当前页面。')
+      if (pendingRequest.current === navigation) {
+        setError(e instanceof Error ? e.message : '保存失败，修改仍保留在当前页面。')
+      }
     } finally {
+      saving.current = false
       setBusy(false)
     }
   }
@@ -135,23 +161,22 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
       {children}
       <Modal
         open={!!pending}
-        busy={busy}
         onOpenChange={(open) => {
-          if (!open && !busy) setPending(null)
+          if (!open) cancelNavigation()
         }}
         title="有未保存的修改"
         description="离开前选择如何处理当前修改。"
       >
         <div className="admin-form">
           {error && <p role="alert" className="admin-form-error">{error}</p>}
-          <p role="status" className="sr-only">{busy ? '正在保存，请稍候。' : ''}</p>
+          <p role="status">{busy ? '正在保存。选择继续编辑会取消离页，已开始的保存仍会继续。' : ''}</p>
           <Button variant="primary" disabled={busy} aria-busy={busy} onClick={() => void leave(true)}>
             {busy ? '正在保存…' : '保存后离开'}
           </Button>
           <Button variant="danger" disabled={busy} onClick={() => void leave(false)}>
             放弃修改
           </Button>
-          <Button disabled={busy} onClick={() => setPending(null)}>
+          <Button onClick={cancelNavigation}>
             继续编辑
           </Button>
         </div>
@@ -161,7 +186,7 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
 }
 export function useUnsavedChanges(
   dirty: boolean,
-  save: () => Promise<boolean>,
+  save: SaveHandler,
   discard: () => void = () => {},
 ) {
   const id = useId(),
@@ -173,7 +198,7 @@ export function useUnsavedChanges(
       get dirty() {
         return current.current.dirty
       },
-      save: () => current.current.save(),
+      save: (context) => current.current.save(context),
       discard: () => current.current.discard(),
     })
     return () => register(id, null)

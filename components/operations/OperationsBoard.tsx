@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowUpRight, Check, Copy, MessageCircle, PenLine, Sparkles } from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import { Button, Input } from '@/components/admin/ui'
-import { useUnsavedChanges } from '@/components/admin/UnsavedChanges'
+import { useUnsavedChanges, type SaveContext } from '@/components/admin/UnsavedChanges'
 import { copyText } from '@/components/library/client'
 import type { XDraft } from '@/lib/repositories/x-drafts'
 import {
@@ -47,7 +47,7 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
   const dirty = text !== (current.edited_content ?? current.content)
   const count = countXChars(text)
   const valid = !!text.trim() && text.length <= 10000
-  async function save(status?: Status): Promise<boolean> {
+  async function save(status?: Status, context?: SaveContext): Promise<boolean> {
     if (saving.current || !valid) return false
     saving.current = true
     setBusy(true)
@@ -71,7 +71,8 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
       if (!response.ok) throw new Error(data.error || '保存失败，请重试。')
       setCurrent(data.draft)
       toast.success(status ? `已标记为${OPERATION_STATUSES[status]}` : '文案已保存')
-      router.refresh()
+      // A refresh changes the editor's revision key and would remount newer text.
+      if (!context || context.isCurrent()) router.refresh()
       return true
     } catch (e) {
       setError(e instanceof Error ? e.message : '保存失败')
@@ -83,7 +84,7 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
   }
   useUnsavedChanges(
     dirty,
-    () => save(),
+    (context) => save(undefined, context),
     () => setText(current.edited_content ?? current.content),
   )
   async function polish() {

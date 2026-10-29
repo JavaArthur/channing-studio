@@ -1,5 +1,5 @@
 'use client'
-import { useUnsavedChanges } from '@/components/admin/UnsavedChanges'
+import { useUnsavedChanges, type SaveContext } from '@/components/admin/UnsavedChanges'
 import { useWorkspace } from './WorkspaceState'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -26,7 +26,8 @@ export function Collections({
     (title !== (editing === 'new' ? '' : editing.title) ||
       description !== (editing === 'new' ? '' : editing.description))
   const guard = useUnsavedChanges(dirty, save)
-  async function save() {
+  async function save(context?: SaveContext) {
+    if (busy) return false
     if (!title.trim()) {
       setError('请填写资料集名称')
       return false
@@ -34,9 +35,10 @@ export function Collections({
     setBusy(true)
     setError('')
     try {
-      if (editing === 'new') await libraryRequest({ action: 'collection', title, description })
-      else if (editing)
-        await libraryRequest({
+      if (!editing) return false
+      const result = editing === 'new'
+        ? await libraryRequest({ action: 'collection', title, description })
+        : await libraryRequest({
           action: 'collection_update',
           id: editing.id,
           expected_revision: editing.revision,
@@ -44,8 +46,10 @@ export function Collections({
           description,
           archived,
         })
-      setEditing(null)
+      // Keep the saved identity/revision while preserving the live title and description.
+      setEditing(result.collection || { id: result.id, title, description, revision: 1, item_count: 0 })
       await reload()
+      if (!context || context.isCurrent()) setEditing(null)
       router.refresh()
       return true
     } catch (e) {
