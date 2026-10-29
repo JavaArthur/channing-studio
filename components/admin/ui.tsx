@@ -37,11 +37,13 @@ export function Modal({
   children,
   sheet = false,
   description,
+  busy = false,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   title: string
   description?: string
+  busy?: boolean
   children: ReactNode
   sheet?: boolean
 }) {
@@ -51,6 +53,9 @@ export function Modal({
         <Dialog.Overlay className="admin-overlay" />
         <Dialog.Content
           className={`admin-dialog ${sheet ? 'admin-sheet' : ''}`}
+          aria-busy={busy || undefined}
+          onEscapeKeyDown={(event) => { if (busy) event.preventDefault() }}
+          onInteractOutside={(event) => { if (busy) event.preventDefault() }}
           {...(!description ? { 'aria-describedby': undefined } : {})}
         >
           <header className="admin-dialog-header">
@@ -59,8 +64,8 @@ export function Modal({
               {description && <Dialog.Description>{description}</Dialog.Description>}
             </div>
             <Dialog.Close asChild>
-              <Button variant="ghost" aria-label={`关闭${title}`}>
-                <X size={17} />
+              <Button variant="ghost" aria-label={`关闭${title}`} disabled={busy}>
+                <X size={17} aria-hidden="true" />
               </Button>
             </Dialog.Close>
           </header>

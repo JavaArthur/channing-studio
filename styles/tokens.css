@@ -1,4 +1,9 @@
 :root {
+  --publication-paper: #ffffff;
+  --font-code: var(--font-geist-mono), ui-monospace, monospace;
+  --site-width: 1200px;
+  --site-gutter: clamp(20px, 3.4vw, 40px);
+  --font-body: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   color-scheme: light;
   --background: #f5f4ed;
   --foreground: #141413;
@@ -22,8 +27,8 @@
   --cta-divider: #a9502f;
   --cta-disabled-bg: var(--editor-sand);
   --cta-disabled-ink: var(--stone-gray);
-  /* Focus: light mode = 2px #3898ec inner ring + 2px Near Black outer ring (see :focus-visible in app/globals.css) */
-  --focus-ring: #3898ec;
+  /* Light focus contrasts with paper even when a component uses a single outline. */
+  --focus-ring: #2374b7;
   --focus-ring-outer: #141413;
   --danger: #b53333;
   --danger-soft-bg: #f6e7e2;

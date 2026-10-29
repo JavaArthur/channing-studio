@@ -61,8 +61,9 @@ export default async function WritingPage({
     >
       {posts.length === 0 ? (
         <div className="studio-empty-state">
-          <p>还没有文章</p>
-          <span>从后台开始写作，记录思考。</span>
+          <p>{currentPage > 1 ? '这一页没有文章' : '还没有公开文章'}</p>
+          <span>{currentPage > 1 ? '可以返回文章首页继续阅读。' : '新的实践与思考会在这里更新。'}</span>
+          <StudioLink href={currentPage > 1 ? '/writing' : '/work'}>{currentPage > 1 ? '返回文章首页' : '浏览作品'}</StudioLink>
         </div>
       ) : (
         <>
@@ -71,12 +72,14 @@ export default async function WritingPage({
               <StudioLink key={post.slug} href={`/${post.slug}`} className="block">
                 <article className="studio-writing-row group">
                   <div className="min-w-0">
-                    <StudioCardLabel>{post.category || '随笔'}</StudioCardLabel>
-                    <h2 className="font-serif font-medium studio-writing-title mt-2">{post.title}</h2>
+                    <h2 className="font-serif font-medium studio-writing-title">{post.title}</h2>
                     {post.description && <p className="studio-writing-description mt-2">{post.description}</p>}
+                    <div className="public-entry-meta">
+                    <StudioCardLabel>{post.category || '随笔'}</StudioCardLabel>
                     <time className="studio-writing-date" dateTime={new Date(post.published_at * 1000).toISOString()}>
                       {formatDate(post.published_at)}
                     </time>
+                    </div>
                   </div>
                   <ArrowUpRight aria-hidden className="studio-card-arrow" size={20} />
                 </article>

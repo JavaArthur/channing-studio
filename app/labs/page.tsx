@@ -41,6 +41,8 @@ export default async function LabsPage() {
     console.error('Studio labs: failed to fetch content', error)
   }
 
+  const visibleLabs = content.labs.filter((lab) => lab.visible)
+
   return (
     <StudioShell
       title="先把自己每天用的工具做好。"
@@ -49,21 +51,28 @@ export default async function LabsPage() {
       initialTheme={defaultTheme}
     >
       <div className="divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
-        {content.labs.filter((lab) => lab.visible).map((lab) => (
+        {visibleLabs.map((lab) => (
           <StudioLink key={lab.id} href={lab.href} className="block">
-            <article className="studio-lab-row">
+            <article className="studio-lab-row public-lab-row">
               <div>
+                <h2 className="font-serif font-medium text-xl text-[var(--editor-ink)]">{lab.title}</h2>
                 <StudioCardLabel>{LAB_TYPE_LABELS[lab.type] ?? lab.type}</StudioCardLabel>
-                <h2 className="font-serif font-medium mt-2 text-xl text-[var(--editor-ink)]">{lab.title}</h2>
               </div>
-              <div className="flex items-center gap-5">
-                <p className="hidden max-w-lg text-sm leading-7 text-[var(--editor-muted)] sm:block">{lab.description}</p>
+              <div className="public-lab-description">
+                <p className="max-w-lg text-base leading-7 text-[var(--editor-muted)]">{lab.description}</p>
                 <ArrowUpRight aria-hidden className="studio-card-arrow" size={20} />
               </div>
             </article>
           </StudioLink>
         ))}
       </div>
+      {visibleLabs.length === 0 && (
+        <div className="studio-empty-state">
+          <p>实验室正在整理中</p>
+          <span>可以先浏览工作中使用的工具。</span>
+          <StudioLink href="/tools">浏览工具收藏</StudioLink>
+        </div>
+      )}
       {tools.length > 0 && (
         <div className="mt-14 border-t border-[var(--editor-line)] pt-10">
           <div className="flex flex-wrap items-end justify-between gap-4">

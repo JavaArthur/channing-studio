@@ -2,22 +2,31 @@
 
 import Link from 'next/link'
 import { isSafeLink } from '@/lib/url'
-import { Suspense, useState, type FormEvent } from 'react'
+import { Suspense, useRef, useState, type FormEvent } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 function AdminLoginForm() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [invalid, setInvalid] = useState(false)
   const [loading, setLoading] = useState(false)
+  const passwordInput = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!password) return
+    if (loading) return
+    if (!password) {
+      setInvalid(true)
+      setError('请输入管理密码后再登录。')
+      passwordInput.current?.focus()
+      return
+    }
 
     setLoading(true)
     setError('')
+    setInvalid(false)
 
     try {
       const res = await fetch('/api/admin/login', {
@@ -35,6 +44,7 @@ function AdminLoginForm() {
         router.push(safePath)
         router.refresh()
       } else {
+        setInvalid(res.status === 401)
         setError(
           typeof data?.error === 'string'
             ? data.error
@@ -42,16 +52,18 @@ function AdminLoginForm() {
               ? '密码错误，请重试'
               : '登录服务暂不可用，请稍后重试'
         )
+        passwordInput.current?.focus()
       }
     } catch {
-      setError('网络错误，请稍后重试')
+      setError('网络连接失败，请检查连接后重试。')
+      passwordInput.current?.focus()
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="studio-login min-h-screen bg-[var(--editor-app-bg)] flex items-center justify-center px-4">
+    <div className="studio-login min-h-dvh bg-[var(--editor-app-bg)] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-left mb-6">
@@ -64,7 +76,7 @@ function AdminLoginForm() {
 
         {/* 登录表单 */}
         <div className="bg-[var(--editor-panel)] rounded-xl border border-[var(--editor-line)] p-6">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" aria-busy={loading} noValidate>
             <div>
               <label
                 htmlFor="password"
@@ -73,29 +85,39 @@ function AdminLoginForm() {
                 管理密码
               </label>
               <input
+                ref={passwordInput}
                 id="password"
+                name="password"
+                required
+                readOnly={loading}
+                aria-invalid={invalid || undefined}
+                aria-describedby="login-feedback"
                 type="password"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value)
                   if (error) setError('')
+                  if (invalid) setInvalid(false)
                 }}
                 placeholder="请输入管理密码"
                 autoFocus
                 autoComplete="current-password"
-                className="min-h-11 min-w-11 w-full border border-[var(--editor-line)] rounded-lg px-3.5 py-2.5 text-sm text-[var(--editor-ink)] bg-[var(--editor-app-bg)] outline-none transition focus:border-[var(--focus-ring)] focus:ring-2 focus:ring-[var(--focus-ring)]/10 placeholder:text-[var(--editor-muted)]"
+                className="min-h-11 min-w-11 w-full border border-[var(--editor-line)] rounded-lg px-3.5 py-2.5 text-base text-[var(--editor-ink)] bg-[var(--editor-app-bg)] outline-none transition focus:border-[var(--focus-ring)] focus:ring-2 focus:ring-[var(--focus-ring)]/10 placeholder:text-[var(--editor-muted)]"
               />
             </div>
 
-            {error && (
-              <p role="alert" className="text-sm text-[var(--danger)] bg-[var(--danger-soft-bg)] border border-[var(--danger-line)] rounded-md px-3 py-2">
-                {error}
-              </p>
-            )}
+            <p
+              id="login-feedback"
+              role={error ? 'alert' : 'status'}
+              className={`studio-login-feedback text-sm ${error ? 'text-[var(--danger)]' : 'text-[var(--editor-muted)]'}`}
+            >
+              {error || (loading ? '正在验证，请稍候…' : '使用管理密码进入私人工作空间。')}
+            </p>
 
             <button
               type="submit"
-              disabled={loading || !password}
+              disabled={loading}
+              aria-busy={loading}
               className="min-h-11 min-w-11 w-full bg-cta text-cta-ink rounded-md py-2.5 text-sm font-semibold hover:bg-cta-hover transition disabled:bg-cta-disabled disabled:text-cta-disabled-ink disabled:cursor-not-allowed"
             >
               {loading ? '正在进入…' : '进入我的 Studio'}
@@ -103,9 +125,9 @@ function AdminLoginForm() {
           </form>
         </div>
 
-        <p className="text-center mt-6 text-xs text-[var(--editor-muted)]">
+        <p className="text-center mt-6 text-sm text-[var(--editor-muted)]">
           <Link href="/" className="min-h-11 min-w-11 inline-flex items-center hover:text-[var(--editor-ink)] transition-colors">
-            ← 返回公开首页
+            返回公开首页
           </Link>
         </p>
       </div>

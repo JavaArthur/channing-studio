@@ -11,10 +11,13 @@ function locationLabel(href: string) {
 export function PortfolioIndex({
   projects,
   compact = false,
+  headingLevel = 3,
 }: {
   projects: PublicPortfolioProject[]
   compact?: boolean
+  headingLevel?: 2 | 3
 }) {
+  const Heading = headingLevel === 2 ? 'h2' : 'h3'
   return (
     <ol className={`portfolio-index${compact ? ' portfolio-index-compact' : ''}`}>
       {projects.map((project) => {
@@ -22,7 +25,7 @@ export function PortfolioIndex({
         return (
           <li key={project.slug} id={project.slug} className="portfolio-entry">
             <div className="portfolio-entry-head">
-              <h3>{href ? <StudioLink href={href} className="portfolio-entry-title">{project.title}</StudioLink> : project.title}</h3>
+              <Heading className="portfolio-project-heading">{href ? <StudioLink href={href} className="portfolio-entry-title">{project.title}</StudioLink> : project.title}</Heading>
               {href && <span className="portfolio-entry-location">{locationLabel(href)}</span>}
             </div>
             <div className="portfolio-entry-body">
@@ -34,7 +37,7 @@ export function PortfolioIndex({
               )}
             </div>
             <div className="portfolio-entry-meta">
-              <span className="portfolio-status" data-status={project.status}>{PORTFOLIO_STATUS_LABELS[project.status]}</span>
+              <span className="portfolio-status public-project-status" data-status={project.status}>{PORTFOLIO_STATUS_LABELS[project.status]}</span>
               {!compact && (
                 <div className="portfolio-entry-actions">
                   {project.site_url && <StudioLink href={project.site_url} className="portfolio-action">访问网站<ArrowUpRight size={14} aria-hidden="true" /></StudioLink>}

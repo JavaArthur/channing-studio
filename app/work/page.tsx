@@ -3,7 +3,7 @@ import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getSiteHeaderData } from '@/lib/site'
 import { getPublicPortfolio } from '@/lib/repositories/portfolio'
 import { PortfolioIndex } from '@/components/PortfolioIndex'
-import { StudioShell } from '@/components/StudioSection'
+import { StudioLink, StudioShell } from '@/components/StudioSection'
 import { getSiteUrl } from '@/lib/site-config'
 import type { Theme } from '@/lib/appearance'
 import type { SiteNavLink } from '@/lib/site'
@@ -39,11 +39,12 @@ export default async function WorkPage() {
       initialTheme={defaultTheme}
     >
       {projects.length ? (
-        <PortfolioIndex projects={projects} />
+        <PortfolioIndex projects={projects} headingLevel={2} />
       ) : (
         <div className="studio-empty-state">
           <p>作品整理中</p>
           <span>可以先去看看文章和实验室。</span>
+          <div className="public-empty-actions"><StudioLink href="/writing">阅读文章</StudioLink><StudioLink href="/labs">浏览实验室</StudioLink></div>
         </div>
       )}
     </StudioShell>

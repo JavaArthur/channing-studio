@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getSiteHeaderData } from '@/lib/site'
 import { getPrompts, type Prompt } from '@/lib/repositories/prompts'
-import { StudioShell } from '@/components/StudioSection'
+import { StudioLink, StudioShell } from '@/components/StudioSection'
 import { ResourceTabs } from '@/components/ResourceTabs'
 import { PromptCard } from '@/components/PromptCard'
 import { getSiteUrl } from '@/lib/site-config'
@@ -44,13 +44,14 @@ export default async function PromptsPage() {
     >
       <ResourceTabs active="prompts" />
       {prompts.length > 0 ? (
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="public-prompt-grid">
           {prompts.map((prompt) => <PromptCard key={prompt.id} prompt={prompt} />)}
         </div>
       ) : (
         <div className="studio-empty-state">
           <p>提示词收藏还在建立中</p>
           <span>后续会分享经过实践的提示词。</span>
+          <StudioLink href="/tools">浏览工具收藏</StudioLink>
         </div>
       )}
     </StudioShell>

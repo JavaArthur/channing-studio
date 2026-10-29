@@ -23,14 +23,14 @@ export function StudioShell({
   children,
 }: StudioShellProps) {
   return (
-    <div className="studio-site min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col">
+    <div className="studio-site public-page min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col">
       <SiteHeader initialTheme={initialTheme} navLinks={navLinks} studioMode />
       <main className="studio-page-main mx-auto w-full max-w-6xl flex-1 px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
         <header className="studio-page-heading border-b border-[var(--editor-line)] pb-10 sm:pb-14">
           <h1 className="font-serif font-medium studio-page-title max-w-4xl"><KeepWords text={title} /></h1>
           <p className="studio-page-description mt-5 max-w-2xl">{description}</p>
         </header>
-        <div className="mt-10 sm:mt-14">{children}</div>
+        <div className="public-page-content">{children}</div>
       </main>
       <SiteFooter />
     </div>

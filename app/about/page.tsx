@@ -38,18 +38,18 @@ export default async function AboutPage() {
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
-      <div className="grid gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
+      <div className="public-about-layout">
         <div>
           <p className="studio-hero-subtitle">{content.profile.subtitle}</p>
-          <div className="mt-8 flex flex-wrap gap-4">
-            {content.profile.contactLinks.map((link) => <StudioLink key={link.url} href={link.url} className="min-h-11 min-w-11 inline-flex items-center">{link.label}<ArrowUpRight aria-hidden size={16} /></StudioLink>)}
+          <div className="public-contact-links">
+            {content.profile.contactLinks.map((link) => <StudioLink key={link.url} href={link.url} className="public-text-link">{link.label}<ArrowUpRight aria-hidden size={16} /></StudioLink>)}
           </div>
         </div>
         <dl className="border-t border-[var(--editor-line)]">
           {content.profile.capabilities.map((capability) => (
-            <div key={capability.title} className="grid gap-2 border-b border-[var(--editor-line)] py-6 sm:grid-cols-[11rem_1fr] sm:gap-8">
+            <div key={capability.title} className="public-capability">
               <dt className="font-serif font-medium text-xl text-[var(--editor-ink)]">{capability.title}</dt>
-              <dd className="text-sm leading-7 text-[var(--editor-muted)]">{capability.description}</dd>
+              <dd className="text-base leading-7 text-[var(--editor-muted)]">{capability.description}</dd>
             </div>
           ))}
         </dl>

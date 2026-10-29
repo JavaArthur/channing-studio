@@ -108,6 +108,7 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
     }
   }, [request, router])
   async function leave(save: boolean) {
+    if (busy) return
     setBusy(true)
     setError('')
     try {
@@ -134,6 +135,7 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
       {children}
       <Modal
         open={!!pending}
+        busy={busy}
         onOpenChange={(open) => {
           if (!open && !busy) setPending(null)
         }}
@@ -141,9 +143,10 @@ export function UnsavedChangesProvider({ children }: { children: ReactNode }) {
         description="离开前选择如何处理当前修改。"
       >
         <div className="admin-form">
-          {error && <p role="alert">{error}</p>}
-          <Button variant="primary" disabled={busy} onClick={() => void leave(true)}>
-            保存后离开
+          {error && <p role="alert" className="admin-form-error">{error}</p>}
+          <p role="status" className="sr-only">{busy ? '正在保存，请稍候。' : ''}</p>
+          <Button variant="primary" disabled={busy} aria-busy={busy} onClick={() => void leave(true)}>
+            {busy ? '正在保存…' : '保存后离开'}
           </Button>
           <Button variant="danger" disabled={busy} onClick={() => void leave(false)}>
             放弃修改

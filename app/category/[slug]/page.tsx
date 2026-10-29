@@ -71,7 +71,7 @@ export default async function CategoryPage({
   const requestTheme = await resolveRequestTheme(headerData.defaultTheme)
 
   return (
-    <div className="min-h-full flex flex-col bg-[var(--background)]">
+    <div className="public-page min-h-screen flex flex-col bg-[var(--background)]">
       <SiteHeader
         initialTheme={requestTheme}
         navLinks={headerData.navLinks}
@@ -79,22 +79,21 @@ export default async function CategoryPage({
         activeCategorySlug={slug}
       />
 
-      <main className="page-main flex-1 mx-auto max-w-3xl w-full px-4 sm:px-6 py-10 sm:py-14">
-        <div className="mb-8 border-b border-[var(--editor-line)] pb-6">
-          <div className="text-xs uppercase tracking-[0.18em] text-[var(--stone-gray)] mb-3">
-            分类
-          </div>
-          <h1 className="font-serif font-medium article-display-title text-3xl sm:text-4xl text-[var(--editor-ink)] leading-tight">
+      <main className="page-main public-archive-main flex-1 mx-auto max-w-3xl w-full px-4 sm:px-6 py-10 sm:py-14">
+        <div className="public-archive-heading">
+          <h1 className="font-serif font-medium">
             {category.name}
           </h1>
           <p className="mt-3 text-sm text-[var(--editor-muted)]">
-            共 {totalCount} 篇文章
+            分类文章，共 {totalCount} 篇
           </p>
         </div>
 
         {posts.length === 0 ? (
-          <div className="py-20 text-center">
-            <p className="text-[var(--editor-muted)] mb-2">这个分类下还没有公开文章</p>
+          <div className="studio-empty-state">
+            <p>{currentPage > 1 ? '这一页没有文章' : '这个分类下还没有公开文章'}</p>
+            <span>可以返回首页，继续浏览其他文章。</span>
+            {currentPage > 1 && <Link href={`/category/${slug}`} className="public-text-link">返回分类首页</Link>}
             <Link
               href="/"
               className="min-h-11 min-w-11 inline-flex items-center text-sm text-[var(--editor-accent)] hover:underline underline-offset-2"
@@ -104,28 +103,26 @@ export default async function CategoryPage({
           </div>
         ) : (
           <>
-            <div className="space-y-0">
-              {posts.map((post, index) => (
+            <div className="public-archive-list">
+              {posts.map((post) => (
                 <article
                   key={post.slug}
-                  className="group border-t border-[var(--editor-line)] first:border-t-0"
-                  style={{ animation: `fadeInUp 0.4s ease-out ${index * 0.05}s both` }}
+                  className="public-archive-entry group"
                 >
                   <Link
                     href={`/${post.slug}`}
-                    className="min-h-11 min-w-11 block py-6 sm:py-7 transition-all duration-200 hover:bg-[var(--editor-panel)] border-l-2 border-l-transparent hover:border-l-[var(--editor-accent)] pl-4"
+                    className="public-archive-row-link"
                   >
                     <h2 className="font-serif font-medium text-xl sm:text-2xl text-[var(--editor-ink)] leading-snug mb-2 group-hover:text-[var(--editor-accent)] transition-colors duration-200">
                       {post.title}
                     </h2>
                     {post.description ? (
-                      <p className="text-sm text-[var(--editor-muted)] leading-relaxed line-clamp-2 mb-2.5">
+                      <p className="public-entry-description">
                         {post.description}
                       </p>
                     ) : null}
-                    <div className="flex items-center gap-2 text-xs text-[var(--stone-gray)]">
-                      <time>{formatDate(post.published_at)}</time>
-                      <span aria-hidden>·</span>
+                    <div className="public-entry-meta">
+                      <time dateTime={new Date(post.published_at * 1000).toISOString()}>{formatDate(post.published_at)}</time>
                       <span className="px-2 py-0.5 rounded-full bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] font-medium border border-[var(--editor-accent)]/15">
                         {category.name}
                       </span>

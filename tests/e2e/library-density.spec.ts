@@ -40,7 +40,9 @@ test('0/5/50/500 fixtures: compact density, pagination, restored scroll, respons
       await Promise.all(
         Array.from({ length: 10 }, async (_, offset) => {
           const i = batch + offset
-          const type = (['note', 'article', 'tool', 'prompt', 'inspiration'] as const)[i % 5]
+          // Inspirations now live in operations and are excluded from library searches.
+          const types = ['note', 'article', 'tool', 'prompt'] as const
+          const type = types[i % types.length]
           const result = await action(context.request, {
             action: 'capture',
             input: {
