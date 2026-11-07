@@ -91,4 +91,4 @@ E2E_BASE_URL=http://127.0.0.1:3104 npx playwright test \
   tests/e2e/journal.spec.ts tests/e2e/public-navigation.spec.ts
 ```
 
-已按 Lead 授权本地提交；没有推送或部署。本轮无需 schema 变更。实际生产发布、生产数据库迁移历史核对及线上凭据由 Lead 另行安排。原有未跟踪 `paseo.json` 未改动。
+本页记录本地验收阶段，截图和写入测试均来自独立合成 D1。本轮无需 schema 变更；后续已按用户授权推送并发布到既有生产 Worker，实际版本、线上只读验收和回滚步骤见[生产发布记录](release-20261108.md)。原有未跟踪 `paseo.json` 未改动。

@@ -10,7 +10,9 @@ Bot 接入：[MCP 指南（Agent 收录 → 私人取用）](docs/api/gorkbot-mc
 
 独立仓库：<https://github.com/JavaArthur/channing-studio>
 
-![Channing Studio 首页](docs/screenshots/studio-home.png)
+![Channing Studio 生产首页（2026-11-08，桌面）](docs/screenshots/release-20261108/studio-production-1440-light-home.png)
+
+截图来自公开生产站点，不含私人后台内容。[手机截图](docs/screenshots/release-20261108/studio-production-375-light-home.png) · [本次发布与回滚记录](docs/release-20261108.md)
 
 ## 站点结构
 
@@ -97,8 +99,6 @@ npx wrangler d1 execute DB --remote --file=db/migrations/你的迁移.sql -c wra
 - [Chrome Clipper](ecosystem/chrome-clipper/)：把网页剪成博客草稿。
 - [Obsidian Publisher](ecosystem/obsidian-publisher/)：从 Obsidian 发布笔记。
 - [Blog Publish Skill](ecosystem/channing-blog-publish-skill/)：通过 Agent 工作流准备和发布文章。
-
-![实验室](docs/screenshots/labs.png)
 
 ## 安全检查
 
