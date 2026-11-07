@@ -4,13 +4,16 @@ import { useRouter } from 'next/navigation'
 import { useUnsavedChanges } from '@/components/admin/UnsavedChanges'
 import { LogOut } from 'lucide-react'
 import { Tooltip } from '@/components/Tooltip'
+import { clearPrivateDrafts } from '@/components/library/DraftScope'
 
 export function LogoutButton() {
   const router = useRouter()
   const guard = useUnsavedChanges(false, async () => true)
 
   const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' })
+    const response = await fetch('/api/admin/logout', { method: 'POST' })
+    if (!response.ok) return
+    try { clearPrivateDrafts() } catch {}
     router.push('/admin/login')
     router.refresh()
   }

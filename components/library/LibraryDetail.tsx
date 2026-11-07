@@ -42,7 +42,7 @@ export function LibraryDetail({
   registerFlush: (fn: (() => Promise<boolean>) | null) => void
 }) {
   const router = useRouter()
-  const { item, status, error: saveError, queue } = useLibrarySave(original)
+  const { item, status, error: saveError, queue, draftStorageError } = useLibrarySave(original)
   const [editing, setEditing] = useState(false)
   const [properties, setProperties] = useState(false)
   const [publishing, setPublishing] = useState(false)
@@ -184,6 +184,7 @@ export function LibraryDetail({
         </div>
       </div>
       <div className="reader-scroll">
+        {draftStorageError && <p role="alert" className="library-feedback">浏览器无法保留恢复草稿，请勿刷新；先保存或复制本地正文。</p>}
         {(message || error) && (
           <p role={error ? 'alert' : 'status'} className="library-feedback">
             {error || message}

@@ -17,6 +17,7 @@ export type SaveStatus = 'saved' | 'pending' | 'saving' | 'error' | 'conflict'
 export class LibrarySaveQueue {
   private base: LibraryItem
   private pending: LibraryChanges = {}
+  private draftRevision: number | undefined
   private running: Promise<boolean> | null = null
   private timer: ReturnType<typeof setTimeout> | undefined
   private listeners = new Set<() => void>()
@@ -43,6 +44,20 @@ export class LibrarySaveQueue {
   }
   get dirty() {
     return Object.keys(this.pending).length > 0 || !!this.running
+  }
+  get draft() {
+    return Object.keys(this.pending).length ? { revision: this.draftRevision ?? this.base.revision, changes: { ...this.pending } } : null
+  }
+  restoreDraft(draft: { revision: number; changes: LibraryChanges }) {
+    if (this.dirty) return
+    this.pending = { ...draft.changes }
+    this.draftRevision = draft.revision
+    for (const key of Object.keys(this.pending) as (keyof LibraryChanges)[]) {
+      if (JSON.stringify(this.pending[key]) === JSON.stringify(this.base[key])) delete this.pending[key]
+    }
+    if (!Object.keys(this.pending).length) { this.draftRevision = undefined; this.emit('saved'); return }
+    this.emit(draft.revision === this.base.revision ? 'error' : 'conflict',
+      draft.revision === this.base.revision ? '已恢复未保存的草稿，请确认后重试保存。' : '已恢复本地草稿，服务端版本已变化，请比较后选择保留的内容。')
   }
   patch(changes: LibraryChanges) {
     this.pending = { ...this.pending, ...changes }
@@ -87,6 +102,7 @@ export class LibrarySaveQueue {
       try {
         const saved = await this.persist(this.base.revision, sent)
         this.base = saved
+        this.draftRevision = undefined
         for (const key of Object.keys(sent) as (keyof LibraryChanges)[]) {
           if (JSON.stringify(this.pending[key]) === JSON.stringify(sent[key]))
             delete this.pending[key]
@@ -113,11 +129,13 @@ export class LibrarySaveQueue {
   accept(item: LibraryItem) {
     if (this.dirty) return
     this.base = item
+    this.draftRevision = undefined
     this.emit('saved')
   }
   discard(item: LibraryItem) {
     this.pending = {}
     this.base = item
+    this.draftRevision = undefined
     this.emit('saved')
   }
   dispose() {

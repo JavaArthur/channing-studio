@@ -43,6 +43,7 @@ export const captureSchema = z
 export const librarySearchSchema = z
   .object({
     sort: z.enum(['newest', 'updated', 'title', 'relevance']).optional(),
+    journal: z.enum(['all', 'learning', 'reflection']).optional(),
     recent: z.boolean().optional(),
     q: z.string().max(200).optional(),
     kind: z.enum([...libraryKinds, 'article']).optional(),

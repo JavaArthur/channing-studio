@@ -11,6 +11,39 @@ const item = {
   revision: 1,
 } as unknown as LibraryItem
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0))
+it('recovers an unsaved draft without writing and keeps stale revision conflicts across repeated reloads', async () => {
+  const persist = vi.fn(async (revision, changes) => ({ ...item, ...changes, revision: revision + 1 }))
+  const queue = new LibrarySaveQueue(item, persist)
+  queue.restoreDraft({ revision: 1, changes: { content: 'recovered' } })
+  expect(queue.snapshot.status).toBe('error')
+  expect(queue.snapshot.item.content).toBe('recovered')
+  expect(persist).not.toHaveBeenCalled()
+  expect(await queue.retry()).toBe(true)
+  expect(queue.draft).toBeNull()
+  const newer = { ...item, revision: 3, content: 'remote edit' }
+  const conflict = new LibrarySaveQueue(newer, persist)
+  conflict.restoreDraft({ revision: 1, changes: { content: 'older local' } })
+  expect(await conflict.retry()).toBe(false)
+  expect(conflict.draft?.revision).toBe(1)
+  const reloaded = new LibrarySaveQueue(newer, persist)
+  reloaded.restoreDraft(conflict.draft!)
+  expect(reloaded.snapshot.status).toBe('conflict')
+  expect(await reloaded.retry()).toBe(false)
+  expect(persist).toHaveBeenCalledTimes(1)
+  reloaded.discard(newer)
+  expect(reloaded.draft).toBeNull()
+})
+it('clears a recovered draft already committed by an uncertain previous request', () => {
+  const persist = vi.fn()
+  const queue = new LibrarySaveQueue({ ...item, revision: 2, content: 'committed' }, persist)
+  queue.restoreDraft({ revision: 1, changes: { content: 'committed' } })
+  expect(queue.draft).toBeNull()
+  expect(queue.snapshot.status).toBe('saved')
+  expect(persist).not.toHaveBeenCalled()
+  queue.patch({ content: 'next local edit' })
+  expect(queue.draft?.revision).toBe(2)
+  queue.dispose()
+})
 afterEach(() => vi.useRealTimers())
 describe('private autosave queue', () => {
   it('does not write on mount or unchanged input; debounces typing and respects Chinese composition', async () => {

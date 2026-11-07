@@ -43,6 +43,7 @@ export interface LibraryItem {
 }
 export interface LibraryQuery {
   sort?: 'newest' | 'updated' | 'title' | 'relevance'
+  journal?: 'all' | 'learning' | 'reflection'
   recent?: boolean
   q?: string
   kind?: LibraryKind | 'article'

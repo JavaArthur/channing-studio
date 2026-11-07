@@ -2,7 +2,7 @@
 import { useWorkspace } from '@/components/library/WorkspaceState'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { BookOpen, Folder, FolderKanban, Globe, Settings, Sparkles, Link2, Star, CircleHelp } from 'lucide-react'
+import { BookOpen, Folder, FolderKanban, Globe, Settings, Sparkles, Link2, Star, CircleHelp, NotebookPen } from 'lucide-react'
 export function BrainNav({ decisions = 0 }: { decisions?: number }) {
   const { usage } = useWorkspace()
   const path = usePathname()
@@ -92,6 +92,8 @@ export function BrainNav({ decisions = 0 }: { decisions?: number }) {
       }}
     >
       <div className="workspace-nav-main">
+        <span className="workspace-nav-label">日常工作台</span>
+        <Link href="/admin/learning" aria-current={path === '/admin/learning' ? 'page' : undefined}><NotebookPen size={17} aria-hidden="true" /><span>学习与复盘</span></Link>
         {[main[1],main[0],...main.slice(2)].map(({ title, href, Icon, active }) => (
           <Link key={href} href={href} aria-current={active ? 'page' : undefined}>
             <Icon size={17} aria-hidden="true" />

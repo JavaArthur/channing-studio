@@ -4,8 +4,12 @@ import { useRouter } from 'next/navigation'
 import { LibrarySaveQueue } from '@/lib/library/save-queue'
 import type { LibraryItem } from '@/lib/library/types'
 import { libraryRequest } from './client'
+import { useDraftKey } from './DraftScope'
+import { libraryChangesSchema } from '@/lib/library/validation'
 export function useLibrarySave(item: LibraryItem) {
   const router = useRouter()
+  const draftKey = useDraftKey(`edit:${item.kind}:${item.id}`)
+  const [draftStorageError, setDraftStorageError] = useState(false)
   const [queue] = useState(
     () =>
       new LibrarySaveQueue(
@@ -23,6 +27,31 @@ export function useLibrarySave(item: LibraryItem) {
       ),
   )
   const state = useSyncExternalStore(queue.subscribe, queue.getSnapshot, queue.getSnapshot)
+  useEffect(() => {
+    if (!draftKey) return
+    try {
+      const stored = sessionStorage.getItem(draftKey)
+      if (stored) {
+        const draft = JSON.parse(stored)
+        const changes = libraryChangesSchema.safeParse(draft.changes)
+        if (changes.success && Number.isSafeInteger(draft.revision) && draft.revision > 0)
+          queue.restoreDraft({ revision: draft.revision, changes: changes.data })
+      }
+    } catch {
+      // Browser storage is only available after hydration; surface its read failure.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDraftStorageError(true)
+    }
+    const preserve = () => {
+      try {
+        if (queue.draft) sessionStorage.setItem(draftKey, JSON.stringify(queue.draft))
+        else sessionStorage.removeItem(draftKey)
+        setDraftStorageError(false)
+      } catch { setDraftStorageError(true) }
+    }
+    preserve()
+    return queue.subscribe(preserve)
+  }, [draftKey, queue])
   useEffect(() => {
     queue.accept(item)
   }, [queue, item])
@@ -82,5 +111,5 @@ export function useLibrarySave(item: LibraryItem) {
       queue.dispose()
     }
   }, [queue, router])
-  return { queue, ...state }
+  return { queue, draftStorageError, ...state }
 }

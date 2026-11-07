@@ -37,6 +37,7 @@ export function StudioHome({ content, portfolio, posts, tools, prompts, navLinks
       <SiteHeader navLinks={navLinks} initialTheme={initialTheme} />
       <main className="portfolio-main" id="main-content" tabIndex={-1}>
         <section className="portfolio-hero" aria-labelledby="studio-title">
+          <p className="studio-public-eyebrow">CHANNING STUDIO <span>实践 · 作品 · 思考</span></p>
           <h1 id="studio-title"><KeepWords text={content.profile.title} /></h1>
           <div className="portfolio-hero-bottom">
             <div className="portfolio-hero-summary">
@@ -53,6 +54,12 @@ export function StudioHome({ content, portfolio, posts, tools, prompts, navLinks
             <ul>{content.profile.capabilities.map(capability => <li key={capability.title}>{capability.title}</li>)}</ul>
           </div>
         </section>
+
+        <nav className="studio-public-index" aria-label="工作室内容索引">
+          <Link href={projects.length ? '#selected-work' : '/work'}><span>作品</span><small>做成的事与实践过程</small></Link>
+          <Link href={posts.length ? '#selected-writing' : '/writing'}><span>文章</span><small>留下思考与方法</small></Link>
+          <Link href={resources.length ? '#selected-resources' : '/tools'}><span>资源</span><small>值得留在手边的工具</small></Link>
+        </nav>
 
         {projects.length > 0 && (
           <section className="portfolio-section" aria-labelledby="selected-work">

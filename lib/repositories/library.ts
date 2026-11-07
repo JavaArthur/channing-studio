@@ -14,6 +14,7 @@ import {
   type LibraryQuery,
 } from '@/lib/library/types'
 import { searchTerms, searchMatch } from '@/lib/library/search'
+import { journalTopics } from '@/lib/library/journal'
 import type { z } from 'zod'
 
 type Row = Omit<LibraryItem, 'topics' | 'favorite' | 'archived' | 'href'> & {
@@ -94,6 +95,13 @@ export async function searchLibrary(db: Database, input: LibraryQuery = {}) {
   if (query.topic) {
     filters.push("EXISTS (SELECT 1 FROM json_each(COALESCE(m.topics_json,'[]')) WHERE value=?)")
     values.push(query.topic)
+  }
+  if (query.journal) {
+    // Journal is a view of existing private notes; identically named tags on other kinds stay out.
+    filters.push("v.kind='note' AND COALESCE(m.content_type,'')!='article'")
+    const topics = query.journal === 'all' ? Object.values(journalTopics) : [journalTopics[query.journal]]
+    filters.push("EXISTS (SELECT 1 FROM json_each(COALESCE(m.topics_json,'[]')) WHERE value IN (SELECT value FROM json_each(?)))")
+    values.push(JSON.stringify(topics))
   }
   if (query.favorite) filters.push('m.favorite=1')
   if (query.decisions) filters.push("length(trim(COALESCE(m.decision_question,'')))>0")
