@@ -113,7 +113,7 @@ export function JournalCapture({ kind, collections, onClose, onSaved }: {
         <label>正文<textarea aria-label="记录正文" required maxLength={50000} rows={9} className="admin-input" value={form.content} placeholder={kind === 'learning' ? '学到了什么？试过之后，有什么自己的理解？' : '今天有什么进展？哪里可以调整？明天想迈出哪一小步？'} onChange={(event) => patch({ content: event.target.value })} /></label>
         {!form.content && <Button variant="ghost" onClick={() => patch({ content: journalTemplates[kind] })}>使用思考提纲</Button>}
         <div className="journal-form-pair">
-          <label>主题标签<Input aria-label="主题标签" value={tagsText} placeholder="例如：AI、产品设计" onChange={(event) => { setTagsText(event.target.value); patch({ topics: [journalTopics[kind], ...event.target.value.split(/[,，]/).map((topic) => topic.trim()).filter(Boolean)] }) }} /></label>
+          <label>主题标签<Input aria-label="主题标签" value={tagsText} placeholder="例如：AI、产品设计" onChange={(event) => { setTagsText(event.target.value); patch({ topics: [journalTopics[kind], ...event.target.value.split(/[,，、]/).map((topic) => topic.trim()).filter(Boolean)] }) }} /></label>
           <label>关联资料集或项目<Select aria-label="关联资料集或项目" value={form.collection_ids[0] || ''} onChange={(event) => patch({ collection_ids: event.target.value ? [event.target.value] : [] })}><option value="">暂不关联</option>{collections.map((collection) => <option key={collection.id} value={collection.id}>{collection.title}</option>)}</Select></label>
         </div>
         <label>参考链接（可选）<Input aria-label="参考链接" type="url" value={form.source_url || ''} placeholder="https://…" onChange={(event) => patch({ source_url: event.target.value || null })} /></label>
