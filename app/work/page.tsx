@@ -11,8 +11,8 @@ import type { PublicPortfolioProject } from '@/lib/portfolio'
 import '@/styles/studio-indexes.css'
 
 export const metadata = {
-  title: '作品 · Channing Studio',
-  description: 'Channing 的公开工程项目与内容系统案例。',
+  title: '开源与实践',
+  description: '开源工具、Agent 实验与工程实践项目归档。',
   alternates: { canonical: `${getSiteUrl()}/work` },
 }
 
@@ -29,36 +29,40 @@ export default async function WorkPage() {
       ])
       navLinks = headerData.navLinks
       defaultTheme = headerData.defaultTheme
-      projects = portfolio
+      projects = portfolio.filter(
+        (item) =>
+          item.slug !== 'channing-studio' &&
+          !/channing[\s-]*studio/i.test(item.title),
+      )
     }
   } catch (error) {
-    console.error('Studio work: failed to fetch content', error)
+    console.error('Projects page: failed to fetch content', error)
   }
 
   return (
     <StudioShell
-      eyebrow="ARCHIVE // 02 · SYSTEMS"
-      meta={projects.length > 0 ? `${projects.length} PUBLIC SYSTEMS` : 'SYSTEMS DOSSIER'}
+      eyebrow="ARCHIVE // 02 · PROJECTS"
+      meta={projects.length > 0 ? `${projects.length} PUBLIC PROJECTS` : 'PROJECTS ARCHIVE'}
       className="studio-index-page"
-      title="作品与实践"
-      description="公开工程系统的定位、技术选型与当前运行状态。沿着条目入口，可继续检阅线上站点或公开源码。"
+      title="开源与实践项目"
+      description="业余时间打磨的开源工具、Agent 应用与工程实验。沿着条目入口，可继续访问线上演示或查阅源码仓库。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
       {projects.length ? (
         <section aria-label="公开项目">
           <div className="index-register">
-            <span>SYSTEMS CATALOGUE · 项目目录</span>
+            <span>PROJECTS CATALOGUE · 项目目录</span>
             <span>{projects.length} 个公开项目</span>
           </div>
           <PortfolioIndex projects={projects} headingLevel={2} />
         </section>
       ) : (
         <div className="studio-empty-state">
-          <p>作品整理中</p>
-          <span>公开项目档案正在同步，可以先阅读工程手记或浏览工具链实验室。</span>
+          <p>项目正在整理中</p>
+          <span>可以先阅读最新技术文章或浏览工具链实验室。</span>
           <div className="public-empty-actions">
-            <StudioLink href="/writing">阅读工程手记</StudioLink>
+            <StudioLink href="/writing">阅读技术文章</StudioLink>
             <StudioLink href="/labs">浏览实验室</StudioLink>
           </div>
         </div>

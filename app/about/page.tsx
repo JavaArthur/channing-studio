@@ -11,7 +11,7 @@ import type { Theme } from '@/lib/appearance'
 import type { SiteNavLink } from '@/lib/site'
 
 export const metadata = {
-  title: '关于我 · Channing Studio',
+  title: '关于作者',
   description: PUBLIC_PROFILE.intro,
   alternates: { canonical: `${getSiteUrl()}/about` },
 }
@@ -32,14 +32,14 @@ export default async function AboutPage() {
       content = studioContent
     }
   } catch (error) {
-    console.error('Studio about: failed to fetch content', error)
+    console.error('About page: failed to fetch content', error)
   }
 
   return (
     <StudioShell
       title={PUBLIC_PROFILE.headline.replace('，', '，\n')}
       description={PUBLIC_PROFILE.introduction}
-      eyebrow="DOSSIER // ABOUT CHANNING"
+      eyebrow={`PROFILE // ${PUBLIC_PROFILE.brand} · 关于作者`}
       meta={`${PUBLIC_PROFILE.experience} · ${PUBLIC_PROFILE.experienceAsOf}`}
       className="studio-about"
       navLinks={navLinks}

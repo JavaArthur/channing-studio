@@ -5,6 +5,8 @@ const posts = [
   { slug: 'latest', title: '最新' },
   { slug: 'middle', title: '中间' },
   { slug: 'oldest', title: '最早' },
+  { slug: 'fourth', title: '第四' },
+  { slug: 'fifth', title: '第五' },
 ]
 
 describe('selectFeaturedPosts', () => {
@@ -18,6 +20,18 @@ describe('selectFeaturedPosts', () => {
     const result = selectFeaturedPosts(posts, [], 2)
 
     expect(result.map((post) => post.slug)).toEqual(['latest', 'middle'])
+  })
+
+  it('supports expanded limits for blog-first hero essay plus writing stream', () => {
+    const result = selectFeaturedPosts(posts, ['fourth'], 5)
+
+    expect(result.map((post) => post.slug)).toEqual([
+      'fourth',
+      'latest',
+      'middle',
+      'oldest',
+      'fifth',
+    ])
   })
 })
 

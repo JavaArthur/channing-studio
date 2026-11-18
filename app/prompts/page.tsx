@@ -11,8 +11,8 @@ import type { Theme } from '@/lib/appearance'
 import '@/styles/studio-indexes.css'
 
 export const metadata = {
-  title: '提示词 · Channing Studio',
-  description: '我会继续使用、修改和复盘的提示词收藏。',
+  title: '提示词',
+  description: '持续使用、迭代和复盘的工程与写作提示词收藏。',
   alternates: { canonical: `${getSiteUrl()}/prompts` },
 }
 
@@ -48,11 +48,11 @@ export default async function PromptsPage() {
 
   return (
     <StudioShell
-      eyebrow="ARSENAL // 04 · PROMPTS"
+      eyebrow="TOOLKIT // 04 · PROMPTS"
       meta={prompts.length > 0 ? `${prompts.length} PROMPT SPECIMENS` : 'SPECIMEN ARCHIVE'}
       className="studio-index-page"
       title="提示词笔记"
-      description="按真实工程与写作场景沉淀的提示词样本。展开检阅完整指令正文，复制后再按任务边界裁剪调整。"
+      description="按真实工程研发与技术写作场景沉淀的提示词样本。展开检阅完整指令正文，复制后再按任务边界裁剪调整。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >

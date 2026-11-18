@@ -13,6 +13,7 @@ import type { SiteNavLink } from '@/lib/site'
 import { getSiteHeaderData } from '@/lib/site'
 import { StudioHome } from '@/components/StudioHome'
 import { getSiteUrl } from '@/lib/site-config'
+import { PUBLIC_PROFILE } from '@/lib/public-profile'
 import type { PostWithTags } from '@/lib/repositories/types'
 
 const BASE_URL = getSiteUrl()
@@ -21,8 +22,9 @@ export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 
 export const metadata = {
-  title: 'Channing Studio · 晨启AI',
-  description: 'AI 平台工程、内容自动化与真实交付的公开工作台。',
+  title: { absolute: '晨启AI · AI 工程与技术博客' },
+  description:
+    '从 Java 后端到 AI Agent，记录企业级 AI 落地、架构取舍与实战复盘的个人技术博客。',
   alternates: { canonical: BASE_URL },
 }
 
@@ -38,31 +40,52 @@ export default async function Home() {
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      // Only featured posts depend on settings; start them without waiting for the other lists.
       const db = env.DB
-      const studioContentPromise = getStudioContent(db)
-      const featuredPostsPromise = studioContentPromise.then((studio) =>
-        getFeaturedPosts(db, studio.featuredPostSlugs),
-      )
-      const [headerData, studioContent, portfolioRows, recentPosts, toolRows, promptRows, featured] = await Promise.all([
-        getSiteHeaderData(env.DB, { includeCategories: false }),
-        studioContentPromise,
-        getPublicPortfolio(env.DB),
-        getPosts(env.DB, 25, 0, false, false, false, false, 'post'),
-        getTools(env.DB, { limit: 3 }),
-        getPromptSummaries(env.DB, 2).catch(() => []),
-        featuredPostsPromise,
+      const [headerData, studioContent] = await Promise.all([
+        getSiteHeaderData(db, { includeCategories: false }),
+        getStudioContent(db),
       ])
       content = studioContent
+      const mods = content.homeModules
+      const needPosts = mods.featuredEssay || mods.writing
+      const postSelectionLimit = Math.max(mods.writingLimit + 1, 6)
+
+      const [portfolioRows, recentPosts, featured, toolRows, promptRows] =
+        await Promise.all([
+          mods.projects ? getPublicPortfolio(db) : Promise.resolve([]),
+          needPosts
+            ? getPosts(db, 25, 0, false, false, false, false, 'post')
+            : Promise.resolve([]),
+          needPosts
+            ? getFeaturedPosts(db, content.featuredPostSlugs)
+            : Promise.resolve([]),
+          mods.tools ? getTools(db, { limit: 4 }) : Promise.resolve([]),
+          mods.prompts
+            ? getPromptSummaries(db, 4).catch(() => [])
+            : Promise.resolve([]),
+        ])
+
       portfolio = portfolioRows
-      posts = selectFeaturedPosts([...featured, ...recentPosts], content.featuredPostSlugs)
+        .filter(
+          (item) =>
+            item.slug !== 'channing-studio' &&
+            !/channing[\s-]*studio/i.test(item.title),
+        )
+        .slice(0, mods.projectsLimit)
+      posts = needPosts
+        ? selectFeaturedPosts(
+            [...featured, ...recentPosts],
+            content.featuredPostSlugs,
+            postSelectionLimit,
+          )
+        : []
       tools = toolRows
       prompts = promptRows
       navLinks = headerData.navLinks
       defaultTheme = headerData.defaultTheme
     }
   } catch (error) {
-    console.error('Studio homepage: failed to fetch content', error)
+    console.error('Blog homepage: failed to fetch content', error)
   }
 
   return (
@@ -73,12 +96,15 @@ export default async function Home() {
           __html: JSON.stringify({
             '@context': 'https://schema.org',
             '@type': 'WebSite',
-            name: 'Channing Studio',
+            name: PUBLIC_PROFILE.brand,
             url: BASE_URL,
             description: metadata.description,
             potentialAction: {
               '@type': 'SearchAction',
-              target: { '@type': 'EntryPoint', urlTemplate: `${BASE_URL}/search?q={search_term_string}` },
+              target: {
+                '@type': 'EntryPoint',
+                urlTemplate: `${BASE_URL}/search?q={search_term_string}`,
+              },
               'query-input': 'required name=search_term_string',
             },
           }),
@@ -89,10 +115,16 @@ export default async function Home() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
-            '@type': 'Person',
-            name: 'Channing',
+            '@type': 'Blog',
+            name: PUBLIC_PROFILE.brand,
             url: BASE_URL,
-            sameAs: content.profile.contactLinks.filter((link) => link.url.startsWith('http')).map((link) => link.url),
+            author: {
+              '@type': 'Person',
+              name: PUBLIC_PROFILE.alias,
+              sameAs: content.profile.contactLinks
+                .filter((link) => link.url.startsWith('http'))
+                .map((link) => link.url),
+            },
           }),
         }}
       />

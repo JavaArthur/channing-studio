@@ -15,22 +15,30 @@ export function AboutProfile({
   contactLinks: ProfileLink[]
   capabilities?: StudioCapability[]
 }) {
-  const links = [...PUBLIC_PROFILE.contactLinks, ...contactLinks].filter(
-    (link, index, all) =>
-      all.findIndex(
-        (candidate) =>
-          candidate.url === link.url ||
-          candidate.label.toLowerCase() === link.label.toLowerCase(),
-      ) === index,
-  )
+  const links = [...PUBLIC_PROFILE.contactLinks, ...contactLinks]
+    .filter(
+      (link) =>
+        !link.url.startsWith('/admin') &&
+        !/studio|工作室|工作台/i.test(link.label),
+    )
+    .filter(
+      (link, index, all) =>
+        all.findIndex(
+          (candidate) =>
+            candidate.url === link.url ||
+            candidate.label.toLowerCase() === link.label.toLowerCase(),
+        ) === index,
+    )
 
   return (
     <div className="about-profile">
       {/* Identity & Career Overview Ledger */}
-      <section className="about-identity" aria-label="个人背景">
+      <section className="about-identity" aria-label="作者背景">
         <div className="about-identity-name">
-          <p className="about-label">00 // IDENTITY</p>
-          <h2>{PUBLIC_PROFILE.alias}</h2>
+          <p className="about-label">00 // AUTHOR PROFILE</p>
+          <h2>
+            {PUBLIC_PROFILE.brand} · {PUBLIC_PROFILE.alias}
+          </h2>
           <p>{PUBLIC_PROFILE.role}</p>
         </div>
 
@@ -43,7 +51,7 @@ export function AboutProfile({
         </div>
 
         <a className="about-case-jump" href="#selected-experience">
-          项目与职责 <ArrowDown aria-hidden size={16} />
+          代表系统与职责 <ArrowDown aria-hidden size={16} />
         </a>
       </section>
 
@@ -55,7 +63,7 @@ export function AboutProfile({
       >
         <header className="about-section-heading">
           <div>
-            <p className="about-label">01 // SELECTED EXPERIENCE</p>
+            <p className="about-label">01 // SELECTED SYSTEMS</p>
             <h2 id="about-records-title">做过的系统，承担的部分。</h2>
           </div>
           <p className="about-section-note">任职期间核对过的代表性工程系统</p>
@@ -82,7 +90,9 @@ export function AboutProfile({
             <div className="about-case-body">
               <div className="about-evidence">
                 <p className="about-label">
-                  {project.id === 'reservation' ? 'TEAM DELIVERY // 团队交付' : 'PLATFORM OUTCOME // 平台成果'}
+                  {project.id === 'reservation'
+                    ? 'TEAM DELIVERY // 团队交付'
+                    : 'PLATFORM OUTCOME // 平台成果'}
                 </p>
                 <p className="about-evidence-number">
                   {project.metric}
@@ -112,8 +122,8 @@ export function AboutProfile({
         <section className="about-pillars" aria-labelledby="about-pillars-title">
           <header className="about-section-heading">
             <div>
-              <p className="about-label">02 // ENGINEERING PILLARS</p>
-              <h2 id="about-pillars-title">持续投入的工作方向。</h2>
+              <p className="about-label">02 // FOCUS AREAS</p>
+              <h2 id="about-pillars-title">长期投入与写作的技术方向。</h2>
             </div>
           </header>
 
@@ -144,11 +154,11 @@ export function AboutProfile({
           <p className="about-closing-copy">{PUBLIC_PROFILE.closing}</p>
 
           <div className="about-primary-actions">
-            <StudioLink href="/work" className="about-action-btn about-action-primary">
-              查看公开作品 <ArrowUpRight aria-hidden size={16} />
+            <StudioLink href="/writing" className="about-action-btn about-action-primary">
+              阅读技术长文 <ArrowUpRight aria-hidden size={16} />
             </StudioLink>
-            <StudioLink href="/writing" className="about-action-btn about-action-secondary">
-              阅读工程手记 <ArrowUpRight aria-hidden size={16} />
+            <StudioLink href="/work" className="about-action-btn about-action-secondary">
+              查看开源与项目 <ArrowUpRight aria-hidden size={16} />
             </StudioLink>
           </div>
 

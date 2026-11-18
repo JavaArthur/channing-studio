@@ -13,6 +13,7 @@ import { TwitterEmbedsEnhancer } from '@/components/TwitterEmbedsEnhancer'
 import { getSiteHeaderData } from '@/lib/site'
 import { getPublicContentCacheNamespace } from '@/lib/cache'
 import { getSiteUrl } from '@/lib/site-config'
+import { PUBLIC_PROFILE } from '@/lib/public-profile'
 import { resolveRequestTheme } from '@/lib/server-appearance'
 import { formatDate } from '@/lib/format-date'
 import { stripLeadingTitleHeading } from '@/lib/post-render'
@@ -55,7 +56,7 @@ export async function generateMetadata({
     return {
       title: post.title,
       description: post.description,
-      authors: [{ name: 'Channing' }],
+      authors: [{ name: PUBLIC_PROFILE.alias }],
       alternates: {
         canonical: `${baseUrl}/${post.slug}`,
       },
@@ -65,7 +66,7 @@ export async function generateMetadata({
         type: 'article',
         publishedTime: new Date(post.published_at * 1000).toISOString(),
         modifiedTime: new Date(post.updated_at * 1000).toISOString(),
-        authors: ['Channing'],
+        authors: [PUBLIC_PROFILE.alias],
         images: [{ url: ogImage }],
       },
       twitter: {
@@ -202,10 +203,10 @@ export default async function PostPage({
               headline: post.title,
               description: post.description || '',
               image: ogImage,
-              author: { '@type': 'Person', name: 'Channing', url: baseUrl },
+              author: { '@type': 'Person', name: PUBLIC_PROFILE.alias, url: baseUrl },
               publisher: {
                 '@type': 'Organization',
-                name: 'Channing Studio',
+                name: PUBLIC_PROFILE.brand,
                 url: baseUrl,
                 logo: { '@type': 'ImageObject', url: `${baseUrl}/icon-512.png` },
               },
@@ -259,9 +260,9 @@ export default async function PostPage({
             <div className="article-monograph-bar">
               <Link href="/writing" className="article-back-link">
                 <ArrowLeft size={14} aria-hidden="true" />
-                返回工程手记
+                返回文章归档
               </Link>
-              <span>MONOGRAPH // FIELD NOTE</span>
+              <span>{`${PUBLIC_PROFILE.brand} // 技术长文`}</span>
             </div>
 
             <header className="article-header">
@@ -325,14 +326,14 @@ export default async function PostPage({
             />
 
             <div className="article-endmark">
-              <span>END OF FIELD NOTE · CHANNING STUDIO</span>
+              <span>END OF ESSAY · {PUBLIC_PROFILE.brand}</span>
               <div className="article-endmark-links">
                 <Link href="/writing">
                   <ArrowLeft size={14} aria-hidden="true" />
-                  全部工程手记
+                  全部技术文章
                 </Link>
-                <Link href="/work">
-                  公开系统档案
+                <Link href="/about">
+                  关于作者
                   <ArrowUpRight size={14} aria-hidden="true" />
                 </Link>
               </div>

@@ -13,9 +13,9 @@ import { isSafeLink } from '@/lib/url'
 export type NavLink = SiteNavLink
 
 const defaultLinks: NavLink[] = [
-  { label: '作品', url: '/work', openInNewTab: false },
   { label: '文章', url: '/writing', openInNewTab: false },
-  { label: '资源', url: '/tools', openInNewTab: false },
+  { label: '项目', url: '/work', openInNewTab: false },
+  { label: '百宝箱', url: '/tools', openInNewTab: false },
   { label: '关于', url: '/about', openInNewTab: false },
 ]
 
@@ -46,7 +46,10 @@ export function SiteHeader({ navLinks, initialTheme = 'light' }: Props) {
   const pathname = usePathname()
 
   const links = (navLinks?.length ? navLinks : defaultLinks).filter(
-    (l) => isSafeLink(l.url) && !l.url.startsWith('/admin'),
+    (l) =>
+      isSafeLink(l.url) &&
+      !l.url.startsWith('/admin') &&
+      !/studio|工作台|工作室/i.test(l.label),
   )
 
   const isActiveLink = (url: string) =>
@@ -115,16 +118,16 @@ export function SiteHeader({ navLinks, initialTheme = 'light' }: Props) {
         <Link
           href="/"
           className="min-h-11 min-w-11 brand"
-          aria-label="Channing Studio 首页"
+          aria-label="晨启AI 首页"
           onClick={() => setOpen(false)}
         >
           <span className="brand-mark" aria-hidden="true">
-            C<span className="brand-slash">/</span>
+            晨<span className="brand-slash">/</span>
           </span>
           <span className="brand-copy">
-            <span className="brand-title">Channing Studio</span>
+            <span className="brand-title">晨启AI</span>
             <span className="brand-tag" aria-hidden="true">
-              ENGINEERING MONOGRAPH
+              AI 工程手记
             </span>
           </span>
         </Link>

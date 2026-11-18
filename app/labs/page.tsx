@@ -20,8 +20,8 @@ const LAB_TYPE_LABELS: Record<string, string> = {
 }
 
 export const metadata = {
-  title: '实验室 · Channing Studio',
-  description: '正在使用和持续折腾的内容工具链与 Agent 工作流。',
+  title: '工具链实验',
+  description: '正在使用和持续迭代的写作自动化工具链与 Agent 工作流。',
   alternates: { canonical: `${getSiteUrl()}/labs` },
 }
 
@@ -44,22 +44,22 @@ export default async function LabsPage() {
       tools = toolRows
     }
   } catch (error) {
-    console.error('Studio labs: failed to fetch content', error)
+    console.error('Labs page: failed to fetch content', error)
   }
 
   const visibleLabs = content.labs.filter((lab) => lab.visible)
 
   return (
     <StudioShell
-      eyebrow="ATELIER // 05 · LABS"
+      eyebrow="BENCH // 05 · LABS"
       meta={
         visibleLabs.length > 0
           ? `${visibleLabs.length} WORKFLOW COMPONENTS`
           : 'EXPERIMENTAL BENCH'
       }
       className="studio-index-page"
-      title="工具链实验室"
-      description="剪藏、发布工具、工作流与 Agent 实验。这里保留各个组件的设计职责与仓库入口，展示它们如何串联日常生产力。"
+      title="工具链与自动化实验"
+      description="网页剪藏、Markdown 同步与 Agent 发布脚本。这里归档各个小工具的设计职责与源码入口，展示它们如何串联日常写作与研发流程。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >

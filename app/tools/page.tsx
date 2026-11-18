@@ -16,8 +16,8 @@ export const dynamicParams = true
 export const dynamic = 'force-dynamic'
 
 export const metadata = {
-  title: '工具收藏',
-  description: '按类型整理的工具、代码仓库与 Mac 软件收藏。',
+  title: '百宝箱 · 工具收藏',
+  description: '按类型整理的高频开发工具、代码仓库与 Mac 软件收藏。',
   alternates: { canonical: `${BASE_URL}/tools` },
 }
 
@@ -66,11 +66,11 @@ export default async function ToolsPage() {
 
   return (
     <StudioShell
-      eyebrow="ARSENAL // 03 · TOOLS"
-      meta={tools.length > 0 ? `${tools.length} CURATED TOOLS` : 'EQUIPMENT SHELF'}
+      eyebrow="TOOLKIT // 03 · TOOLS"
+      meta={tools.length > 0 ? `${tools.length} CURATED TOOLS` : 'TOOLKIT SHELF'}
       className="studio-index-page"
-      title="工具架"
-      description="高频使用的在线服务、开源代码仓库与 Mac 桌面软件。按类型归档，沿着标签与原始链接直接取用。"
+      title="常用工具架"
+      description="日常研发与写作中高频使用的在线服务、开源代码仓库与 Mac 桌面软件。按类型归档，沿着标签与原始链接直接取用。"
       navLinks={navLinks}
       initialTheme={requestTheme}
     >

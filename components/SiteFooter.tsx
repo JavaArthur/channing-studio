@@ -11,8 +11,17 @@ interface SiteFooterProps {
 
 export function SiteFooter({ subtitle, contactLinks = [] }: SiteFooterProps) {
   const year = new Date().getFullYear()
+  const cleanSubtitle =
+    subtitle && !/studio|工作室|工作台/i.test(subtitle) ? subtitle : PUBLIC_PROFILE.role
+
   const mergedContacts = [...PUBLIC_PROFILE.contactLinks, ...contactLinks]
-    .filter((link) => isSafeLink(link.url) && link.url !== '/feed.xml')
+    .filter(
+      (link) =>
+        isSafeLink(link.url) &&
+        link.url !== '/feed.xml' &&
+        !link.url.startsWith('/admin') &&
+        !/studio|工作室|工作台/i.test(link.label),
+    )
     .filter(
       (link, index, all) =>
         all.findIndex(
@@ -26,50 +35,51 @@ export function SiteFooter({ subtitle, contactLinks = [] }: SiteFooterProps) {
     <footer className="public-footer" role="contentinfo">
       <div className="public-colophon">
         <div className="public-colophon-strip">
-          <span>COLOPHON // CHANNING STUDIO · ENGINEERING MONOGRAPH</span>
-          <span>EDITION {year} · OBSIDIAN &amp; VELLUM</span>
+          <span>COLOPHON // {PUBLIC_PROFILE.brand} · AI 工程与技术博客</span>
+          <span>EDITION {year} · 曜石与暖宣</span>
         </div>
 
         <div className="public-colophon-grid">
           <div className="public-colophon-signature">
             <Link href="/" className="min-h-11 public-colophon-brand">
               <span className="public-colophon-monogram" aria-hidden="true">
-                C<span>/</span>
+                晨<span>/</span>
               </span>
               <span className="public-colophon-wordmark">
-                Channing Studio<span aria-hidden="true">.</span>
+                {PUBLIC_PROFILE.brand}
+                <span aria-hidden="true">.</span>
               </span>
             </Link>
-            <p className="public-colophon-role">{subtitle || PUBLIC_PROFILE.role}</p>
+            <p className="public-colophon-role">{cleanSubtitle}</p>
             <p className="public-colophon-note">{PUBLIC_PROFILE.publication}</p>
           </div>
 
-          <nav className="public-colophon-column" aria-label="站点目录">
-            <p className="public-colophon-heading">01 // DIRECTORY</p>
+          <nav className="public-colophon-column" aria-label="博客栏目">
+            <p className="public-colophon-heading">01 // 栏目导航</p>
             <div className="public-colophon-links">
-              <Link href="/work" className="min-h-11">
-                作品档案
-              </Link>
               <Link href="/writing" className="min-h-11">
-                工程手记
+                技术文章
+              </Link>
+              <Link href="/work" className="min-h-11">
+                开源与项目
               </Link>
               <Link href="/tools" className="min-h-11">
-                工具收藏
+                常用工具
               </Link>
               <Link href="/prompts" className="min-h-11">
                 提示词库
               </Link>
               <Link href="/labs" className="min-h-11">
-                实验室
+                工具链实验
               </Link>
               <Link href="/about" className="min-h-11">
-                关于我
+                关于作者
               </Link>
             </div>
           </nav>
 
-          <nav className="public-colophon-column" aria-label="联络与入口">
-            <p className="public-colophon-heading">02 // CHANNELS &amp; VAULT</p>
+          <nav className="public-colophon-column" aria-label="订阅与联络">
+            <p className="public-colophon-heading">02 // 订阅与联络</p>
             <div className="public-colophon-links">
               {mergedContacts.slice(0, 4).map((item) => {
                 const external = item.url.startsWith('http')
@@ -91,23 +101,19 @@ export function SiteFooter({ subtitle, contactLinks = [] }: SiteFooterProps) {
                 )
               })}
               <a href={`mailto:${PUBLIC_PROFILE.email}`} className="min-h-11">
-                邮件联络
+                邮件交流
                 <ArrowUpRight size={13} aria-hidden="true" />
               </a>
               <a href="/feed.xml" className="min-h-11">
                 RSS 订阅
               </a>
-              <Link href="/admin" className="min-h-11 public-colophon-vault">
-                我的工作台
-                <ArrowUpRight size={13} aria-hidden="true" />
-              </Link>
             </div>
           </nav>
         </div>
 
         <div className="public-colophon-bottom">
-          <span>© {year} Channing Studio · 曜石与暖宣 · 精密工程手稿</span>
-          <span>PUBLIC ARCHIVE // NEXT.JS · CLOUDFLARE D1</span>
+          <span>© {year} {PUBLIC_PROFILE.brand} · 原创技术长文与工程实战记录</span>
+          <span>AI AGENT · ARCHITECTURE · ENGINEERING NOTES</span>
         </div>
       </div>
     </footer>

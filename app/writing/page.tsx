@@ -17,8 +17,8 @@ export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 
 export const metadata = {
-  title: '文章 · Channing Studio',
-  description: '关于 AI、工程、产品和生活的持续记录。',
+  title: '文章',
+  description: '关于 AI Agent 架构、后端工程与产品实践的持续记录。',
   alternates: { canonical: `${BASE_URL}/writing` },
 }
 
@@ -73,8 +73,8 @@ export default async function WritingPage({
           : 'CHRONOLOGICAL LEDGER'
       }
       className="studio-index-page"
-      title="工程手记"
-      description="关于 AI 架构、平台工程、产品交付与技术思考的持续记录。留下实践中的判断，也留下尚未解决的问题。"
+      title="技术文章与手记"
+      description="记录 AI Agent 架构、知识检索、Java 后端与系统演进中的真实复盘。留下实践中的判断，也留下尚未解决的问题。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
@@ -84,10 +84,10 @@ export default async function WritingPage({
           <span>
             {currentPage > 1
               ? '可以返回文章首页继续阅读。'
-              : '新的工程实践与思考会在这里持续更新。'}
+              : '新的技术长文与思考会在这里持续更新。'}
           </span>
-          <StudioLink href={currentPage > 1 ? '/writing' : '/work'}>
-            {currentPage > 1 ? '返回文章首页' : '浏览作品档案'}
+          <StudioLink href={currentPage > 1 ? '/writing' : '/about'}>
+            {currentPage > 1 ? '返回文章首页' : '了解作者背景'}
           </StudioLink>
         </div>
       ) : (
