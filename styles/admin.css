@@ -1529,6 +1529,14 @@ textarea.admin-input {
   box-shadow: 0 0 0 3px var(--atelier-vermilion-soft);
 }
 
+.studio-login input:-webkit-autofill,
+.studio-login input:-webkit-autofill:hover,
+.studio-login input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--background) inset;
+  -webkit-text-fill-color: var(--editor-ink);
+  caret-color: var(--atelier-vermilion);
+}
+
 .studio-login-feedback {
   font-size: 12.5px;
   line-height: 1.6;

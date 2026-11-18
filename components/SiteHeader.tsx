@@ -19,6 +19,15 @@ const defaultLinks: NavLink[] = [
   { label: '关于', url: '/about', openInNewTab: false },
 ]
 
+const CORE_BLOG_ROUTES = new Set([
+  '/writing',
+  '/work',
+  '/tools',
+  '/prompts',
+  '/about',
+  '/labs',
+])
+
 const KNOWN_TOP_ROUTES = new Set([
   '/',
   '/work',
@@ -45,12 +54,14 @@ export function SiteHeader({ navLinks, initialTheme = 'light' }: Props) {
   const menuButton = useRef<HTMLButtonElement>(null)
   const pathname = usePathname()
 
-  const links = (navLinks?.length ? navLinks : defaultLinks).filter(
+  const safeProvided = (navLinks ?? []).filter(
     (l) =>
       isSafeLink(l.url) &&
       !l.url.startsWith('/admin') &&
       !/channing|studio|工作台|工作室/i.test(l.label),
   )
+  const hasCoreBlogSection = safeProvided.some((l) => CORE_BLOG_ROUTES.has(l.url))
+  const links = hasCoreBlogSection ? safeProvided : defaultLinks
 
   const isActiveLink = (url: string) =>
     pathname === url ||
