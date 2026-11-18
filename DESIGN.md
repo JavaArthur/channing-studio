@@ -1,63 +1,78 @@
-# Channing Studio 设计系统
+# Channing Studio 设计系统 · Obsidian & Warm Paper Atelier
 
-## 当前设计与边界
+## 1. 美学定位与统一边界
 
-首页采用 Taste Skill 方案 A「个人工程作品档案」。上一轮蓝白介绍页已被用户否定；它的「口号 + 能力面板 + 内容目录」构图不再作为首页规范。选定版在 `studio-taste-atlas` 独立 worktree 完成实现与生产包验证，再将已审核的首页组件和局部样式定向整合回原项目。两份候选 worktree 与评审记录均保留；2026-11-09 已按用户授权部署线上，发布记录见 docs/release-20261109.md，尚未执行 Git 提交或推送。
+Channing Studio（含对外公开工程手稿站与私人知识工作台）统一采用 **「曜石与暖宣 · 精密工程手稿工坊」（Obsidian & Warm Paper · Precision Editorial Atelier）** 设计语言，灵感汲取自 Stripe Press 的出版物纸感、Linear 的精密 1px 结构线以及 Teenage Engineering 的机械遥测克制感。
 
-本轮查证并读取 [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)，结合真实内容、版面层次和局部设计系统执行。两个独立 worktree 分别实现档案版和作者工作室版，使用同尺寸桌面及手机实拍开展作者交叉评审和独立评审。具体抽取记录与取舍见 [TASTE-PLAN.md](TASTE-PLAN.md)。
+核心原则：
+1. **全域连续单主题（Zero Split-Theme Discontinuity）**：公开站与私人工作台共享同一套根级色彩与质感语义。日间全站为温润典藏棉宣纸（`#F6F4EF`）与微白羊皮纸表面（`#FCFBF8`）；夜间全站为纯正黑曜碳底（`#0D0D0C`）与暗岩抬升层（`#151513`）。严禁出现“深色封面拼接浅色正文”或“公开站暖纸但后台退回通用蓝白 SaaS”的割裂感。
+2. **碳墨主调 + 朱砂信号（Carbon Ink & Signal Vermilion）**：界面 92% 由纸底、1px 精密分割线与碳黑/钨白层级构成；朱砂红（日间 `#C83E1B` / 夜间 `#FF6B42`）仅作为高价值行动号召（CTA）、关键激活指示线、键盘焦点环与引用边线出现。
+3. **真实数据与公开身份边界**：对外公开身份严格保持 `Channing`（维护于 `lib/public-profile.ts`），绝不编造虚构客户、虚假统计指标或内部私有信息；私人总控台（`/admin`）与各子工作台全部读取真实数据库查询结果，空状态优雅呈现。
 
-公开页面采用统一的 Atlas 视觉系统：首页、关于、作品、文章、工具、提示词、实验室、搜索与文章阅读页共享纸灰 / 深灰绿底色、铜色强调、同一导航与版心。`public-atlas.css` 根据公开页面标识设置根级语义颜色，使挂载在 body 的搜索弹层也继承主题；进入私人工作台后自动退出该作用域，工作台保持原样。此前的数据读取、字体和路由资源优化保留。
+---
 
-关于页以履历核对后的对外定位、三个精简项目和技术写作介绍构成。对外介绍集中维护在 `lib/public-profile.ts`；公开身份仅使用 Channing，不展示真实姓名或企业内部项目品牌。案例用企业级 AI 客服、企业 AI 能力平台、中央预订系统描述，并保留成果口径。邮箱、GitHub、X、CSDN、技术博客与公众号来自 chen-blog 既有公开资料，按用户要求展示；不复制私人简历或其他私人联系方式。首页复用同一短定位与简介。项目、文章、资源继续读取数据库，关于页联系入口优先使用已核对的公开链接并合并后台配置、按 URL 或标签去重。
+## 2. 色彩令牌体系（`styles/tokens.css`）
 
-## 首页构图
+所有语义变量同时保留历史兼容令牌名（`--editor-*`、`--article-*`、`--cta-*`）与新版工坊语义别名（`--atelier-*`），并映射至 Tailwind v4 `@theme inline`（`app/globals.css`）。
 
-首屏以 Channing 英文字标建立作者身份，经履历核对的对外定位下沉为中文简介。右侧的主作品档案使用实际项目标题、slug、摘要、标签和状态构成视觉，不模拟不存在的产品界面。其余项目组成目录；阅读区以文章为主体、工作方向为边注，资源采用紧凑书架。
+| 语义角色 | CSS 变量 | 日间（Warm Paper） | 夜间（Obsidian） | 用途说明 |
+|---|---|---|---|---|
+| 全站画布底色 | `--background` / `--editor-app-bg` / `--atelier-canvas` | `#F6F4EF` | `#0D0D0C` | 页面主背景、滚动视口底色 |
+| 侧栏导轨底色 | `--atelier-rail` | `#F0EDE5` | `#111110` | 工作台左侧导航栏、次级边栏 |
+| 抬升纸面 / 面板 | `--editor-panel` / `--atelier-surface` | `#FCFBF8` | `#151513` | 档案卡、工作台面板、弹层、表格底 |
+| 柔和内嵌层 | `--editor-soft` / `--atelier-soft` | `#EFECE4` | `#1C1B18` | 悬停底色、代码块底、内嵌筛选槽 |
+| 深层按压 / 砂纸层 | `--editor-sand` / `--atelier-sand` | `#E5E0D5` | `#262420` | 按压态、禁用控件底色、嵌套块 |
+| 精密细分割线 | `--editor-line` / `--atelier-hairline` | `#DDD8CC` | `#282622` | 1px 结构网格线、列表与卡片边界 |
+| 强化结构线 | `--editor-line-strong` / `--atelier-hairline-strong` | `#B8B0A0` | `#3E3B34` | 重点外框、机械按键描边、十字准星 |
+| 主碳墨 / 标题字色 | `--foreground` / `--editor-ink` / `--article-heading` | `#141311` | `#F2EFE8` | 主标题、核心正文与导航激活文字 |
+| 长文阅读字色 | `--article-body` / `--atelier-body` | `#2E2C28` | `#D2CEC4` | 文章正文、编辑器长文阅读 |
+| 次要说明字色 | `--editor-muted` / `--atelier-muted` | `#656058` | `#9B9589` | 摘要、副标题、表单说明 |
+| 遥测 / 元数据灰 | `--stone-gray` / `--atelier-subtle` | `#787268` | `#7E786D` | 日期编号、快捷键说明、次级标签 |
+| 工作室碳黑实心 | `--editor-accent`（配 `--editor-accent-ink`） | `#141311` (`#FAF8F5`) | `#F2EFE8` (`#141311`) | 次级实心按钮、高对比选中胶囊 |
+| 朱砂信号色 / 链接 | `--atelier-vermilion` / `--coral` / `--editor-link` | `#C83E1B` | `#FF6B42` | 正文链接、激活指示条、焦点环 |
+| 朱砂微底 / 边线 | `--atelier-vermilion-soft` / `--atelier-vermilion-line` | `rgba(200,62,27,0.09)` | `rgba(255,107,66,0.14)` | 选中行背景、高亮徽章 |
+| 核心主行动按钮 | `--cta-bg` / `--cta-bg-hover` / `--cta-ink` | `#C83E1B` / `#A93112` / `#FFFDF9` | `#E04F26` / `#FF6B42` / `#FFFDF9` | 全站核心提交与主入口 CTA |
+| 文本选区高亮 | `--editor-selection` | `#F6D5C9` | `#4A2216` | 浏览器选区与编辑器节点选中态 |
+| 状态信标（正常/警告/告警） | `--success` / `--warning` / `--danger` | `#1B6541` / `#854D0E` / `#B42318` | `#6CE0A3` / `#F5C469` / `#FF8B80` | Hermes 同步、发布流水线与表单校验 |
 
-桌面读序：作者字标 → 个人简介与主作品 → 其他项目 → 实践记录与工作方向 → 工具与提示词 → 联系方式。手机改为单列，实践记录先于工作方向，保持作者与作品优先。
+> 注：`--publication-paper` 固定保持 `#FCFBF8`，专供微信公众号终端预览画布还原目标平台白底体验，不随站点深色模式反黑。
 
-主作品、其他项目、文章和资源具有不同的视觉尺度。首页不再出现三张重复能力卡，也不以装饰性图标或空泛指标填补作品材料。目录序号仅表示当页顺序，不表示成就、总量或时间。
+---
 
-## 公开站点颜色
+## 3. 字体、圆角与精密构件规范
 
-| 角色 | 白天 | 晚上 |
-|---|---|---|
-| 全页背景（含导航、封面、阅读、页脚） | 冷灰白 `#f2f2ee` | 深灰绿 `#20231f` |
-| 文字 | `#242522` | `#e8eae2` |
-| 次要文字 | `#62635d` | `#b6baae` |
-| 主作品表面 | `#e7e9e1` | `#2a2f27` |
-| 悬停表面 | `#e2e5dc` | `#30362c` |
-| 分隔线 | `#c9cbc3` | `#474d42` |
-| 强调、链接与焦点 | `#a13f22` | `#f89b7a` |
+### 字体栈
+- **人文衬线展示栈（`--font-editorial-serif`）**：`"Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Songti SC", serif` —— 用于公开站刊头刊号、英文点睛字标与专著级导语。
+- **现代无衬线正文栈（`--font-body`）**：本地自托管 `Geist` WOFF2 + `"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif` —— 保证中文标题、UI 控件与长文阅读的清晰度。
+- **工程等宽遥测栈（`--font-mono-tech` / `--font-code`）**：本地自托管 `Geist Mono` WOFF2 + 系统等宽回退 —— 用于编号（`01 //`）、日期戳、计数器（强制 `font-variant-numeric: tabular-nums`）、快捷键 `kbd` 与代码块。
 
-实现以 [studio-atlas.css](styles/studio-atlas.css) 为准。白天整页浅色，晚上整页深色；主作品表面仅作同色系微差，内部所有文字与链接随主题变化。2026-11-09 用户指出原深色封面与浅色阅读区断层突兀，旧版“明暗分区”的审核结论撤回，禁止继续作为设计依据。
+### 几何尺度与建筑感辅助类（`styles/hallmark.css` & `app/globals.css`）
+- **圆角克制化**：摒弃廉价大圆角气泡，统一使用 `--radius-xs: 4px`（徽章、按键、指示块）、`--radius-sm: 6px`（按钮、输入框、代码框）、`--radius-md: 10px`（档案面板、模态窗）。
+- **可复用结构辅助类**：
+  - `.atelier-kicker` / `.atelier-eyebrow`：等宽大写章节编号眉题（`INDEX // 01`、`WORKBENCH // COMMAND DESK`）。
+  - `.atelier-mono` / `.atelier-serif`：等宽表格数字与典藏衬线切换工具类。
+  - `.atelier-hairline-t` / `.atelier-hairline-b` / `.atelier-hairline-y` / `.atelier-hairline-box`：1px 精密分割线与面板容器。
+  - `.atelier-dossier` / `.atelier-crosshair`：带四角精密准星刻度（7px 十字角标）的工程档案标本框。
+  - `.atelier-badge`（支持 `data-tone="vermilion"`）与 `.atelier-beacon`（支持 `data-tone="healthy" | "warning" | "alert" | "vermilion"`）：状态胶囊与信标圆点。
+  - `kbd` / `.atelier-kbd`：带 `1px` 底部微棱边阴影的机械键帽样式。
 
-## 字体与版面
+---
 
-英文作者字标使用本机 Bodoni MT / Didot / Times New Roman 衬线栈，中文及正文使用现有 Geist 与系统中文无衬线字体。系统字体随平台有细节差异；没有新增字体下载。代码及档案标签使用系统等宽字体。
+## 4. 公开站与私人工作台架构约定
 
-字标负责身份，中文标题负责说明，项目标题负责入口。主要说明与摘要不以很小字号换取空白；元数据和技术标签保持可读。全文自然撑高，不截断动态标题或摘要，不为精确截图强制整屏高度。
+1. **对外公开专著站（`/`、`/writing`、`/work`、`/labs`、`/tools`、`/prompts`、`/about`、`/[slug]`）**：
+   - `StudioHome` 与 `AboutProfile` 保持纯 Server Component，零多余客户端水合负担。
+   - 统一刊头（`SiteHeader`：`C/` 徽记、规整导览、`⌘K` 搜索入口、主题切换、移动端抽屉）与统一工作室尾署（`SiteFooter` Colophon：版次印记、RSS、真实社交矩阵与工作台入口）。
+   - 首页以左栏自述主张 + 右栏主系统档案卡（`System Dossier 01`）构成非对称首屏，下方依次展开系统矩阵、实践手记与能力边栏、工具与提示词标本架。
+2. **私人工程与知识工作台（`/admin`、`/admin/*`、`/editor`）**：
+   - 左侧 256px 建筑感导轨（`--atelier-rail`）+ 顶部状态栏 + 主工作区；移动端折叠抽屉保留 `Escape` 关闭与焦点归位。
+   - `/admin` 根路由直接呈现 Server Component **私人总控台（Studio Command Center）**：聚合快捷创作入口、真实库存遥测（文章、知识库、待决定项、项目与工具提示词）以及近期知识流与写作管线，所有数据库读取均具备空库容错降级。
+   - `/admin/learning`、`/admin/library`、`/admin/operations`、`/admin/publish` 及内容管理页全部对齐暖宣/曜石色彩令牌，彻底清除遗留的硬编码蓝色与冷灰类。
 
-版面最大宽度 1440px，边距随视口缩放；手机保留 20px 边距。项目索引根据实际数量排布，避免少量数据留下无意义空列。主作品之后的阅读区通过细分隔线、留白和标题尺度建立节奏，不能依靠大面积反色制造断层。
+---
 
-## 主题视觉验收门槛
+## 5. 无障碍与视觉验收门槛
 
-- 日间与夜间分别检查首屏、每个区块交界、页尾和整页长图；滚动经过交界时不能出现非主题切换造成的大面积明暗突变。
-- 桌面和手机都要覆盖；卡片、菜单打开、悬停、键盘焦点及搜索弹层不能仅靠默认状态推断。
-- 测试、无溢出与文字对比度只是独立证据，不代表视觉整体通过。审核者必须写出实际看过的截图与未覆盖范围。
-- 用户指出的问题作为明确验收条件；先前审核通过不能用来反驳新证据。
-
-## 数据与交互
-
-- 首页主张与简介、关于页履历来自 `PUBLIC_PROFILE` 对外编辑稿；更新这些文字需修改该稿。个人配置中的 eyebrow、subtitle、capabilities、contactLinks 仍由后台管理，旧 title / statement 配置保留但不再作为首页对外介绍。
-- 项目只读取公开 snapshot，项目状态来自实际字段；没有伪造运行指标。
-- 文章、工具、提示词仍由既有查询提供；空集合不生成虚构条目。
-- 项目网站、公开源码、文章、资源与联系入口指向原有真实链接。
-- 复用 SiteHeader 的搜索、主题和手机菜单；Escape 关闭菜单并恢复焦点。
-- 保留主内容跳转、语义标题、44px 操作目标、可见键盘焦点与 reduced-motion。
-
-## 性能与验证
-
-StudioHome 与 AboutProfile 继续作为 Server Component，不增加客户端组件、动画库、图片请求或新依赖。首页、关于和目录页的版式样式各自分包，共享公开主题以页面标识限定作用域；既有 WOFF2 和查询限量优化保留。
-
-本地视觉验收使用独立 QA 数据库；截图中的示例文章、日期与项目是布局测试材料，不证明线上内容或运行情况。构建、真实浏览器行为和资源测量单独记录于 [PERFORMANCE.md](PERFORMANCE.md)。视觉评审结论是实施建议，不等同于用户接受，更不构成发布授权。
+- **对比度与焦点**：正文与背景对比度大于 12:1，次要说明与链接对比度满足 WCAG AA（>= 4.5:1）；全站 `:focus-visible` 呈现清晰可见的 2px 朱砂焦点环（浅色模式下附带外层微白隔离环）。
+- **触控与动效**：公开站与移动端交互目标保持 `>= 44px` 点击热区（紧凑图标按钮使用 `.hit-44` / `.hit-area-44` 扩展热区）；严格遵循 `prefers-reduced-motion: reduce`。
+- **双模式与多视口实测**：桌面端（`1440×900`）与移动端（`390×844`）在 Light / Dark 双模式下均不得出现横向溢出（`scrollWidth <= innerWidth`）、断层反色或模态框底色失配。

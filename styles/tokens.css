@@ -1,151 +1,238 @@
+/* ==========================================================================
+   Channing Studio · Design Tokens
+   "OBSIDIAN & WARM PAPER · PRECISION EDITORIAL ATELIER"
+   (曜石与暖宣 · 精密工程手稿工坊)
+   Unified across External Public Monograph & Private Workbench.
+   ========================================================================== */
+
 :root {
-  --publication-paper: #ffffff;
-  --font-code: var(--font-geist-mono), ui-monospace, monospace;
-  --site-width: 1200px;
-  --site-gutter: clamp(20px, 3.4vw, 40px);
-  --font-body: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-  /* Retain the legacy token name for existing readers and editor components. */
-  --font-serif: var(--font-body);
-  --logo-font: var(--font-body);
   color-scheme: light;
-  --background: #f7faff;
-  --foreground: #142846;
-  --editor-app-bg: #f7faff;
-  --editor-panel: #ffffff;
-  --editor-soft: #eaf1fb;
-  --editor-sand: #dce7f6;
-  --editor-line: #d7e2f1;
-  --editor-line-strong: #a9bdd7;
-  --editor-ink: #142846;
-  --editor-muted: #4c607b;
-  --stone-gray: #586d87;
-  --text-disabled-decor: #72839a;
-  --editor-accent: #183b70;
-  --editor-accent-ink: #ffffff;
-  --editor-link: #2457dc;
-  --coral: var(--editor-link);
-  --cta-bg: #2457dc;
-  --cta-ink: #ffffff;
-  --cta-bg-hover: #1844b6;
-  --cta-divider: #1844b6;
+
+  /* Typography & Layout Geometry */
+  --publication-paper: #FCFBF8;
+  --site-width: 1200px;
+  --atelier-max-width: 1360px;
+  --site-gutter: clamp(20px, 3.4vw, 40px);
+  --font-body: var(--font-geist-sans), "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+  /* Retain legacy token name for existing readers and editor components. */
+  --font-serif: var(--font-body);
+  --font-editorial-serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Songti SC", serif;
+  --font-code: var(--font-geist-mono), ui-monospace, monospace;
+  --font-mono-tech: var(--font-geist-mono), ui-monospace, monospace;
+  --logo-font: var(--font-body);
+
+  /* Precision Radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Light Mode · Warm Archival Cotton Paper & Deep Carbon Ink */
+  --background: #F6F4EF;
+  --foreground: #141311;
+  --editor-app-bg: #F6F4EF;
+  --editor-panel: #FCFBF8;
+  --editor-soft: #EFECE4;
+  --editor-sand: #E5E0D5;
+  --editor-line: #DDD8CC;
+  --editor-line-strong: #B8B0A0;
+
+  /* Ink Hierarchy */
+  --editor-ink: #141311;
+  --article-heading: #141311;
+  --article-body: #2E2C28;
+  --editor-muted: #656058;
+  --stone-gray: #787268;
+  --text-disabled-decor: #8E887D;
+
+  /* Studio Carbon Fill & Signature Signal Vermilion */
+  --editor-accent: #141311;
+  --editor-accent-ink: #FAF8F5;
+  --atelier-vermilion: #C83E1B;
+  --atelier-vermilion-hover: #A93112;
+  --atelier-vermilion-soft: rgba(200, 62, 27, 0.09);
+  --atelier-vermilion-line: rgba(200, 62, 27, 0.28);
+  --coral: #C83E1B;
+  --editor-link: #C83E1B;
+
+  /* Primary Actions & Focus */
+  --cta-bg: #C83E1B;
+  --cta-ink: #FFFDF9;
+  --cta-bg-hover: #A93112;
+  --cta-divider: #A93112;
   --cta-disabled-bg: var(--editor-sand);
   --cta-disabled-ink: var(--stone-gray);
-  --focus-ring: #2457dc;
-  --focus-ring-outer: #ffffff;
-  --danger: #ad303f;
-  --danger-soft-bg: #fff0f1;
-  --danger-line: #edc1c8;
-  --success: #236747;
-  --success-soft-bg: #e8f4ee;
-  --success-line: #bddacb;
-  --warning: #80530d;
-  --warning-soft-bg: #fff4dc;
-  --warning-line: #e8d39f;
-  --editor-code-bg: #eaf1fb;
-  --editor-code-border: #d7e2f1;
-  --editor-quote-bg: #eaf1fb;
-  --editor-selection: #cedfff;
-  --article-heading: #142846;
-  --article-body: #304663;
-  --article-quote: #586d87;
-  --article-quote-border: #2457dc;
-  --article-quote-nested-border: #a9bdd7;
-  --article-quote-nested-bg: #eaf1fb;
-  --overlay: rgba(12, 28, 51, 0.45);
+  --focus-ring: #C83E1B;
+  --focus-ring-outer: #FCFBF8;
+
+  /* Semantic Atelier Aliases */
+  --atelier-canvas: var(--background);
+  --atelier-surface: var(--editor-panel);
+  --atelier-rail: #F0EDE5;
+  --atelier-soft: var(--editor-soft);
+  --atelier-sand: var(--editor-sand);
+  --atelier-hairline: var(--editor-line);
+  --atelier-hairline-strong: var(--editor-line-strong);
+  --atelier-ink: var(--editor-ink);
+  --atelier-body: var(--article-body);
+  --atelier-muted: var(--editor-muted);
+  --atelier-subtle: var(--stone-gray);
+
+  /* Telemetry & Status Beacons */
+  --danger: #B42318;
+  --danger-soft-bg: #FDF2F0;
+  --danger-line: #EBC0BA;
+  --success: #1B6541;
+  --success-soft-bg: #ECF6F0;
+  --success-line: #B6DEC6;
+  --warning: #854D0E;
+  --warning-soft-bg: #FEF6E4;
+  --warning-line: #E6CE9E;
+
+  /* Editorial Prose, Code & Selection */
+  --editor-code-bg: #EFECE4;
+  --editor-code-border: #DDD8CC;
+  --editor-quote-bg: #EFECE4;
+  --editor-selection: #F6D5C9;
+  --article-quote: #5C574F;
+  --article-quote-border: #C83E1B;
+  --article-quote-nested-border: #B8B0A0;
+  --article-quote-nested-bg: #E5E0D5;
+
+  /* Overlays & Architectural Hairline Rings */
+  --overlay: rgba(13, 13, 12, 0.48);
   --border-warm: var(--editor-line);
   --shadow-ring: 0 0 0 1px var(--editor-line-strong);
   --shadow-ring-subtle: 0 0 0 1px var(--editor-line);
-  --shadow-whisper: 0 0 0 1px var(--editor-line), 0 4px 24px rgba(20, 40, 70, 0.05);
+  --shadow-whisper: 0 0 0 1px var(--editor-line), 0 8px 28px rgba(20, 19, 17, 0.06);
+  --shadow-elevated: 0 0 0 1px var(--editor-line-strong), 0 16px 40px rgba(20, 19, 17, 0.10);
 }
 
 :root[data-color-mode="dark"] {
   color-scheme: dark;
-  --background: #101c30;
-  --foreground: #edf3fc;
-  --editor-app-bg: #101c30;
-  --editor-panel: #17263d;
-  --editor-soft: #20334f;
-  --editor-sand: #2c4361;
-  --editor-line: #2c405d;
-  --editor-line-strong: #506886;
-  --editor-ink: #edf3fc;
-  --editor-muted: #b3c2d9;
-  --stone-gray: #a6b9d2;
-  --text-disabled-decor: #7f93b0;
-  --editor-accent: #c1d6fc;
-  --editor-accent-ink: #142846;
-  --editor-link: #a4c2ff;
-  --cta-bg: #aac6ff;
-  --cta-ink: #10264b;
-  --cta-bg-hover: #c5d8ff;
-  --cta-divider: #7a9bd9;
-  --focus-ring: #aac6ff;
-  --focus-ring-outer: #101c30;
-  --danger: #ffacb8;
-  --danger-soft-bg: #3d2635;
-  --danger-line: #6f3b4e;
-  --success: #9ddab9;
-  --success-soft-bg: #1d3934;
-  --success-line: #396052;
-  --warning: #f2ce87;
-  --warning-soft-bg: #3c3427;
-  --warning-line: #695637;
-  --editor-code-bg: #17263d;
-  --editor-code-border: #2c405d;
-  --editor-quote-bg: #17263d;
-  --editor-selection: #365580;
-  --article-heading: #edf3fc;
-  --article-body: #d3dff0;
-  --article-quote: #a6b9d2;
-  --article-quote-border: #aac6ff;
-  --article-quote-nested-border: #506886;
-  --article-quote-nested-bg: #20334f;
-  --overlay: rgba(4, 12, 25, 0.65);
+
+  /* Dark Mode · True Obsidian Carbon & Warm Tungsten Ink */
+  --background: #0D0D0C;
+  --foreground: #F2EFE8;
+  --editor-app-bg: #0D0D0C;
+  --editor-panel: #151513;
+  --editor-soft: #1C1B18;
+  --editor-sand: #262420;
+  --editor-line: #282622;
+  --editor-line-strong: #3E3B34;
+  --atelier-rail: #111110;
+
+  /* Ink Hierarchy */
+  --editor-ink: #F2EFE8;
+  --article-heading: #F2EFE8;
+  --article-body: #D2CEC4;
+  --editor-muted: #9B9589;
+  --stone-gray: #7E786D;
+  --text-disabled-decor: #635E55;
+
+  /* Studio Tungsten Fill & Luminous Signal Vermilion */
+  --editor-accent: #F2EFE8;
+  --editor-accent-ink: #141311;
+  --atelier-vermilion: #FF6B42;
+  --atelier-vermilion-hover: #FF8563;
+  --atelier-vermilion-soft: rgba(255, 107, 66, 0.14);
+  --atelier-vermilion-line: rgba(255, 107, 66, 0.34);
+  --coral: #FF6B42;
+  --editor-link: #FF6B42;
+
+  /* Primary Actions & Focus */
+  --cta-bg: #E04F26;
+  --cta-ink: #FFFDF9;
+  --cta-bg-hover: #FF6B42;
+  --cta-divider: #B83D1B;
+  --focus-ring: #FF6B42;
+  --focus-ring-outer: #0D0D0C;
+
+  /* Telemetry & Status Beacons */
+  --danger: #FF8B80;
+  --danger-soft-bg: #2B1816;
+  --danger-line: #5C2C28;
+  --success: #6CE0A3;
+  --success-soft-bg: #13281E;
+  --success-line: #26523C;
+  --warning: #F5C469;
+  --warning-soft-bg: #292112;
+  --warning-line: #57431F;
+
+  /* Editorial Prose, Code & Selection */
+  --editor-code-bg: #151513;
+  --editor-code-border: #282622;
+  --editor-quote-bg: #151513;
+  --editor-selection: #4A2216;
+  --article-quote: #A8A195;
+  --article-quote-border: #FF6B42;
+  --article-quote-nested-border: #3E3B34;
+  --article-quote-nested-bg: #1C1B18;
+
+  /* Overlays & Architectural Shadows */
+  --overlay: rgba(5, 5, 4, 0.72);
+  --shadow-whisper: 0 0 0 1px var(--editor-line), 0 12px 32px rgba(0, 0, 0, 0.48);
+  --shadow-elevated: 0 0 0 1px var(--editor-line-strong), 0 18px 44px rgba(0, 0, 0, 0.65);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-color-mode]) {
     color-scheme: dark;
-    --background: #101c30;
-    --foreground: #edf3fc;
-    --editor-app-bg: #101c30;
-    --editor-panel: #17263d;
-    --editor-soft: #20334f;
-    --editor-sand: #2c4361;
-    --editor-line: #2c405d;
-    --editor-line-strong: #506886;
-    --editor-ink: #edf3fc;
-    --editor-muted: #b3c2d9;
-    --stone-gray: #a6b9d2;
-    --text-disabled-decor: #7f93b0;
-    --editor-accent: #c1d6fc;
-    --editor-accent-ink: #142846;
-    --editor-link: #a4c2ff;
-    --cta-bg: #aac6ff;
-    --cta-ink: #10264b;
-    --cta-bg-hover: #c5d8ff;
-    --cta-divider: #7a9bd9;
-    --focus-ring: #aac6ff;
-    --focus-ring-outer: #101c30;
-    --danger: #ffacb8;
-    --danger-soft-bg: #3d2635;
-    --danger-line: #6f3b4e;
-    --success: #9ddab9;
-    --success-soft-bg: #1d3934;
-    --success-line: #396052;
-    --warning: #f2ce87;
-    --warning-soft-bg: #3c3427;
-    --warning-line: #695637;
-    --editor-code-bg: #17263d;
-    --editor-code-border: #2c405d;
-    --editor-quote-bg: #17263d;
-    --editor-selection: #365580;
-    --article-heading: #edf3fc;
-    --article-body: #d3dff0;
-    --article-quote: #a6b9d2;
-    --article-quote-border: #aac6ff;
-    --article-quote-nested-border: #506886;
-    --article-quote-nested-bg: #20334f;
-    --overlay: rgba(4, 12, 25, 0.65);
+
+    --background: #0D0D0C;
+    --foreground: #F2EFE8;
+    --editor-app-bg: #0D0D0C;
+    --editor-panel: #151513;
+    --editor-soft: #1C1B18;
+    --editor-sand: #262420;
+    --editor-line: #282622;
+    --editor-line-strong: #3E3B34;
+    --atelier-rail: #111110;
+
+    --editor-ink: #F2EFE8;
+    --article-heading: #F2EFE8;
+    --article-body: #D2CEC4;
+    --editor-muted: #9B9589;
+    --stone-gray: #7E786D;
+    --text-disabled-decor: #635E55;
+
+    --editor-accent: #F2EFE8;
+    --editor-accent-ink: #141311;
+    --atelier-vermilion: #FF6B42;
+    --atelier-vermilion-hover: #FF8563;
+    --atelier-vermilion-soft: rgba(255, 107, 66, 0.14);
+    --atelier-vermilion-line: rgba(255, 107, 66, 0.34);
+    --coral: #FF6B42;
+    --editor-link: #FF6B42;
+
+    --cta-bg: #E04F26;
+    --cta-ink: #FFFDF9;
+    --cta-bg-hover: #FF6B42;
+    --cta-divider: #B83D1B;
+    --focus-ring: #FF6B42;
+    --focus-ring-outer: #0D0D0C;
+
+    --danger: #FF8B80;
+    --danger-soft-bg: #2B1816;
+    --danger-line: #5C2C28;
+    --success: #6CE0A3;
+    --success-soft-bg: #13281E;
+    --success-line: #26523C;
+    --warning: #F5C469;
+    --warning-soft-bg: #292112;
+    --warning-line: #57431F;
+
+    --editor-code-bg: #151513;
+    --editor-code-border: #282622;
+    --editor-quote-bg: #151513;
+    --editor-selection: #4A2216;
+    --article-quote: #A8A195;
+    --article-quote-border: #FF6B42;
+    --article-quote-nested-border: #3E3B34;
+    --article-quote-nested-bg: #1C1B18;
+
+    --overlay: rgba(5, 5, 4, 0.72);
+    --shadow-whisper: 0 0 0 1px var(--editor-line), 0 12px 32px rgba(0, 0, 0, 0.48);
+    --shadow-elevated: 0 0 0 1px var(--editor-line-strong), 0 18px 44px rgba(0, 0, 0, 0.65);
   }
 }

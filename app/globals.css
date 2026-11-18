@@ -1,4 +1,4 @@
-/* Channing Studio · shared foundations; public Atlas theme is route-scoped. */
+/* Channing Studio · Unified Obsidian & Warm Paper Atelier Foundations */
 @import "tailwindcss";
 
 @import "../styles/tokens.css";
@@ -7,28 +7,42 @@
 @import "../styles/public-pages.css";
 @import "../styles/hallmark.css";
 @import "../styles/public-atlas.css";
+
 @custom-variant dark (&:where([data-color-mode="dark"], [data-color-mode="dark"] *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-editorial: var(--font-editorial-serif);
+  --font-serif: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", sans-serif;
+
   --color-panel: var(--editor-panel);
+  --color-rail: var(--atelier-rail);
   --color-soft: var(--editor-soft);
   --color-sand: var(--editor-sand);
   --color-line: var(--editor-line);
   --color-line-strong: var(--editor-line-strong);
   --color-ink: var(--editor-ink);
+  --color-body: var(--article-body);
   --color-muted: var(--editor-muted);
+  --color-subtle: var(--stone-gray);
   --color-accent: var(--editor-accent);
   --color-accent-ink: var(--editor-accent-ink);
+  --color-vermilion: var(--atelier-vermilion);
+  --color-vermilion-soft: var(--atelier-vermilion-soft);
+  --color-vermilion-line: var(--atelier-vermilion-line);
+
   --color-cta: var(--cta-bg);
   --color-cta-ink: var(--cta-ink);
   --color-cta-hover: var(--cta-bg-hover);
   --color-cta-disabled: var(--cta-disabled-bg);
   --color-cta-disabled-ink: var(--cta-disabled-ink);
+
   --color-focus-ring: var(--focus-ring);
   --color-focus-ring-outer: var(--focus-ring-outer);
+
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft-bg);
   --color-danger-line: var(--danger-line);
@@ -39,19 +53,21 @@
   --color-warning-soft: var(--warning-soft-bg);
   --color-warning-line: var(--warning-line);
   --color-overlay: var(--overlay);
-  --font-serif: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", sans-serif;
-  --radius-xs: 6px;
+
+  --radius-xs: 4px;
   --radius-sm: 6px;
-  --shadow-sm: var(--shadow-ring);
-  --shadow: var(--shadow-ring);
-  --shadow-md: var(--shadow-ring);
-  --shadow-lg: var(--shadow-whisper);
-  --shadow-xl: var(--shadow-whisper);
-  --shadow-2xl: var(--shadow-whisper);
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 0 0 1px var(--editor-line);
+  --shadow: 0 0 0 1px var(--editor-line-strong);
+  --shadow-md: 0 0 0 1px var(--editor-line-strong);
+  --shadow-lg: 0 0 0 1px var(--editor-line), 0 8px 28px rgba(20, 19, 17, 0.06);
+  --shadow-xl: 0 0 0 1px var(--editor-line-strong), 0 16px 40px rgba(20, 19, 17, 0.10);
+  --shadow-2xl: 0 0 0 1px var(--editor-line-strong), 0 16px 40px rgba(20, 19, 17, 0.10);
   --shadow-ring: 0 0 0 1px var(--editor-line-strong);
   --shadow-ring-subtle: 0 0 0 1px var(--editor-line);
-  --shadow-whisper: 0 0 0 1px var(--editor-line), rgba(20,40,70,0.06) 0 4px 24px;
-
+  --shadow-whisper: 0 0 0 1px var(--editor-line), 0 8px 28px rgba(20, 19, 17, 0.06);
 }
 
 h1, h2, h3, h4 {
@@ -64,6 +80,32 @@ h1, h2, h3, h4 {
   ::placeholder {
     color: var(--stone-gray);
     opacity: 1;
+  }
+
+  ::selection {
+    background: var(--editor-selection);
+    color: var(--foreground);
+  }
+
+  /* Tactile mechanical keycap styling (Teenage Engineering × Linear) */
+  :where(kbd),
+  .atelier-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.45em;
+    padding: 0.1rem 0.38rem;
+    border: 1px solid var(--editor-line-strong);
+    border-radius: var(--radius-xs);
+    background: var(--editor-panel);
+    box-shadow: 0 1px 0 var(--editor-line-strong);
+    color: var(--editor-muted);
+    font-family: var(--font-mono-tech);
+    font-size: 0.72rem;
+    font-weight: 500;
+    line-height: 1.35;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   :where(button, input:not([type="hidden"]), select, textarea, summary, [role="button"], [role="tab"], [role="menuitem"], [cmdk-item]):not(:where(.workspace-shell *, .admin-dialog *, .admin-menu *, .article-editor-shell *)) {
@@ -79,8 +121,9 @@ label:has(input:is([type="checkbox"], [type="radio"])) {
   min-height: 44px;
   min-width: 44px;
 }
+
 input[type="range"] {
-  accent-color: var(--editor-accent);
+  accent-color: var(--atelier-vermilion);
 }
 
 label input:is([type="checkbox"], [type="radio"]) {
@@ -88,7 +131,7 @@ label input:is([type="checkbox"], [type="radio"]) {
   min-width: 16px;
   width: 16px;
   height: 16px;
-  accent-color: var(--editor-accent);
+  accent-color: var(--atelier-vermilion);
 }
 
 /* Compact editor icons keep their visual size; margins keep hit areas separate. */
@@ -158,7 +201,7 @@ body {
   max-width: 520px;
   height: min(1080px, calc(100vh - 10rem));
   min-height: 620px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 8px;
 }
 
@@ -167,7 +210,7 @@ body {
   max-width: 720px;
   height: min(960px, calc(100vh - 10rem));
   min-height: 620px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 8px;
 }
 
@@ -176,7 +219,7 @@ body {
   min-height: 0;
   flex: 1;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--publication-paper);
 }
 
@@ -192,8 +235,7 @@ body {
   display: none;
 }
 
-/* Focus states use the mode-specific ring token.
-   Light mode adds a dark outer ring; components using only an outline retain 3:1 contrast.
+/* Focus states use Signal Vermilion (--focus-ring) with high-contrast outer halo in light mode.
    The editor writing surface keeps its own focus treatment. */
 *:focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -210,14 +252,11 @@ body {
   }
 }
 
-/* Menu items inside overflow-hidden / scrolling menus (Dropdown, CategorySelector, publish status):
-   draw the same ring *inside* the item so the container can't clip it and the menu size doesn't change.
-   Dark: 2px #3898ec at the item edge. Light: 2px outer ring (inset shadow, at the edge, against the menu panel)
-   + 2px #3898ec just inside it. */
+/* Menu items inside overflow-hidden / scrolling menus:
+   draw the same ring *inside* the item so the container cannot clip it. */
 .focus-ring-inset:focus-visible {
   outline-offset: -2px;
-  /* 8px ≥ the menus' inner corner radius, so a first/last item flush with a rounded container keeps its ring corners */
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 :root[data-color-mode="light"] .focus-ring-inset:focus-visible:not(.novel-prose) {
   outline-offset: -4px;
@@ -236,11 +275,10 @@ body {
     scroll-behavior: smooth;
   }
 
-  /* Fade in up animation for list items */
   @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(14px);
     }
     to {
       opacity: 1;
@@ -249,6 +287,7 @@ body {
   }
 }
 
+/* ── Editorial Prose & Novel Editor Surfaces ── */
 .editor-surface {
   min-height: calc(100vh - 13rem);
 }
@@ -260,7 +299,7 @@ body {
   font-size: 1.06rem;
   line-height: 1.9;
   outline: none;
-  caret-color: var(--editor-accent);
+  caret-color: var(--atelier-vermilion);
 }
 
 @media (min-width: 640px) {
@@ -314,16 +353,16 @@ body {
 }
 
 :is(.novel-prose, .rich-content) > * + * {
-  margin-top: 1.15em;
+  margin-top: 1.2em;
 }
 
 :is(.novel-prose, .rich-content) h1,
 :is(.novel-prose, .rich-content) h2,
 :is(.novel-prose, .rich-content) h3 {
   font-family: var(--font-serif);
-  font-weight: 500;
-  letter-spacing: 0;
-  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.28;
   color: var(--article-heading);
 }
 
@@ -332,11 +371,18 @@ body {
 }
 
 :is(.novel-prose, .rich-content) h2 {
-  font-size: clamp(1.55rem, 3vw, 2rem);
+  margin-top: 1.85em;
+  font-size: clamp(1.45rem, 2.8vw, 1.85rem);
 }
 
 :is(.novel-prose, .rich-content) h3 {
-  font-size: clamp(1.2rem, 2vw, 1.45rem);
+  margin-top: 1.5em;
+  font-size: clamp(1.18rem, 2vw, 1.38rem);
+}
+
+:is(.novel-prose, .rich-content) strong {
+  color: var(--article-heading);
+  font-weight: 600;
 }
 
 :is(.novel-prose, .rich-content) p,
@@ -347,12 +393,17 @@ body {
 :is(.novel-prose, .rich-content) a {
   color: var(--editor-link);
   text-decoration: underline;
+  text-decoration-color: var(--atelier-vermilion-line);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.24em;
   overflow-wrap: anywhere;
   word-break: break-word;
+  transition: text-decoration-color 140ms ease, color 140ms ease;
 }
 
 :is(.novel-prose, .rich-content) a:hover {
   text-decoration: underline;
+  text-decoration-color: currentColor;
 }
 
 :is(.novel-prose, .rich-content) ul,
@@ -369,18 +420,18 @@ body {
 }
 
 :is(.novel-prose, .rich-content) li + li {
-  margin-top: 0.4rem;
+  margin-top: 0.42rem;
 }
 
 :is(.novel-prose, .rich-content) blockquote {
-  border-left: 3px solid var(--article-quote-border);
+  border-left: 2px solid var(--article-quote-border);
   background: var(--editor-quote-bg);
-  padding: 0.9rem 1.2rem;
+  padding: 0.95rem 1.25rem;
   margin-left: 0;
   margin-right: 0;
-  border-radius: 0 6px 6px 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   color: var(--article-quote);
-  font-style: italic;
+  font-style: normal;
 }
 
 :is(.novel-prose, .rich-content) blockquote > * + * {
@@ -395,27 +446,28 @@ body {
   margin-bottom: 0;
 }
 
-/* 嵌套引用 */
+/* Nested blockquotes */
 :is(.novel-prose, .rich-content) blockquote blockquote {
   border-left-color: var(--article-quote-nested-border);
   background: var(--article-quote-nested-bg);
   margin-top: 0.6em;
 }
 
-/* 表格样式 */
+/* Monograph tables */
 :is(.novel-prose, .rich-content) table {
   width: 100%;
   border-collapse: collapse;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--editor-line);
-  margin-block: 1.2em;
+  margin-block: 1.35em;
+  font-size: 0.95em;
 }
 
 :is(.novel-prose, .rich-content) table th,
 :is(.novel-prose, .rich-content) table td {
   border: 1px solid var(--editor-line);
-  padding: 0.55rem 0.75rem;
+  padding: 0.6rem 0.8rem;
   text-align: left;
   vertical-align: top;
   min-width: 80px;
@@ -425,18 +477,19 @@ body {
   background: var(--editor-soft);
   font-weight: 600;
   color: var(--editor-ink);
-  font-size: 0.95em;
+  font-size: 0.9em;
+  letter-spacing: 0.01em;
 }
 
 :is(.novel-prose, .rich-content) table td {
-  background: var(--background);
+  background: var(--editor-panel);
 }
 
 :is(.novel-prose, .rich-content) table tr:nth-child(even) td {
-  background: var(--editor-quote-bg);
+  background: var(--background);
 }
 
-/* 编辑器中表格选中态 */
+/* Selected table cell in editor */
 .novel-prose table .selectedCell {
   background: var(--editor-selection);
 }
@@ -444,24 +497,26 @@ body {
 :is(.novel-prose, .rich-content) hr {
   border: 0;
   border-top: 1px solid var(--editor-line);
-  margin-block: 2rem;
+  margin-block: 2.25rem;
 }
 
 :is(.novel-prose, .rich-content) code {
   border: 1px solid var(--editor-code-border);
   background: var(--editor-code-bg);
-  border-radius: 6px;
-  padding: 0.1rem 0.35rem;
-  font-family: var(--font-geist-mono), "SFMono-Regular", Consolas, monospace;
-  font-size: 0.92em;
+  border-radius: var(--radius-xs);
+  padding: 0.12rem 0.36rem;
+  font-family: var(--font-mono-tech);
+  font-size: 0.89em;
 }
 
 :is(.novel-prose, .rich-content) pre {
   overflow-x: auto;
-  border-radius: 6px;
+  border: 1px solid var(--editor-code-border);
+  border-radius: var(--radius-sm);
   background: var(--editor-code-bg);
   color: var(--article-body);
-  padding: 1rem 1.1rem;
+  padding: 1.05rem 1.2rem;
+  line-height: 1.7;
 }
 
 :is(.novel-prose, .rich-content) pre code {
@@ -469,12 +524,14 @@ body {
   background: transparent;
   padding: 0;
   color: inherit;
+  font-size: inherit;
 }
 
 :is(.novel-prose, .rich-content) img {
   display: block;
   max-width: 100%;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--editor-line);
 }
 
 .novel-prose img:hover {
@@ -483,14 +540,15 @@ body {
 }
 
 .novel-prose img.ProseMirror-selectednode {
-  outline: 3px solid var(--focus-ring);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .novel-prose .ProseMirror-selectednode {
   background: var(--editor-selection);
 }
 
-/* ── 全局块拖拽把手 ── */
+/* ── Global Block Drag Handle ── */
 .drag-handle {
   position: fixed;
   opacity: 0.4;
@@ -501,7 +559,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   z-index: 50;
 }
 .drag-handle.hide {
@@ -526,7 +584,7 @@ body {
   cursor: grabbing;
 }
 
-/* ── 图片拖拽缩放 ── */
+/* ── Image Resize Grips ── */
 .resizable-image-wrapper {
   display: flex;
   justify-content: center;
@@ -540,9 +598,9 @@ body {
 }
 
 .resizable-image.selected {
-  outline: 2px solid var(--editor-accent);
+  outline: 2px solid var(--atelier-vermilion);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .resizable-image.resizing {
@@ -555,15 +613,15 @@ body {
   bottom: 0;
   width: 8px;
   cursor: col-resize;
-  background: var(--editor-accent);
+  background: var(--atelier-vermilion);
   opacity: 0;
   transition: opacity 0.15s;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
 }
 
 .resizable-image:hover .resize-handle,
 .resizable-image.selected .resize-handle {
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 .resize-handle:hover {
@@ -593,9 +651,9 @@ body {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  border-radius: 0.9rem;
-  padding: 0.65rem 0.8rem;
-  font-size: 0.92rem;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
   color: var(--editor-ink);
   transition: background 0.15s ease, color 0.15s ease;
 }
@@ -605,8 +663,8 @@ body {
 }
 
 .editor-image-menu-item-active {
-  background: color-mix(in srgb, var(--editor-accent) 10%, var(--editor-panel));
-  color: var(--editor-accent);
+  background: var(--atelier-vermilion-soft);
+  color: var(--atelier-vermilion);
 }
 
 :is(.novel-prose, .rich-content) ul[data-type="taskList"] {
@@ -632,7 +690,7 @@ body {
 :is(.novel-prose, .rich-content) ul[data-type="taskList"] input[type="checkbox"] {
   width: 1rem;
   height: 1rem;
-  accent-color: var(--editor-accent);
+  accent-color: var(--atelier-vermilion);
 }
 
 .rich-content {
@@ -653,10 +711,7 @@ body {
   }
 }
 
-/* ── 楷体排版优化 ── */
-/* 楷体笔画细、字形小，需要更大字号和行高 */
-/* 所有字体模式的标题保持统一的衬线字体。 */
-
+/* ── Kaiti Reading Mode Typography ── */
 [data-font="kaiti"] .rich-content {
   font-size: 1.08rem;
   line-height: 2;
@@ -670,7 +725,6 @@ body {
   }
 }
 
-/* 楷体正文保留，标题使用中等字重衬线字体。 */
 [data-font="kaiti"] :is(.rich-content) h1,
 [data-font="kaiti"] :is(.rich-content) h2,
 [data-font="kaiti"] :is(.rich-content) h3 {
@@ -679,25 +733,23 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* 文章主标题与章节标题保持一致。 */
 [data-font="kaiti"] .article-display-title {
   font-family: var(--font-serif);
   font-weight: 500;
 }
 
-/* 移动端代码块横向滚动 */
+/* Code block sizing across viewports */
 .rich-content pre {
   font-size: 0.85rem;
 }
 
 @media (min-width: 640px) {
   .rich-content pre {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
 }
 
-
-/* 内联编辑器：去掉全页编辑器的 padding 和 min-height，融入文章详情页 */
+/* Inline article editor integration */
 .inline-editor .novel-prose {
   min-height: auto;
   padding: 0;
@@ -716,10 +768,11 @@ body {
   min-height: auto;
 }
 
-/* ── 视频 / 音频移动端兼容 ── */
+/* ── Embedded Video & Audio ── */
 :is(.novel-prose, .rich-content) video {
   max-width: 100%;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--editor-line);
   background: var(--editor-soft);
 }
 
@@ -728,14 +781,15 @@ body {
   margin: 1rem 0;
 }
 
-/* ── YouTube 嵌入 ── */
+/* ── YouTube Embeds ── */
 :is(.novel-prose, .rich-content) div[data-youtube-video] {
   position: relative;
   width: 100% !important;
   height: 0 !important;
-  padding-bottom: 56.25%; /* 16:9 */
+  padding-bottom: 56.25%;
   margin: 1.5rem 0;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--editor-line);
   overflow: hidden;
   background: var(--editor-soft);
 }
@@ -749,7 +803,7 @@ body {
   border: 0;
 }
 
-/* ── Twitter/X 嵌入 ── */
+/* ── Twitter/X Embeds ── */
 .twitter-node-view {
   margin: 1.5rem auto;
   display: flex;
@@ -758,7 +812,6 @@ body {
   max-width: 100%;
 }
 
-/* Twitter widget 自适应宽度 */
 .twitter-node-view > div {
   width: 100%;
   max-width: 550px;
@@ -771,7 +824,6 @@ body {
   max-width: 100% !important;
 }
 
-/* 前台渲染（非编辑器） */
 :is(.novel-prose, .rich-content) div[data-twitter-src] {
   display: flex;
   justify-content: center;
@@ -779,25 +831,27 @@ body {
   background: transparent;
 }
 
-/* 确保 twitter iframe 不被 ProseMirror/编辑器样式约束 */
 .twitter-node-view iframe {
   max-width: 100% !important;
 }
 
-/* ── 数学公式 ── */
+/* ── LaTeX / Math Blocks ── */
 .math-node-editing {
   margin: 1rem 0;
 }
 .math-editor-container {
   border: 1px solid var(--editor-line);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 0.75rem 1rem;
   background: var(--editor-soft);
 }
 .math-editor-label {
   display: block;
+  font-family: var(--font-mono-tech);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--editor-muted);
   margin-bottom: 0.4rem;
 }
@@ -806,7 +860,7 @@ body {
   font-family: var(--font-code);
   font-size: 0.9rem;
   border: 1px solid var(--editor-line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 0.5rem;
   background: var(--editor-panel);
   resize: vertical;
@@ -816,8 +870,6 @@ body {
   border-color: var(--focus-ring);
   box-shadow: 0 0 0 2px var(--focus-ring);
 }
-/* .math-editor-input sets outline:none, so in light mode the global rule would leave only the dark outer ring.
-   Restore the blue inner ring there to get the same two-tone ring; dark mode keeps the existing blue focus glow. */
 :root[data-color-mode="light"] .math-editor-input:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 0;
@@ -834,7 +886,7 @@ body {
   margin: 1rem 0;
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: background 0.15s;
 }
 .math-node-rendered:hover {
@@ -857,7 +909,7 @@ body {
   overflow-x: auto;
 }
 
-/* Channing Studio */
+/* ── Shared Channing Studio Surface Primitives ── */
 .keep-word {
   white-space: nowrap;
 }
@@ -866,14 +918,16 @@ body {
   max-width: 72rem;
 }
 
-/* Category labels carry information (post category, lab type); quiet sans, not a mono costume. */
 .studio-eyebrow,
 .studio-card-label,
 .studio-index {
   color: var(--stone-gray);
-  font-size: 0.78rem;
+  font-family: var(--font-mono-tech);
+  font-size: 0.75rem;
   font-weight: 500;
-  line-height: 1.4;
+  letter-spacing: 0.06em;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
 }
 
 .studio-hero-title,
@@ -882,17 +936,17 @@ body {
   color: var(--editor-ink);
   font-family: var(--font-serif);
   font-weight: 500;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.035em;
 }
 
 .studio-hero-title {
-  font-size: clamp(2.75rem, 7vw, 5.8rem);
-  line-height: 1.02;
+  font-size: clamp(2.75rem, 7vw, 5.6rem);
+  line-height: 1.04;
 }
 
 .studio-hero-subtitle {
   color: var(--editor-ink);
-  font-size: clamp(1.15rem, 2vw, 1.65rem);
+  font-size: clamp(1.15rem, 2vw, 1.6rem);
   line-height: 1.45;
 }
 
@@ -904,40 +958,41 @@ body {
 }
 
 .studio-hero-note {
-  border-left: 2px solid var(--editor-accent);
+  border-left: 2px solid var(--atelier-vermilion);
   padding-left: 1.25rem;
 }
 
 .studio-page-title {
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  line-height: 1.35;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.25;
 }
 
 .studio-section-title {
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.15;
+  font-size: clamp(1.85rem, 3.6vw, 2.8rem);
+  line-height: 1.18;
 }
 
 .studio-button {
   align-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   display: inline-flex;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  gap: 0.65rem;
+  gap: 0.55rem;
   justify-content: center;
   min-height: 2.75rem;
-  padding: 0.7rem 1.1rem;
-  transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
+  padding: 0.65rem 1.15rem;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
 }
 
-.studio-button:hover {
-  transform: translateY(-1px);
+.studio-button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .studio-button-primary {
   background: var(--cta-bg);
   color: var(--cta-ink);
+  border: 1px solid transparent;
 }
 
 .studio-button-primary:hover {
@@ -952,86 +1007,86 @@ body {
 }
 
 .studio-button-secondary {
-  background: var(--editor-sand);
-  box-shadow: var(--shadow-ring);
-  border: 1px solid var(--editor-line);
+  background: var(--editor-panel);
+  border: 1px solid var(--editor-line-strong);
   color: var(--editor-ink);
 }
 
 .studio-button-secondary:hover {
   background: var(--editor-soft);
+  border-color: var(--editor-ink);
 }
 
 .studio-card {
   background: var(--editor-panel);
   border: 1px solid var(--editor-line);
-  border-radius: 1rem;
+  border-radius: var(--radius-md);
   display: block;
   padding: 1.5rem;
-  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease;
 }
 
 .studio-card:hover {
   background: var(--editor-panel);
-  border-color: color-mix(in srgb, var(--editor-accent) 55%, var(--editor-line));
-
+  border-color: var(--editor-line-strong);
 }
 
 .studio-card-title {
   color: var(--editor-ink);
   font-family: var(--font-serif);
-  font-size: clamp(1.55rem, 3vw, 2.1rem);
+  font-size: clamp(1.45rem, 2.8vw, 1.95rem);
   font-weight: 500;
   letter-spacing: -0.025em;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .studio-card-description {
   color: var(--editor-muted);
-  font-size: 0.95rem;
+  font-size: 0.9375rem;
   line-height: 1.8;
 }
 
 .studio-card-arrow {
-  color: var(--editor-accent);
-  font-size: 1.25rem;
+  color: var(--atelier-vermilion);
+  font-size: 1.15rem;
   line-height: 1;
 }
 
 .studio-writing-title {
   color: var(--editor-ink);
   font-family: var(--font-serif);
-  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
   font-weight: 500;
-  letter-spacing: -0.025em;
-  line-height: 1.3;
+  letter-spacing: -0.022em;
+  line-height: 1.32;
 }
 
 .studio-writing-description {
   color: var(--editor-muted);
   font-size: 0.92rem;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 .studio-writing-date {
   color: var(--stone-gray);
   display: block;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.7rem;
+  font-family: var(--font-mono-tech);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
   margin-top: 0.65rem;
 }
 
 .studio-empty-state {
   border-block: 1px solid var(--editor-line);
   color: var(--editor-muted);
-  padding: 5rem 1rem;
+  padding: 4.5rem 1rem;
   text-align: center;
 }
 
 .studio-empty-state p {
   color: var(--editor-ink);
   font-family: var(--font-serif);
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 500;
 }
 
@@ -1043,11 +1098,12 @@ body {
 
 .studio-tag {
   border: 1px solid var(--editor-line);
-  border-radius: 999px;
+  border-radius: var(--radius-xs);
+  background: var(--editor-soft);
   color: var(--editor-muted);
-  font-family: var(--font-body);
-  font-size: 0.8125rem;
-  padding: 0.25rem 0.5rem;
+  font-family: var(--font-mono-tech);
+  font-size: 0.75rem;
+  padding: 0.18rem 0.5rem;
 }
 
 .studio-lab-row,
@@ -1057,20 +1113,20 @@ body {
   display: flex;
   gap: 1.5rem;
   justify-content: space-between;
-  min-height: 6.5rem;
-  padding: 1.35rem 0.25rem;
-  transition: background-color 160ms ease;
+  min-height: 6rem;
+  padding: 1.3rem 0.35rem;
+  transition: background-color 140ms ease;
 }
 
 .studio-lab-row:hover,
 .studio-writing-row:hover {
-  background: var(--editor-panel);
+  background: var(--editor-soft);
 }
 
 .studio-inline-link {
-  color: var(--editor-accent);
+  color: var(--editor-link);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   text-underline-offset: 0.25rem;
 }
 
@@ -1082,14 +1138,14 @@ body {
   .studio-lab-row,
   .studio-writing-row {
     align-items: flex-start;
-    min-height: 5.5rem;
+    min-height: 5.25rem;
   }
 
   .studio-page-main {
-    padding-top: 2.5rem;
+    padding-top: 2.25rem;
   }
 
   .studio-card {
-    border-radius: 0.8rem;
+    border-radius: var(--radius-sm);
   }
 }
