@@ -23,7 +23,10 @@ export default async function WorkPage() {
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, portfolio] = await Promise.all([getSiteHeaderData(env.DB), getPublicPortfolio(env.DB)])
+      const [headerData, portfolio] = await Promise.all([
+        getSiteHeaderData(env.DB),
+        getPublicPortfolio(env.DB),
+      ])
       navLinks = headerData.navLinks
       defaultTheme = headerData.defaultTheme
       projects = portfolio
@@ -34,23 +37,30 @@ export default async function WorkPage() {
 
   return (
     <StudioShell
-      eyebrow="WORK / 作品档案"
+      eyebrow="ARCHIVE // 02 · SYSTEMS"
+      meta={projects.length > 0 ? `${projects.length} PUBLIC SYSTEMS` : 'SYSTEMS DOSSIER'}
       className="studio-index-page"
       title="作品与实践"
-      description="公开项目的用途、技术选择与当前状态。沿着项目入口，可以继续查看网站或公开源码。"
+      description="公开工程系统的定位、技术选型与当前运行状态。沿着条目入口，可继续检阅线上站点或公开源码。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
       {projects.length ? (
         <section aria-label="公开项目">
-          <div className="index-register"><span>项目目录</span><span>{projects.length} 个公开项目</span></div>
+          <div className="index-register">
+            <span>SYSTEMS CATALOGUE · 项目目录</span>
+            <span>{projects.length} 个公开项目</span>
+          </div>
           <PortfolioIndex projects={projects} headingLevel={2} />
         </section>
       ) : (
         <div className="studio-empty-state">
           <p>作品整理中</p>
-          <span>可以先去看看文章和实验室。</span>
-          <div className="public-empty-actions"><StudioLink href="/writing">阅读文章</StudioLink><StudioLink href="/labs">浏览实验室</StudioLink></div>
+          <span>公开项目档案正在同步，可以先阅读工程手记或浏览工具链实验室。</span>
+          <div className="public-empty-actions">
+            <StudioLink href="/writing">阅读工程手记</StudioLink>
+            <StudioLink href="/labs">浏览实验室</StudioLink>
+          </div>
         </div>
       )}
     </StudioShell>

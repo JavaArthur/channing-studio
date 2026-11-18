@@ -23,7 +23,10 @@ export default async function AboutPage() {
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, studioContent] = await Promise.all([getSiteHeaderData(env.DB), getStudioContent(env.DB)])
+      const [headerData, studioContent] = await Promise.all([
+        getSiteHeaderData(env.DB),
+        getStudioContent(env.DB),
+      ])
       navLinks = headerData.navLinks
       defaultTheme = headerData.defaultTheme
       content = studioContent
@@ -36,12 +39,16 @@ export default async function AboutPage() {
     <StudioShell
       title={PUBLIC_PROFILE.headline.replace('，', '，\n')}
       description={PUBLIC_PROFILE.introduction}
-      eyebrow="ABOUT / CHANNING"
+      eyebrow="DOSSIER // ABOUT CHANNING"
+      meta={`${PUBLIC_PROFILE.experience} · ${PUBLIC_PROFILE.experienceAsOf}`}
       className="studio-about"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
-      <AboutProfile contactLinks={content.profile.contactLinks} />
+      <AboutProfile
+        contactLinks={content.profile.contactLinks}
+        capabilities={content.profile.capabilities}
+      />
     </StudioShell>
   )
 }

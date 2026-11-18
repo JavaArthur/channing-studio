@@ -1,44 +1,77 @@
 import { ArrowDown, ArrowUpRight } from 'lucide-react'
 import { StudioLink } from '@/components/StudioSection'
 import { PUBLIC_PROFILE } from '@/lib/public-profile'
-import type { StudioLink as ProfileLink } from '@/lib/studio-content'
+import {
+  DEFAULT_STUDIO_CONTENT,
+  type StudioCapability,
+  type StudioLink as ProfileLink,
+} from '@/lib/studio-content'
 import '@/styles/studio-about.css'
 
-export function AboutProfile({ contactLinks }: { contactLinks: ProfileLink[] }) {
-  const links = [...PUBLIC_PROFILE.contactLinks, ...contactLinks].filter((link, index, all) =>
-    all.findIndex((candidate) => candidate.url === link.url || candidate.label.toLowerCase() === link.label.toLowerCase()) === index,
+export function AboutProfile({
+  contactLinks,
+  capabilities = DEFAULT_STUDIO_CONTENT.profile.capabilities,
+}: {
+  contactLinks: ProfileLink[]
+  capabilities?: StudioCapability[]
+}) {
+  const links = [...PUBLIC_PROFILE.contactLinks, ...contactLinks].filter(
+    (link, index, all) =>
+      all.findIndex(
+        (candidate) =>
+          candidate.url === link.url ||
+          candidate.label.toLowerCase() === link.label.toLowerCase(),
+      ) === index,
   )
+
   return (
     <div className="about-profile">
+      {/* Identity & Career Overview Ledger */}
       <section className="about-identity" aria-label="个人背景">
         <div className="about-identity-name">
-          <p className="about-label">ABOUT ME</p>
+          <p className="about-label">00 // IDENTITY</p>
           <h2>{PUBLIC_PROFILE.alias}</h2>
           <p>{PUBLIC_PROFILE.role}</p>
         </div>
+
         <div className="about-experience">
-          <p>{PUBLIC_PROFILE.experience}</p>
-          <span>{PUBLIC_PROFILE.experienceAsOf}</span>
+          <div className="about-experience-head">
+            <p>{PUBLIC_PROFILE.experience}</p>
+            <span className="about-asof">{PUBLIC_PROFILE.experienceAsOf}</span>
+          </div>
           <p className="about-team">{PUBLIC_PROFILE.team}</p>
         </div>
+
         <a className="about-case-jump" href="#selected-experience">
-          项目与职责 <ArrowDown aria-hidden size={18} />
+          项目与职责 <ArrowDown aria-hidden size={16} />
         </a>
       </section>
 
-      <section id="selected-experience" className="about-records" aria-labelledby="about-records-title">
+      {/* Verified Engineering Case Monographs */}
+      <section
+        id="selected-experience"
+        className="about-records"
+        aria-labelledby="about-records-title"
+      >
         <header className="about-section-heading">
           <div>
-            <p className="about-label">SELECTED EXPERIENCE</p>
+            <p className="about-label">01 // SELECTED EXPERIENCE</p>
             <h2 id="about-records-title">做过的系统，承担的部分。</h2>
           </div>
-          <p>任职期间的团队项目</p>
+          <p className="about-section-note">任职期间核对过的代表性工程系统</p>
         </header>
 
         {PUBLIC_PROFILE.cases.map((project) => (
-          <article className="about-case" key={project.id} aria-labelledby={`about-case-${project.id}`}>
+          <article
+            className="about-case"
+            key={project.id}
+            aria-labelledby={`about-case-${project.id}`}
+          >
             <div className="about-case-heading">
-              <p className="about-case-index"><span>{project.number}</span>{project.field}</p>
+              <p className="about-case-index">
+                <span>CASE // {project.number}</span>
+                {project.field}
+              </p>
               <div>
                 <h3 id={`about-case-${project.id}`}>{project.name}</h3>
                 <p className="about-case-period">{project.period}</p>
@@ -48,42 +81,101 @@ export function AboutProfile({ contactLinks }: { contactLinks: ProfileLink[] }) 
 
             <div className="about-case-body">
               <div className="about-evidence">
-                <p className="about-label">{project.id === 'reservation' ? '团队交付' : '平台成果'}</p>
-                <p className="about-evidence-number">{project.metric}<span>{project.metricUnit}</span></p>
+                <p className="about-label">
+                  {project.id === 'reservation' ? 'TEAM DELIVERY // 团队交付' : 'PLATFORM OUTCOME // 平台成果'}
+                </p>
+                <p className="about-evidence-number">
+                  {project.metric}
+                  <span>{project.metricUnit}</span>
+                </p>
                 <p className="about-evidence-label">{project.metricLabel}</p>
                 <p className="about-evidence-note">{project.metricNote}</p>
                 <p className="about-evidence-date">{project.metricDate}</p>
               </div>
+
               <div className="about-case-story">
                 <p className="about-case-headline">{project.headline}</p>
                 <p className="about-case-summary">{project.summary}</p>
-                <p className="about-technologies">{project.technologies}</p>
+                <ul className="about-tech-list" aria-label="关键技术栈">
+                  {project.technologies.split(' / ').map((tech) => (
+                    <li key={tech}>{tech}</li>
+                  ))}
+                </ul>
               </div>
             </div>
           </article>
         ))}
       </section>
 
+      {/* Practice Pillars Matrix */}
+      {capabilities.length > 0 && (
+        <section className="about-pillars" aria-labelledby="about-pillars-title">
+          <header className="about-section-heading">
+            <div>
+              <p className="about-label">02 // ENGINEERING PILLARS</p>
+              <h2 id="about-pillars-title">持续投入的工作方向。</h2>
+            </div>
+          </header>
+
+          <dl className="about-pillars-grid" data-count={capabilities.length}>
+            {capabilities.map((item, idx) => (
+              <div key={`${item.title}-${idx}`} className="about-pillar-cell">
+                <dt>
+                  <span aria-hidden="true">{String(idx + 1).padStart(2, '0')}</span>
+                  {item.title}
+                </dt>
+                <dd>{item.description}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
+      {/* Writing Philosophy & Verified Contact Matrix */}
       <section className="about-closing" aria-labelledby="about-closing-title">
-        <p className="about-label">WRITING & CONTACT</p>
-        <div>
+        <div className="about-closing-rail">
+          <p className="about-label">03 // WRITING &amp; CONTACT</p>
+          <p className="about-rail-pub">{PUBLIC_PROFILE.publication}</p>
+        </div>
+
+        <div className="about-closing-body">
           <h2 id="about-closing-title">{PUBLIC_PROFILE.closingTitle}</h2>
           <p className="about-closing-copy">{PUBLIC_PROFILE.writing}</p>
           <p className="about-closing-copy">{PUBLIC_PROFILE.closing}</p>
-          <p className="about-closing-copy">{PUBLIC_PROFILE.publication}</p>
-          <div className="about-links">
-            <StudioLink href="/work" className="about-link">查看公开作品 <ArrowUpRight aria-hidden size={17} /></StudioLink>
-            <StudioLink href="/writing" className="about-link">阅读工程记录 <ArrowUpRight aria-hidden size={17} /></StudioLink>
+
+          <div className="about-primary-actions">
+            <StudioLink href="/work" className="about-action-btn about-action-primary">
+              查看公开作品 <ArrowUpRight aria-hidden size={16} />
+            </StudioLink>
+            <StudioLink href="/writing" className="about-action-btn about-action-secondary">
+              阅读工程手记 <ArrowUpRight aria-hidden size={16} />
+            </StudioLink>
           </div>
+
           <div className="about-contact">
-            <p>联系与订阅</p>
-            <div className="about-links">
-              <a href={`mailto:${PUBLIC_PROFILE.email}`} className="about-link">
-                {PUBLIC_PROFILE.email} <ArrowUpRight aria-hidden size={17} />
+            <p className="about-contact-heading">VERIFIED CHANNELS // 联系与订阅</p>
+            <div className="about-contact-matrix">
+              <a
+                href={`mailto:${PUBLIC_PROFILE.email}`}
+                className="min-h-11 about-contact-cell"
+              >
+                <span className="about-contact-kind">EMAIL</span>
+                <span className="about-contact-val">
+                  {PUBLIC_PROFILE.email}
+                  <ArrowUpRight aria-hidden size={15} />
+                </span>
               </a>
               {links.map((link) => (
-                <StudioLink key={`${link.label}-${link.url}`} href={link.url} className="about-link">
-                  {link.label} <ArrowUpRight aria-hidden size={17} />
+                <StudioLink
+                  key={`${link.label}-${link.url}`}
+                  href={link.url}
+                  className="about-contact-cell"
+                >
+                  <span className="about-contact-kind">CHANNEL</span>
+                  <span className="about-contact-val">
+                    {link.label}
+                    <ArrowUpRight aria-hidden size={15} />
+                  </span>
                 </StudioLink>
               ))}
             </div>

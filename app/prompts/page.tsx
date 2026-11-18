@@ -36,15 +36,23 @@ export default async function PromptsPage() {
     console.error('Prompts page: failed to fetch prompts', error)
   }
 
-  const categories = [...new Set(prompts.map((prompt) => prompt.category?.trim() || '未分类'))]
-  const groups = categories.map((category) => ({ category, prompts: prompts.filter((prompt) => (prompt.category?.trim() || '未分类') === category) }))
+  const categories = [
+    ...new Set(prompts.map((prompt) => prompt.category?.trim() || '未分类')),
+  ]
+  const groups = categories.map((category) => ({
+    category,
+    prompts: prompts.filter(
+      (prompt) => (prompt.category?.trim() || '未分类') === category,
+    ),
+  }))
 
   return (
     <StudioShell
-      eyebrow="RESOURCES / 提示词收藏"
+      eyebrow="ARSENAL // 04 · PROMPTS"
+      meta={prompts.length > 0 ? `${prompts.length} PROMPT SPECIMENS` : 'SPECIMEN ARCHIVE'}
       className="studio-index-page"
       title="提示词笔记"
-      description="按使用场景整理的提示词。展开阅读完整正文，复制后再根据具体任务调整。"
+      description="按真实工程与写作场景沉淀的提示词样本。展开检阅完整指令正文，复制后再按任务边界裁剪调整。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
@@ -53,14 +61,34 @@ export default async function PromptsPage() {
         <>
           {groups.length > 1 && (
             <nav className="index-contents" aria-label="提示词分类目录">
-              {groups.map((group, index) => <a key={group.category} href={`#prompt-group-${index}`}><span>{group.category}</span><span>{group.prompts.length}</span></a>)}
+              {groups.map((group, index) => (
+                <a key={group.category} href={`#prompt-group-${index}`}>
+                  <span>{group.category}</span>
+                  <span>{group.prompts.length}</span>
+                </a>
+              ))}
             </nav>
           )}
+
           {groups.map((group, index) => (
-            <section key={group.category} id={`prompt-group-${index}`} className="index-resource-section" aria-labelledby={`prompt-heading-${index}`}>
-              <div className="index-section-heading"><span className="index-section-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><h2 id={`prompt-heading-${index}`}>{group.category}</h2><span className="index-meta">{group.prompts.length} 项</span></div>
+            <section
+              key={group.category}
+              id={`prompt-group-${index}`}
+              className="index-resource-section"
+              aria-labelledby={`prompt-heading-${index}`}
+            >
+              <div className="index-section-heading">
+                <span className="index-section-number" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <h2 id={`prompt-heading-${index}`}>{group.category}</h2>
+                <span className="index-meta">{group.prompts.length} 份样本</span>
+              </div>
+
               <div className="index-prompt-list">
-                {group.prompts.map((prompt) => <PromptCard key={prompt.id} prompt={prompt} />)}
+                {group.prompts.map((prompt) => (
+                  <PromptCard key={prompt.id} prompt={prompt} />
+                ))}
               </div>
             </section>
           ))}
@@ -68,7 +96,7 @@ export default async function PromptsPage() {
       ) : (
         <div className="studio-empty-state">
           <p>提示词收藏还在建立中</p>
-          <span>后续会分享经过实践的提示词。</span>
+          <span>后续会持续归档经过实战验证的提示词样本。</span>
           <StudioLink href="/tools">浏览工具收藏</StudioLink>
         </div>
       )}

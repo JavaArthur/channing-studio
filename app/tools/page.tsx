@@ -1,13 +1,13 @@
-import { notFound } from 'next/navigation'
 import { ArrowUpRight } from 'lucide-react'
-import { getTools } from '@/lib/repositories/tools'
+import { getTools, type Tool } from '@/lib/repositories/tools'
 import { ResourceTabs } from '@/components/ResourceTabs'
 import { isHttpUrl, isSafeLink } from '@/lib/url'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { StudioLink, StudioShell } from '@/components/StudioSection'
-import { getSiteHeaderData } from '@/lib/site'
+import { getSiteHeaderData, type SiteNavLink } from '@/lib/site'
 import { getSiteUrl } from '@/lib/site-config'
 import { resolveRequestTheme } from '@/lib/server-appearance'
+import type { Theme } from '@/lib/appearance'
 import '@/styles/studio-indexes.css'
 
 const BASE_URL = getSiteUrl()
@@ -38,24 +38,40 @@ function host(url: string | null): string | null {
 }
 
 export default async function ToolsPage() {
-  const env = await getAppCloudflareEnv()
-  if (!env?.DB) notFound()
+  let tools: Tool[] = []
+  let navLinks: SiteNavLink[] = []
+  let defaultTheme: Theme = 'light'
 
-  const [tools, headerData] = await Promise.all([
-    getTools(env.DB),
-    getSiteHeaderData(env.DB),
-  ])
-  const requestTheme = await resolveRequestTheme(headerData.defaultTheme)
+  try {
+    const env = await getAppCloudflareEnv()
+    if (env?.DB) {
+      const [toolRows, headerData] = await Promise.all([
+        getTools(env.DB),
+        getSiteHeaderData(env.DB),
+      ])
+      tools = toolRows
+      navLinks = headerData.navLinks
+      defaultTheme = headerData.defaultTheme
+    }
+  } catch (error) {
+    console.error('Tools page: failed to fetch tools', error)
+  }
+
+  const requestTheme = await resolveRequestTheme(defaultTheme)
   const types = [...new Set(tools.map((tool) => tool.type))]
-  const groups = types.map((type) => ({ type, tools: tools.filter((tool) => tool.type === type) }))
+  const groups = types.map((type) => ({
+    type,
+    tools: tools.filter((tool) => tool.type === type),
+  }))
 
   return (
     <StudioShell
-      eyebrow="RESOURCES / 工具收藏"
+      eyebrow="ARSENAL // 03 · TOOLS"
+      meta={tools.length > 0 ? `${tools.length} CURATED TOOLS` : 'EQUIPMENT SHELF'}
       className="studio-index-page"
       title="工具架"
-      description="在线工具、代码仓库与 Mac 软件。按类型浏览收藏，再沿着标签和原始链接继续探索。"
-      navLinks={headerData.navLinks}
+      description="高频使用的在线服务、开源代码仓库与 Mac 桌面软件。按类型归档，沿着标签与原始链接直接取用。"
+      navLinks={navLinks}
       initialTheme={requestTheme}
     >
       <ResourceTabs active="tools" />
@@ -69,29 +85,87 @@ export default async function ToolsPage() {
         <>
           {groups.length > 1 && (
             <nav className="index-contents" aria-label="工具分类目录">
-              {groups.map((group, index) => <a key={group.type} href={`#tool-group-${index}`}><span>{TYPE_LABELS[group.type] ?? group.type}</span><span>{group.tools.length}</span></a>)}
+              {groups.map((group, index) => (
+                <a key={group.type} href={`#tool-group-${index}`}>
+                  <span>{TYPE_LABELS[group.type] ?? group.type}</span>
+                  <span>{group.tools.length}</span>
+                </a>
+              ))}
             </nav>
           )}
+
           {groups.map((group, index) => (
-            <section key={group.type} id={`tool-group-${index}`} className="index-resource-section" aria-labelledby={`tool-heading-${index}`}>
-              <div className="index-section-heading"><span className="index-section-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><h2 id={`tool-heading-${index}`}>{TYPE_LABELS[group.type] ?? group.type}</h2><span className="index-meta">{group.tools.length} 项</span></div>
+            <section
+              key={group.type}
+              id={`tool-group-${index}`}
+              className="index-resource-section"
+              aria-labelledby={`tool-heading-${index}`}
+            >
+              <div className="index-section-heading">
+                <span className="index-section-number" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <h2 id={`tool-heading-${index}`}>
+                  {TYPE_LABELS[group.type] ?? group.type}
+                </h2>
+                <span className="index-meta">{group.tools.length} 项</span>
+              </div>
+
               <div className="index-tool-grid">
                 {group.tools.map((tool) => {
                   const h = host(tool.url)
                   const safeUrl = tool.url && isHttpUrl(tool.url) ? tool.url : null
                   const Wrapper = safeUrl ? 'a' : 'div'
                   return (
-                    <Wrapper key={tool.id} {...(safeUrl ? { href: safeUrl, target: '_blank', rel: 'noopener noreferrer nofollow' } : {})} className="index-tool-entry">
+                    <Wrapper
+                      key={tool.id}
+                      {...(safeUrl
+                        ? {
+                            href: safeUrl,
+                            target: '_blank',
+                            rel: 'noopener noreferrer nofollow',
+                          }
+                        : {})}
+                      className="index-tool-entry"
+                    >
                       <div className="index-tool-heading">
                         {tool.icon && isSafeLink(tool.icon) ? (
-                          <img src={tool.icon} alt="" loading="lazy" width={36} height={36} className="index-tool-icon" />
-                        ) : <span className="index-tool-icon index-tool-initial" aria-hidden="true">{tool.name.slice(0, 1).toUpperCase()}</span>}
-                        <div><h3>{tool.name}</h3>{h && <span className="index-location">{h}</span>}</div>
-                        {safeUrl && <ArrowUpRight size={18} aria-hidden="true" />}
+                          <img
+                            src={tool.icon}
+                            alt=""
+                            loading="lazy"
+                            width={38}
+                            height={38}
+                            className="index-tool-icon"
+                          />
+                        ) : (
+                          <span
+                            className="index-tool-icon index-tool-initial"
+                            aria-hidden="true"
+                          >
+                            {tool.name.slice(0, 1).toUpperCase()}
+                          </span>
+                        )}
+                        <div>
+                          <h3>{tool.name}</h3>
+                          {h && <span className="index-location">{h}</span>}
+                        </div>
+                        {safeUrl && <ArrowUpRight size={17} aria-hidden="true" />}
                       </div>
-                      {tool.is_pinned === 1 && <span className="index-pinned">置顶收藏</span>}
+
+                      {tool.is_pinned === 1 && (
+                        <span className="index-pinned">PINNED · 置顶收藏</span>
+                      )}
+
                       {tool.description && <p>{tool.description}</p>}
-                      {tool.tags.length > 0 && <ul className="index-tags" aria-label="标签">{tool.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>}
+
+                      {tool.tags.length > 0 && (
+                        <ul className="index-tags" aria-label="标签">
+                          {tool.tags.map((tag) => (
+                            <li key={tag}>{tag}</li>
+                          ))}
+                        </ul>
+                      )}
                     </Wrapper>
                   )
                 })}

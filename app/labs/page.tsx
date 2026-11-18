@@ -12,7 +12,12 @@ import { getSiteUrl } from '@/lib/site-config'
 import type { Theme } from '@/lib/appearance'
 import type { SiteNavLink } from '@/lib/site'
 
-const LAB_TYPE_LABELS: Record<string, string> = { tool: '工具', skill: 'Skill', workflow: '工作流', agent: 'Agent' }
+const LAB_TYPE_LABELS: Record<string, string> = {
+  tool: '工具',
+  skill: 'Skill',
+  workflow: '工作流',
+  agent: 'Agent',
+}
 
 export const metadata = {
   title: '实验室 · Channing Studio',
@@ -46,42 +51,78 @@ export default async function LabsPage() {
 
   return (
     <StudioShell
-      eyebrow="LABS / 实验记录"
+      eyebrow="ATELIER // 05 · LABS"
+      meta={
+        visibleLabs.length > 0
+          ? `${visibleLabs.length} WORKFLOW COMPONENTS`
+          : 'EXPERIMENTAL BENCH'
+      }
       className="studio-index-page"
       title="工具链实验室"
-      description="发布工具、工作流与 Agent 实验。这里保留各个组件的说明与入口，便于理解它们在流程中承担的工作。"
+      description="剪藏、发布工具、工作流与 Agent 实验。这里保留各个组件的设计职责与仓库入口，展示它们如何串联日常生产力。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
-      {visibleLabs.length > 0 && (
+      {visibleLabs.length > 0 ? (
         <section aria-label="公开实验">
-          <div className="index-register"><span>组件与工作流</span><span>{visibleLabs.length} 项公开实验</span></div>
+          <div className="index-register">
+            <span>WORKFLOW &amp; AGENT BENCH · 组件与工作流</span>
+            <span>{visibleLabs.length} 项公开实验</span>
+          </div>
           <ol className="index-lab-list">
             {visibleLabs.map((lab, index) => (
               <li key={lab.id}>
                 <StudioLink href={lab.href} className="index-lab-entry">
-                  <span className="index-section-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                  <article><span className="index-category">{LAB_TYPE_LABELS[lab.type] ?? lab.type}</span><h2>{lab.title}</h2><p>{lab.description}</p></article>
-                  <ArrowUpRight aria-hidden="true" className="index-entry-arrow" size={20} />
+                  <span className="index-section-number" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <article>
+                    <span className="index-category">
+                      {LAB_TYPE_LABELS[lab.type] ?? lab.type}
+                    </span>
+                    <h2>{lab.title}</h2>
+                    <p>{lab.description}</p>
+                  </article>
+                  <ArrowUpRight
+                    aria-hidden="true"
+                    className="index-entry-arrow"
+                    size={20}
+                  />
                 </StudioLink>
               </li>
             ))}
           </ol>
         </section>
-      )}
-      {visibleLabs.length === 0 && (
+      ) : (
         <div className="studio-empty-state">
           <p>实验室正在整理中</p>
-          <span>可以先浏览工作中使用的工具。</span>
+          <span>可以先浏览日常工程中使用的工具架。</span>
           <StudioLink href="/tools">浏览工具收藏</StudioLink>
         </div>
       )}
+
       {tools.length > 0 && (
         <section className="index-related" aria-labelledby="related-tools">
-          <div className="index-section-heading"><h2 id="related-tools">相关工具</h2><StudioLink href="/tools" className="index-text-link">完整工具架<ArrowUpRight aria-hidden size={16} /></StudioLink></div>
+          <div className="index-section-heading">
+            <span className="index-section-number" aria-hidden="true">
+              REF
+            </span>
+            <h2 id="related-tools">相关在用工具</h2>
+            <StudioLink href="/tools" className="index-text-link">
+              完整工具架
+              <ArrowUpRight aria-hidden size={14} />
+            </StudioLink>
+          </div>
           <div className="index-related-links">
             {selectStudioTools(tools).map((tool) => (
-              <StudioLink key={tool.id} href={tool.url || '/tools'} className="index-text-link">{tool.name}<ArrowUpRight aria-hidden size={14} /></StudioLink>
+              <StudioLink
+                key={tool.id}
+                href={tool.url || '/tools'}
+                className="index-text-link"
+              >
+                {tool.name}
+                <ArrowUpRight aria-hidden size={14} />
+              </StudioLink>
             ))}
           </div>
         </section>
