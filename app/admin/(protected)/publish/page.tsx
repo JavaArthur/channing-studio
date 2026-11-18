@@ -1,5 +1,7 @@
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getPublicationSummary } from '@/lib/repositories/library'
+import { DEFAULT_HOME_MODULES, DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
+import { getStudioContent } from '@/lib/studio-settings'
 import Link from 'next/link'
 import {
   ArrowUpRight,
@@ -15,80 +17,97 @@ import {
 const links = [
   {
     code: '01',
-    href: '/admin/posts',
-    label: '文章与摘录',
-    description: '编辑工作稿，核对元信息与分类，确认后对外发布。',
-    Icon: FileText,
+    href: '/admin/studio',
+    label: '博客首页编排 · 可插拔吐出',
+    description: '控制首屏精选长文、文章流、项目与百宝箱是否向晨启AI首页吐出，维护个人名片。',
+    Icon: Layout,
   },
   {
     code: '02',
-    href: '/admin/portfolio',
-    label: '作品集',
-    description: '在项目导航里挑选公开系统，确认后同步到公开作品页。',
-    Icon: FolderKanban,
+    href: '/admin/posts',
+    label: '文章与手记',
+    description: '编辑私人工作稿，核对分类与摘要，显式确认后发布至晨启AI技术博客。',
+    Icon: FileText,
   },
   {
     code: '03',
-    href: '/admin/studio',
-    label: '首页与个人介绍',
-    description: '维护公开首屏主张、能力支柱、实验室与精选文章。',
-    Icon: Layout,
+    href: '/admin/portfolio',
+    label: '开源与实践项目',
+    description: '在项目导航里挑选愿意对外展示的实践项目，独立生成公开快照。',
+    Icon: FolderKanban,
   },
   {
     code: '04',
     href: '/admin/tools',
-    label: '公开工具',
-    description: '挑选日常验证过的工程工具，独立维护公开快照。',
+    label: '百宝箱 · 公开工具',
+    description: '挑选日常验证过的工程利器，向博客访客吐出脱敏后的公开版本。',
     Icon: Wrench,
   },
   {
     code: '05',
     href: '/admin/prompts',
-    label: '公开提示词',
-    description: '审校并发布可供访客直接复用的提示词标本。',
+    label: '百宝箱 · 公开提示词',
+    description: '审校并发布可供读者直接复制复用的工程提示词标本。',
     Icon: MessageSquare,
   },
 ]
 
 export default async function Page() {
   const env = await getAppCloudflareEnv()
-  const stats = env.DB ? await getPublicationSummary(env.DB).catch(() => null) : null
+  const [stats, studio] = env.DB
+    ? await Promise.all([
+        getPublicationSummary(env.DB).catch(() => null),
+        getStudioContent(env.DB).catch(() => DEFAULT_STUDIO_CONTENT),
+      ])
+    : [null, DEFAULT_STUDIO_CONTENT]
+
+  const modules = studio.homeModules ?? DEFAULT_HOME_MODULES
+  const activeModules = [
+    modules.featuredEssay,
+    modules.writing,
+    modules.focusAreas,
+    modules.projects,
+    modules.tools,
+    modules.prompts,
+  ].filter(Boolean).length
+
   const states: Record<string, string> = {
+    '/admin/studio': `${activeModules} / 6 个首页模块已插拔启用`,
     '/admin/posts': `${stats?.posts ?? 0} 篇已发布 · ${stats?.drafts ?? 0} 篇草稿`,
-    '/admin/tools': `${stats?.tools ?? 0} 件已公开`,
-    '/admin/prompts': `${stats?.prompts ?? 0} 条已公开`,
-    '/admin/portfolio': `${stats?.portfolio ?? 0} 个项目已公开`,
-    '/admin/studio': '编辑站点内容',
+    '/admin/portfolio': `${stats?.portfolio ?? 0} 个项目已公开${modules.projects ? '' : ' · 首页已拔除'}`,
+    '/admin/tools': `${stats?.tools ?? 0} 件已公开${modules.tools ? '' : ' · 首页已拔除'}`,
+    '/admin/prompts': `${stats?.prompts ?? 0} 条已公开${modules.prompts ? '' : ' · 首页已拔除'}`,
   }
 
   const telemetry = [
     {
-      code: 'WRITING',
+      code: 'PROJECTION',
+      label: '首页启用模块',
+      value: `${activeModules}/6`,
+      sub: '点击配置可插拔开关',
+      href: '/admin/studio',
+    },
+    {
+      code: 'BLOG ESSAYS',
       label: '已发布文章',
-      value: stats?.posts ?? 0,
-      sub: `${stats?.drafts ?? 0} 篇草稿待审`,
+      value: String(stats?.posts ?? 0),
+      sub: `${stats?.drafts ?? 0} 篇草稿在工作台`,
       href: '/admin/posts',
     },
     {
-      code: 'SYSTEMS',
-      label: '公开作品项目',
-      value: stats?.portfolio ?? 0,
-      sub: '同步至 /work',
+      code: 'SIDE PROJECTS',
+      label: '公开实践项目',
+      value: String(stats?.portfolio ?? 0),
+      sub: modules.projects ? '首页吐出中 · /work' : '仅保留在 /work',
       href: '/admin/portfolio',
     },
     {
-      code: 'ARSENAL · TOOLS',
-      label: '公开工具收藏',
-      value: stats?.tools ?? 0,
-      sub: '同步至 /tools',
+      code: 'TOOLKIT',
+      label: '公开工具与提示词',
+      value: String((stats?.tools ?? 0) + (stats?.prompts ?? 0)),
+      sub:
+        modules.tools || modules.prompts ? '首页百宝箱吐出中' : '首页已收起百宝箱',
       href: '/admin/tools',
-    },
-    {
-      code: 'ARSENAL · PROMPTS',
-      label: '公开提示词',
-      value: stats?.prompts ?? 0,
-      sub: '同步至 /prompts',
-      href: '/admin/prompts',
     },
   ]
 
@@ -97,22 +116,27 @@ export default async function Page() {
       <header className="workspace-page-heading">
         <div>
           <div className="workspace-breadcrumb">
-            我的 Studio <span>/</span> 对外分享
+            晨启工作台 <span>/</span> 博客吐出
           </div>
           <span className="atelier-eyebrow">
             <span className="atelier-beacon" data-tone="vermilion" aria-hidden="true" />
-            PUBLICATION // STUDIO DISPATCH
+            PUBLICATION // BLOG PROJECTION HUB
           </span>
-          <h1>公开管理</h1>
-          <p>把你选择的成果带到外面。私人资料始终由你显式确认后才生成公开快照。</p>
+          <h1>晨启AI 公开博客吐出管理</h1>
+          <p>
+            工作台负责沉淀与审校，「晨启AI」博客仅展示你显式吐出的内容，外部访客对私人工作台零感知。
+          </p>
         </div>
         <div className="publish-header-actions">
-          <Link href="/editor?new=1" className="admin-button admin-button-primary atelier-cta-vermilion">
+          <Link
+            href="/editor?new=1"
+            className="admin-button admin-button-primary atelier-cta-vermilion"
+          >
             <PenLine size={15} />
             写新文章
           </Link>
           <Link href="/" target="_blank" className="brain-secondary">
-            查看网站
+            查看晨启AI博客
             <ArrowUpRight size={15} />
           </Link>
         </div>
@@ -160,7 +184,7 @@ export default async function Page() {
       <div className="publish-secondary">
         <Link href="/admin/categories">
           <Tags size={14} />
-          文章分类
+          文章分类管理
         </Link>
       </div>
     </div>

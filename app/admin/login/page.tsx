@@ -71,7 +71,7 @@ function AdminLoginForm() {
       <div className="vault-topbar">
         <span className="atelier-kicker">
           <span className="atelier-beacon" data-tone={beaconTone} aria-hidden="true" />
-          <span>CHANNING ATELIER // PRIVATE VAULT</span>
+          <span>PRIVATE WORKBENCH // 仅自己可见</span>
         </span>
         <ThemeDropdown />
       </div>
@@ -81,14 +81,14 @@ function AdminLoginForm() {
           <header className="vault-header">
             <div className="vault-identity">
               <span className="vault-monogram" aria-hidden="true">
-                C<span>/</span>
+                晨<span>/</span>
               </span>
               <div>
-                <span className="vault-kicker">ACCESS GATE // 01</span>
-                <h1>Channing Atelier</h1>
+                <span className="vault-kicker">ACCESS GATE // 私人空间</span>
+                <h1>晨启 · 私人工作台</h1>
               </div>
             </div>
-            <p className="vault-subtitle">私人工程手稿、知识复盘与站点出版工作台</p>
+            <p className="vault-subtitle">个人写作手稿、知识复盘与晨启AI博客内容编排空间</p>
           </header>
 
           <div className="vault-telemetry" aria-hidden="true">
@@ -120,7 +120,7 @@ function AdminLoginForm() {
                     if (error) setError('')
                     if (invalid) setInvalid(false)
                   }}
-                  placeholder="输入工作台访问密钥"
+                  placeholder="输入私人工作台访问密钥"
                   autoFocus
                   autoComplete="current-password"
                   className="vault-input"
@@ -145,9 +145,9 @@ function AdminLoginForm() {
           <footer className="vault-footer">
             <Link href="/" className="vault-back-link">
               <ArrowLeft size={13} aria-hidden="true" />
-              <span>返回公开首页</span>
+              <span>返回晨启AI博客</span>
             </Link>
-            <span className="vault-stamp">ATELIER VAULT · V2</span>
+            <span className="vault-stamp">PRIVATE VAULT · V2</span>
           </footer>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import {
+  ArrowRight,
   ArrowUpRight,
   BookOpen,
   CircleAlert,
@@ -10,6 +11,7 @@ import {
   Layers,
   NotebookPen,
   Send,
+  SlidersHorizontal,
   Sparkles,
   Terminal,
   Wrench,
@@ -22,9 +24,11 @@ import { getTools } from '@/lib/repositories/tools'
 import { getPrompts } from '@/lib/repositories/prompts'
 import { listXDrafts } from '@/lib/repositories/x-drafts'
 import { libraryLabels } from '@/lib/library/types'
+import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
+import { getStudioContent } from '@/lib/studio-settings'
 
 export const dynamic = 'force-dynamic'
-export const metadata = { title: '总控台 · Channing Atelier' }
+export const metadata = { title: '总控台 · 晨启私人工作台' }
 
 function formatDeskDate(epoch?: number | null): string {
   if (!epoch || !Number.isFinite(epoch) || epoch <= 0) return '—'
@@ -54,7 +58,7 @@ function formatMastheadStamp(): string {
     const get = (type: string) => parts.find((p) => p.type === type)?.value ?? ''
     return `${get('year')}.${get('month')}.${get('day')} · ${get('weekday').toUpperCase()} · UTC+8`
   } catch {
-    return 'UTC+8 · ATELIER'
+    return 'UTC+8 · PRIVATE WORKBENCH'
   }
 }
 
@@ -63,7 +67,16 @@ export default async function WorkbenchCommandPage() {
   const db = env?.DB
   const dbReady = Boolean(db)
 
-  const [postPage, libraryRecent, decisionResult, portfolioProjects, tools, prompts, xDrafts] = db
+  const [
+    postPage,
+    libraryRecent,
+    decisionResult,
+    portfolioProjects,
+    tools,
+    prompts,
+    xDrafts,
+    studioContent,
+  ] = db
     ? await Promise.all([
         getAdminPostPage(db, { page: 1 }).catch(() => null),
         searchLibrary(db, { limit: 6, sort: 'updated' }).catch(() => null),
@@ -72,8 +85,9 @@ export default async function WorkbenchCommandPage() {
         getTools(db, { includeHidden: true }).catch(() => null),
         getPrompts(db, { includeHidden: true }).catch(() => null),
         listXDrafts(db, { account_id: 'all', status: 'pending', limit: 1 }).catch(() => null),
+        getStudioContent(db).catch(() => DEFAULT_STUDIO_CONTENT),
       ])
-    : [null, null, null, null, null, null, null]
+    : [null, null, null, null, null, null, null, DEFAULT_STUDIO_CONTENT]
 
   const publishedPosts = postPage?.stats?.published ?? 0
   const draftPosts = postPage?.stats?.draft ?? 0
@@ -94,6 +108,17 @@ export default async function WorkbenchCommandPage() {
   const promptsCount = prompts?.length ?? 0
   const arsenalTotal = toolsCount + promptsCount
   const pendingXDrafts = xDrafts?.total ?? 0
+
+  const homeModules = studioContent?.homeModules ?? DEFAULT_STUDIO_CONTENT.homeModules
+  const projectionModules = [
+    { key: 'featuredEssay', label: '精选长文', active: homeModules.featuredEssay },
+    { key: 'writing', label: `文章流 (${homeModules.writingLimit})`, active: homeModules.writing },
+    { key: 'focusAreas', label: '写作关注', active: homeModules.focusAreas },
+    { key: 'projects', label: `项目 (${homeModules.projectsLimit})`, active: homeModules.projects },
+    { key: 'tools', label: '工具', active: homeModules.tools },
+    { key: 'prompts', label: '提示词', active: homeModules.prompts },
+  ]
+  const activeProjectionCount = projectionModules.filter((item) => item.active).length
 
   const quickActions = [
     {
@@ -123,7 +148,7 @@ export default async function WorkbenchCommandPage() {
     {
       code: '04 // PUBLISH',
       title: '管理公开站',
-      desc: '审校草稿与脱敏快照，显式更新公开作品集与文章站。',
+      desc: '编排可插拔模块与脱敏快照，决定哪些成果吐出至晨启AI博客。',
       href: '/admin/publish',
       Icon: Globe,
       primary: false,
@@ -133,8 +158,8 @@ export default async function WorkbenchCommandPage() {
   const surfaceMatrix = [
     {
       code: 'S1',
-      title: '首页与工作室',
-      desc: 'Hero 叙事、实践支柱与档案设置',
+      title: '首页模块编排',
+      desc: `${activeProjectionCount}/${projectionModules.length} 模块已挂载至晨启AI首页`,
       href: '/admin/studio',
       Icon: Layers,
     },
@@ -187,7 +212,7 @@ export default async function WorkbenchCommandPage() {
               data-tone={dbReady ? 'healthy' : 'warning'}
               aria-hidden="true"
             />
-            <span>WORKBENCH // COMMAND DESK</span>
+            <span>MORNING AI // PRIVATE COMMAND DESK</span>
           </span>
           <span className="command-masthead-stamp">{formatMastheadStamp()}</span>
         </div>
@@ -196,7 +221,7 @@ export default async function WorkbenchCommandPage() {
           <div>
             <h1>私人工程与知识总控台</h1>
             <p>
-              面向写作手稿、知识闭环、项目交付与公开出版的统一调度席。
+              私人沉淀在此闭环；晨启AI公开博客仅接收显式审校与插拔吐出的内容。
               {!dbReady && '（当前未绑定本地 D1，计数与流处于待机状态）'}
             </p>
           </div>
@@ -303,6 +328,41 @@ export default async function WorkbenchCommandPage() {
             <span aria-hidden="true">·</span>
             <span>{promptsCount} 提示词</span>
           </div>
+        </Link>
+      </section>
+
+      {/* ── 02b. Pluggable Homepage Projection Status Strip ── */}
+      <section className="command-projection-strip" aria-label="首页可插拔吐出状态">
+        <div className="command-projection-meta">
+          <span className="command-projection-kicker">
+            <SlidersHorizontal size={13} aria-hidden="true" />
+            <span>PROJECTION // 首页可插拔吐出状态</span>
+          </span>
+          <span className="command-projection-count">
+            {activeProjectionCount}/{projectionModules.length} 已挂载至 /
+          </span>
+        </div>
+
+        <div className="command-projection-pills">
+          {projectionModules.map((mod) => (
+            <span
+              key={mod.key}
+              className="command-projection-pill"
+              data-active={mod.active ? 'true' : 'false'}
+            >
+              <span
+                className="atelier-beacon"
+                data-tone={mod.active ? 'healthy' : undefined}
+                aria-hidden="true"
+              />
+              <span>{mod.label}</span>
+            </span>
+          ))}
+        </div>
+
+        <Link href="/admin/studio" className="command-projection-cta">
+          <span>配置插拔开关</span>
+          <ArrowRight size={13} aria-hidden="true" />
         </Link>
       </section>
 

@@ -45,11 +45,11 @@ export default async function AdminProtectedLayout({ children }: { children: Rea
             <aside className="workspace-sidebar">
               <Link href="/admin" className="workspace-brand">
                 <span className="brand-mark" aria-hidden="true">
-                  C<span className="brand-slash">/</span>
+                  晨<span className="brand-slash">/</span>
                 </span>
                 <span className="workspace-brand-copy">
-                  <span className="workspace-brand-title">Channing Atelier</span>
-                  <small>PRIVATE WORKBENCH</small>
+                  <span className="workspace-brand-title">晨启 · 私人工作台</span>
+                  <small>PRIVATE VAULT · 仅自己可见</small>
                 </span>
               </Link>
 
@@ -68,7 +68,7 @@ export default async function AdminProtectedLayout({ children }: { children: Rea
 
               <div className="workspace-sidebar-footer">
                 <Link href="/" className="workspace-footer-site">
-                  <span>公开网站</span>
+                  <span>晨启AI · 公开网站</span>
                   <ArrowUpRight size={13} aria-hidden="true" />
                 </Link>
                 <LogoutButton />
@@ -79,15 +79,15 @@ export default async function AdminProtectedLayout({ children }: { children: Rea
               <header className="workspace-topbar">
                 <Link href="/admin" className="workspace-mobile-brand">
                   <span className="brand-mark" aria-hidden="true">
-                    C<span className="brand-slash">/</span>
+                    晨<span className="brand-slash">/</span>
                   </span>
-                  <span>Channing Atelier</span>
+                  <span>晨启 · 私人工作台</span>
                 </Link>
 
                 <span className="workspace-private">
                   <span className="atelier-beacon" data-tone="healthy" aria-hidden="true" />
                   <LockKeyhole size={12} aria-hidden="true" />
-                  <span className="workspace-private-code">PRIVATE VAULT · ENCRYPTED SESSION</span>
+                  <span className="workspace-private-code">PRIVATE WORKBENCH · 仅自己可见</span>
                 </span>
 
                 <div className="workspace-topbar-actions">
@@ -100,7 +100,7 @@ export default async function AdminProtectedLayout({ children }: { children: Rea
                     <span>记一条</span>
                   </Link>
                   <Link href="/" className="workspace-topbar-link workspace-topbar-desktop-only">
-                    <span>公开网站</span>
+                    <span>晨启AI 博客</span>
                     <ArrowUpRight size={12} aria-hidden="true" />
                   </Link>
                   <ThemeDropdown />
@@ -126,7 +126,7 @@ export default async function AdminProtectedLayout({ children }: { children: Rea
                   <BrainNav decisions={decisions} />
                   <div className="workspace-mobile-footer">
                     <Link href="/" className="workspace-footer-site">
-                      <span>公开网站</span>
+                      <span>晨启AI · 公开网站</span>
                       <ArrowUpRight size={13} aria-hidden="true" />
                     </Link>
                     <LogoutButton />
