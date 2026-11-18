@@ -13,7 +13,9 @@ export function LogoutButton() {
   const handleLogout = async () => {
     const response = await fetch('/api/admin/logout', { method: 'POST' })
     if (!response.ok) return
-    try { clearPrivateDrafts() } catch {}
+    try {
+      clearPrivateDrafts()
+    } catch {}
     router.push('/admin/login')
     router.refresh()
   }
@@ -24,12 +26,11 @@ export function LogoutButton() {
         type="button"
         data-admin-logout
         onClick={() => guard(() => void handleLogout())}
-        className="min-h-11 min-w-11 p-2 rounded-lg text-[var(--editor-muted)] hover:text-[var(--danger)] hover:bg-[var(--editor-soft)] transition-all"
+        className="workspace-logout-btn"
         aria-label="退出登录"
       >
-        <LogOut className="w-4 h-4" />
+        <LogOut size={14} aria-hidden="true" />
       </button>
     </Tooltip>
   )
 }
-

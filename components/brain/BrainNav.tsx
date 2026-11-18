@@ -1,77 +1,163 @@
 'use client'
+
 import { useWorkspace } from '@/components/library/WorkspaceState'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { BookOpen, Folder, FolderKanban, Globe, Settings, Sparkles, Link2, Star, CircleHelp, NotebookPen } from 'lucide-react'
+import {
+  BookOpen,
+  CircleHelp,
+  Clock3,
+  Compass,
+  Folder,
+  FolderKanban,
+  Globe,
+  Link2,
+  NotebookPen,
+  Settings,
+  Sparkles,
+  Star,
+  type LucideIcon,
+} from 'lucide-react'
+
+interface NavItem {
+  title: string
+  href: string
+  Icon: LucideIcon
+  active: boolean
+  badge?: number
+}
+
+interface NavSection {
+  code: string
+  label: string
+  items: NavItem[]
+}
+
 export function BrainNav({ decisions = 0 }: { decisions?: number }) {
   const { usage } = useWorkspace()
   const path = usePathname()
   const query = useSearchParams()
   const inLibrary = path === '/admin/library' || path.startsWith('/admin/library/')
   const pinnedCollections = usage.collections.filter((collection) => collection.pinned).slice(0, 6)
-  const main = [
-    { title: '最近阅读', href: '/admin/library?recent=1', Icon: BookOpen, active: inLibrary && query.get('recent') === '1' },
+
+  const sections: NavSection[] = [
     {
-      title: '全部内容',
-      href: '/admin/library',
-      Icon: BookOpen,
-      active:
-        inLibrary &&
-        !query.get('recent') &&
-        !query.get('favorite') &&
-        !query.get('decisions') &&
-        !query.get('collection') &&
-        query.get('kind') !== 'inspiration',
+      code: '01',
+      label: '控制台',
+      items: [
+        {
+          title: '总控台',
+          href: '/admin',
+          Icon: Compass,
+          active: path === '/admin',
+        },
+      ],
     },
     {
-      title: '收藏',
-      href: '/admin/library?favorite=1',
-      Icon: Star,
-      active: inLibrary && !!query.get('favorite'),
+      code: '02',
+      label: '知识与复盘',
+      items: [
+        {
+          title: '学习与复盘',
+          href: '/admin/learning',
+          Icon: NotebookPen,
+          active: path === '/admin/learning',
+        },
+        {
+          title: '全部内容',
+          href: '/admin/library',
+          Icon: BookOpen,
+          active:
+            inLibrary &&
+            !query.get('recent') &&
+            !query.get('favorite') &&
+            !query.get('decisions') &&
+            !query.get('collection') &&
+            query.get('kind') !== 'inspiration',
+        },
+        {
+          title: '最近阅读',
+          href: '/admin/library?recent=1',
+          Icon: Clock3,
+          active: inLibrary && query.get('recent') === '1',
+        },
+        {
+          title: '收藏',
+          href: '/admin/library?favorite=1',
+          Icon: Star,
+          active: inLibrary && !!query.get('favorite'),
+        },
+        {
+          title: '待决定',
+          href: '/admin/library?decisions=1',
+          Icon: CircleHelp,
+          active: inLibrary && !!query.get('decisions'),
+          badge: decisions > 0 ? decisions : undefined,
+        },
+      ],
     },
     {
-      title: '运营',
-      href: '/admin/operations',
-      Icon: Sparkles,
-      active: path.startsWith('/admin/operations'),
+      code: '03',
+      label: '协同与项目',
+      items: [
+        {
+          title: '运营',
+          href: '/admin/operations',
+          Icon: Sparkles,
+          active: path.startsWith('/admin/operations'),
+        },
+        {
+          title: '项目导航',
+          href: '/admin/portfolio',
+          Icon: FolderKanban,
+          active: path.startsWith('/admin/portfolio'),
+        },
+        {
+          title: '主题资料集',
+          href: '/admin/collections',
+          Icon: Folder,
+          active: path === '/admin/collections',
+        },
+      ],
     },
     {
-      title: '项目导航',
-      href: '/admin/portfolio',
-      Icon: FolderKanban,
-      active: path.startsWith('/admin/portfolio'),
-    },
-    {
-      title: '主题资料集',
-      href: '/admin/collections',
-      Icon: Folder,
-      active: path === '/admin/collections',
-    },
-    ...(decisions
-      ? [
-          {
-            title: '待决定',
-            href: '/admin/library?decisions=1',
-            Icon: CircleHelp,
-            active: inLibrary && !!query.get('decisions'),
-          },
-        ]
-      : []),
-    {
-      title: '公开管理',
-      href: '/admin/publish',
-      Icon: Globe,
-      active: [
-        '/admin/publish',
-        '/admin/posts',
-        '/admin/studio',
-        '/admin/tools',
-        '/admin/prompts',
-        '/admin/categories',
-        '/admin/projects',
-      ].some((p) => path.startsWith(p)),
+      code: '04',
+      label: '公开出版',
+      items: [
+        {
+          title: '公开管理',
+          href: '/admin/publish',
+          Icon: Globe,
+          active: [
+            '/admin/publish',
+            '/admin/posts',
+            '/admin/studio',
+            '/admin/tools',
+            '/admin/prompts',
+            '/admin/categories',
+            '/admin/projects',
+            '/admin/x-drafts',
+          ].some((prefix) => path.startsWith(prefix)),
+        },
+      ],
     },
   ]
+
+  const systemItems: NavItem[] = [
+    {
+      title: '连接与密钥',
+      href: '/admin/connections',
+      Icon: Link2,
+      active: path === '/admin/connections',
+    },
+    {
+      title: '站点设置',
+      href: '/admin/settings',
+      Icon: Settings,
+      active: path.startsWith('/admin/settings'),
+    },
+  ]
+
   return (
     <nav
       aria-label="个人工作空间"
@@ -92,48 +178,52 @@ export function BrainNav({ decisions = 0 }: { decisions?: number }) {
       }}
     >
       <div className="workspace-nav-main">
-        <span className="workspace-nav-label">日常工作台</span>
-        <Link href="/admin/learning" aria-current={path === '/admin/learning' ? 'page' : undefined}><NotebookPen size={17} aria-hidden="true" /><span>学习与复盘</span></Link>
-        {[main[1],main[0],...main.slice(2)].map(({ title, href, Icon, active }) => (
-          <Link key={href} href={href} aria-current={active ? 'page' : undefined}>
-            <Icon size={17} aria-hidden="true" />
-            <span>{title}</span>
-            {title === '待决定' && <span className="workspace-nav-count">{decisions}</span>}
-          </Link>
-        ))}
-        {pinnedCollections.length > 0 && (
-          <div className="workspace-collection-nav">
-            <span>常用资料集</span>
-            {pinnedCollections.map((collection) => (
-              <Link
-                key={collection.id}
-                href={`/admin/library?collection=${encodeURIComponent(collection.id)}`}
-                aria-current={inLibrary && query.get('collection') === collection.id ? 'page' : undefined}
-                title={collection.title}
-              >
-                <Folder size={15} aria-hidden="true" />
-                <span>{collection.title}</span>
+        {sections.map((section) => (
+          <div key={section.code} className="workspace-nav-group">
+            <span className="workspace-nav-label">
+              <span className="workspace-nav-code">{`${section.code} //`}</span> {section.label}
+            </span>
+            {section.items.map(({ title, href, Icon, active, badge }) => (
+              <Link key={href} href={href} aria-current={active ? 'page' : undefined}>
+                <Icon size={15} aria-hidden="true" />
+                <span>{title}</span>
+                {badge !== undefined && (
+                  <span className="workspace-nav-count" data-tone="vermilion">
+                    {badge}
+                  </span>
+                )}
               </Link>
             ))}
-            <Link href="/admin/collections">全部资料集</Link>
+            {section.code === '03' && pinnedCollections.length > 0 && (
+              <div className="workspace-collection-nav">
+                <span>{'PINNED // 常用资料集'}</span>
+                {pinnedCollections.map((collection) => (
+                  <Link
+                    key={collection.id}
+                    href={`/admin/library?collection=${encodeURIComponent(collection.id)}`}
+                    aria-current={inLibrary && query.get('collection') === collection.id ? 'page' : undefined}
+                    title={collection.title}
+                  >
+                    <Folder size={14} aria-hidden="true" />
+                    <span>{collection.title}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
+
       <div className="workspace-nav-secondary">
-        <Link
-          href="/admin/connections"
-          aria-current={path === '/admin/connections' ? 'page' : undefined}
-        >
-          <Link2 size={16} aria-hidden="true" />
-          连接记录
-        </Link>
-        <Link
-          href="/admin/settings"
-          aria-current={path.startsWith('/admin/settings') ? 'page' : undefined}
-        >
-          <Settings size={16} aria-hidden="true" />
-          设置
-        </Link>
+        <span className="workspace-nav-label">
+          <span className="workspace-nav-code">{'05 //'}</span> 系统设置
+        </span>
+        {systemItems.map(({ title, href, Icon, active }) => (
+          <Link key={href} href={href} aria-current={active ? 'page' : undefined}>
+            <Icon size={15} aria-hidden="true" />
+            <span>{title}</span>
+          </Link>
+        ))}
       </div>
     </nav>
   )

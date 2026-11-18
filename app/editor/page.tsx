@@ -28,34 +28,43 @@ export default async function EditorPage({
   const edit = params.edit ?? params.slug
   const isNew = params.new === '1'
 
-  let initialData: {
-    revision?: number
-    draft_revision?: number
-    next_slug?: string
-    slug: string
-    title: string
-    html: string
-    category?: string
-    status?: 'draft' | 'published' | 'deleted'
-    password?: string | null
-    is_hidden?: number
-    tags?: string[]
-    description?: string | null
-    cover_image?: string | null
-  } | undefined
+  let initialData:
+    | {
+        revision?: number
+        draft_revision?: number
+        next_slug?: string
+        slug: string
+        title: string
+        html: string
+        category?: string
+        status?: 'draft' | 'published' | 'deleted'
+        password?: string | null
+        is_hidden?: number
+        tags?: string[]
+        description?: string | null
+        cover_image?: string | null
+      }
+    | undefined
 
   if (edit) {
-    const env = await getAppCloudflareEnv()
+    const env = await getAppCloudflareEnv().catch(() => ({ DB: undefined }))
     if (env?.DB) {
-      const post = await getPostBySlug(env.DB, edit, undefined, { includeUnpublished: true })
+      const post = await getPostBySlug(env.DB, edit, undefined, { includeUnpublished: true }).catch(
+        () => null,
+      )
       if (post) {
-        const working = await getWorkingCopy(env.DB, post.id)
-        const draft = working ? JSON.parse(working.payload) : {}
+        const working = await getWorkingCopy(env.DB, post.id).catch(() => null)
+        let draft: Record<string, unknown> = {}
+        if (working?.payload) {
+          try {
+            draft = JSON.parse(working.payload) as Record<string, unknown>
+          } catch {}
+        }
         initialData = {
           revision: working?.base_revision ?? post.revision ?? 0,
           draft_revision: working?.revision ?? 0,
           title: post.title,
-          html: post.html || await renderPostMarkdownToHtml(post.content),
+          html: post.html || (await renderPostMarkdownToHtml(post.content)),
           category: post.category || undefined,
           status: post.status,
           password: post.password,

@@ -1,97 +1,378 @@
-/* Hallmark · v2.0.0 · redesign: polish · theme: brand · genre: app · scope: workspace controls */
-/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V3 · preserve compact data controls and improve their feedback and keyboard access. */
-a, button, input, select, textarea { -webkit-tap-highlight-color: transparent; }
-.public-header { position: sticky; top: 0; z-index: 40; border-bottom: 1px solid var(--editor-line); background: var(--background); }
-.public-header-inner { max-width: 1152px; margin: auto; min-height: 80px; padding: 0 24px; display:flex; justify-content:space-between; align-items:center; gap:24px; }
-.brand { display:flex; align-items:center; gap:12px; font-size:17px; font-weight:600; letter-spacing:-.03em; }
-.brand-mark { display:grid; place-items:center; height:36px; width:36px; border-radius:10px; background:var(--cta-bg); color:var(--cta-ink); font-size:22px; }
-.brand-subtitle { color:var(--editor-muted); font-weight:400; }
-.public-nav-link { display:inline-flex; align-items:center; min-height:44px; min-width:44px; color:var(--editor-muted); font-size:14px; }
-.public-nav-link:hover, .public-nav-link[aria-current] { color:var(--editor-accent); }
-.color-mode-toggle { display:grid; place-items:center; width:44px; height:44px; flex-shrink:0; border:1px solid var(--editor-line); border-radius:50%; color:var(--editor-ink); cursor:pointer; }
-.brain-panel { border:1px solid var(--editor-line); background:var(--editor-panel); border-radius:12px; padding:24px; }
-.brain-input { min-height:44px; min-width:44px; width:100%; border:1px solid var(--editor-line); border-radius:8px; padding:12px; background:var(--background); color:var(--editor-ink); }
-.brain-button { min-height:44px; min-width:44px; display:inline-flex; align-items:center; justify-content:center; gap:8px; border-radius:8px; padding:12px 16px; background:var(--editor-accent); color:var(--editor-accent-ink); font-size:14px; font-weight:600; cursor:pointer; }
-.brain-button:disabled { background:var(--cta-disabled-bg); color:var(--cta-disabled-ink); cursor:not-allowed; }
-.brain-button[aria-busy="true"] { cursor:progress; }
-.brain-button:not(:disabled):active, .brain-secondary:not(:disabled):active { transform:translateY(1px); }
-.brain-secondary { background:var(--editor-panel); box-shadow:none; min-height:44px; min-width:44px; white-space:nowrap; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid var(--editor-line); border-radius:8px; padding:8px 16px; color:var(--editor-ink); font-size:14px; cursor:pointer; }
-.brain-kicker { font-size:13px; text-transform:none; letter-spacing:normal; color:var(--editor-muted); font-weight:500; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
+/* ==========================================================================
+   Channing Studio · Workspace & Shared Control Primitives
+   Obsidian & Warm Paper · Precision Editorial Atelier
+   ========================================================================== */
 
-@media (max-width: 639px) { [role="tooltip"] { display:none; } }
+a,
+button,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.public-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--editor-line);
+  background: var(--background);
+}
+
+.public-header-inner {
+  max-width: var(--site-width, 1200px);
+  margin: auto;
+  min-height: 76px;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
+  border-radius: var(--radius-xs, 4px);
+  background: #141311;
+  border: 1px solid var(--editor-line-strong);
+  color: #FAF8F5;
+  font-family: var(--font-mono-tech);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  flex-shrink: 0;
+}
+
+.brand-mark .brand-slash {
+  color: #FF6B42;
+  margin-left: 0.5px;
+}
+
+.brand-subtitle {
+  color: var(--editor-muted);
+  font-weight: 400;
+}
+
+.public-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  color: var(--editor-muted);
+  font-size: 14px;
+}
+
+.public-nav-link:hover,
+.public-nav-link[aria-current] {
+  color: var(--editor-ink);
+}
+
+.color-mode-toggle {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid var(--editor-line);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--editor-panel);
+  color: var(--editor-ink);
+  cursor: pointer;
+  transition: border-color 120ms ease;
+}
+
+.color-mode-toggle:hover {
+  border-color: var(--editor-line-strong);
+  background: var(--editor-soft);
+}
+
+/* ── Shared Brain / Workbench Surface & Control Primitives ── */
+.brain-panel,
+.admin-card {
+  border: 1px solid var(--editor-line);
+  background: var(--editor-panel);
+  border-radius: var(--radius-sm, 6px);
+  padding: 20px;
+}
+
+.brain-input {
+  min-height: 44px;
+  min-width: 44px;
+  width: 100%;
+  border: 1px solid var(--editor-line);
+  border-radius: var(--radius-sm, 6px);
+  padding: 10px 12px;
+  background: var(--editor-panel);
+  color: var(--editor-ink);
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.brain-input:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--atelier-vermilion-soft);
+}
+
+.brain-button {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid transparent;
+  padding: 10px 16px;
+  background: var(--editor-accent);
+  color: var(--editor-accent-ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 140ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+
+.brain-button:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.brain-button:disabled {
+  background: var(--cta-disabled-bg);
+  color: var(--cta-disabled-ink);
+  cursor: not-allowed;
+}
+
+.brain-button[aria-busy="true"] {
+  cursor: progress;
+}
+
+.brain-button:not(:disabled):active,
+.brain-secondary:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.brain-secondary {
+  background: var(--editor-panel);
+  box-shadow: none;
+  min-height: 44px;
+  min-width: 44px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--editor-line);
+  border-radius: var(--radius-sm, 6px);
+  padding: 8px 14px;
+  color: var(--editor-ink);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.brain-secondary:hover:not(:disabled) {
+  background: var(--editor-soft);
+  border-color: var(--editor-line-strong);
+}
+
+.brain-kicker {
+  font-family: var(--font-mono-tech);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--editor-muted);
+  font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 639px) {
+  [role="tooltip"] {
+    display: none;
+  }
+}
 
 @media (max-width: 1023px) {
-  .editor-settings-panel { position:static !important; width:100% !important; height:auto !important; border-left:0; border-top:1px solid var(--editor-line); }
+  .editor-settings-panel {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    border-left: 0;
+    border-top: 1px solid var(--editor-line);
+  }
 }
 
-/* Primary actions opt in; active tabs and ordinary filled controls stay charcoal. */
-.brain-cta { background:var(--cta-bg); color:var(--cta-ink); }
-.brain-cta:hover { background:var(--cta-bg-hover); }
-.brain-cta:disabled { background:var(--cta-disabled-bg); color:var(--cta-disabled-ink); opacity:1; cursor:not-allowed; }
+/* Primary actions opt into Signal Vermilion; structural fills remain Studio Carbon. */
+.brain-cta {
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  border-color: var(--cta-bg);
+}
 
-/* Header controls fit the 390px canvas with full 44px touch targets. */
+.brain-cta:hover:not(:disabled) {
+  background: var(--cta-bg-hover);
+  border-color: var(--cta-bg-hover);
+  opacity: 1;
+}
+
+.brain-cta:disabled {
+  background: var(--cta-disabled-bg);
+  color: var(--cta-disabled-ink);
+  border-color: transparent;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
 @media (max-width: 639px) {
-  .public-header-inner { padding-inline:16px; gap:12px; }
-  .public-header-inner > div:last-child { gap:4px; }
-  .brand { gap:8px; }
+  .public-header-inner {
+    padding-inline: 16px;
+    gap: 12px;
+  }
+  .public-header-inner > div:last-child {
+    gap: 4px;
+  }
+  .brand {
+    gap: 8px;
+  }
 }
 
-/* Scoped workspace polish: preserve the existing public and private token system. */
+/* ── Scoped Workspace Overflow, Validation & Pointer Accessibility ── */
 .workspace-shell .workspace-nav,
 .workspace-shell .workspace-nav-main,
+.workspace-shell .workspace-nav-group,
 .workspace-shell .workspace-collection-nav,
 .admin-dialog .admin-dialog-header > div {
   min-width: 0;
 }
+
 .workspace-shell .workspace-nav a > span:not(.workspace-nav-count) {
   min-width: 0;
   overflow-wrap: anywhere;
 }
-.workspace-shell .workspace-nav-count { flex-shrink: 0; font-variant-numeric: tabular-nums; }
-.workspace-shell .workspace-nav a[aria-current] { font-weight: inherit; }
-.workspace-shell .workspace-sidebar { overflow-y: auto; overscroll-behavior: contain; }
-.workspace-shell .workspace-mobile-nav[open] {
-  max-width: calc(100% - 24px);
-  max-height: calc(100dvh - 76px);
+
+.workspace-shell .workspace-nav-count {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-shell .workspace-sidebar {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-.admin-dialog[data-state]:not(.admin-sheet) { width: min(620px, calc(100% - 32px)); }
-.admin-dialog.admin-sheet { max-width: 100%; }
-.admin-dialog .admin-dialog-header { flex-shrink: 0; }
-.admin-dialog .admin-dialog-header h2 { overflow-wrap: anywhere; }
-.admin-dialog .admin-dialog-header > button { flex-shrink: 0; }
-.admin-dialog .admin-dialog-body { min-height: 0; }
-.admin-dialog .admin-form-actions { flex-wrap: wrap; }
+
+.admin-dialog[data-state]:not(.admin-sheet) {
+  width: min(620px, calc(100% - 32px));
+}
+
+.admin-dialog.admin-sheet {
+  max-width: 100%;
+}
+
+.admin-dialog .admin-dialog-header {
+  flex-shrink: 0;
+}
+
+.admin-dialog .admin-dialog-header h2 {
+  overflow-wrap: anywhere;
+}
+
+.admin-dialog .admin-dialog-header > button {
+  flex-shrink: 0;
+}
+
+.admin-dialog .admin-dialog-body {
+  min-height: 0;
+}
+
+.admin-dialog .admin-form-actions {
+  flex-wrap: wrap;
+}
+
 .admin-dialog .admin-form-error {
   padding: 8px 12px;
   border-left: 2px solid var(--danger);
   background: var(--danger-soft-bg);
   color: var(--danger);
+  border-radius: 0 var(--radius-xs, 4px) var(--radius-xs, 4px) 0;
 }
+
 :is(.workspace-shell, .admin-dialog) :is(.admin-input, .brain-input)[aria-invalid="true"],
-.studio-login input[aria-invalid="true"] { border-color: var(--danger); }
+.studio-login input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
 :is(.workspace-shell, .admin-dialog) :is(.admin-input, .brain-input):disabled {
-  opacity: .55;
+  opacity: 0.55;
   cursor: not-allowed;
 }
-:is(.workspace-shell, .admin-dialog) .admin-button[aria-busy="true"] { cursor: progress; }
+
+:is(.workspace-shell, .admin-dialog) .admin-button[aria-busy="true"] {
+  cursor: progress;
+}
+
 .studio-login :is(input, button, a):focus-visible {
   outline: 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
-.studio-login input:focus-visible { outline-offset: -3px; }
-.studio-login .studio-login-feedback { min-height: 1.5em; }
-.studio-login button[aria-busy="true"] { cursor: progress; }
+
+.studio-login input:focus-visible {
+  outline-offset: 0;
+}
+
+.studio-login .studio-login-feedback {
+  min-height: 1.5em;
+}
+
+.studio-login button[aria-busy="true"] {
+  cursor: progress;
+}
+
 @media (max-width: 639px) {
-  .admin-dialog.admin-sheet { width: 100%; }
-  .admin-dialog[data-state]:not(.admin-sheet) { width: calc(100% - 24px); }
-  :is(.workspace-shell, .admin-dialog) :is(input.admin-input, select.admin-input, textarea.admin-input, input.brain-input, textarea.brain-input) {
+  .admin-dialog.admin-sheet {
+    width: 100%;
+  }
+  .admin-dialog[data-state]:not(.admin-sheet) {
+    width: calc(100% - 24px);
+  }
+  :is(.workspace-shell, .admin-dialog)
+    :is(
+      input.admin-input,
+      select.admin-input,
+      textarea.admin-input,
+      input.brain-input,
+      textarea.brain-input
+    ) {
     font-size: 16px;
   }
 }
+
 @media (pointer: coarse) {
   .admin-dialog .admin-dialog-header > button,
-  .workspace-shell .workspace-nav a { min-height: 48px; min-width: 48px; }
+  .workspace-shell .workspace-nav a,
+  .workspace-shell .workspace-launch-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }

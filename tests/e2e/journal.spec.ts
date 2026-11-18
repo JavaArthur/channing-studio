@@ -12,7 +12,8 @@ test.beforeEach(async ({ context }) => {
 test('daily learning creates, persists after refresh, edits, searches and stays private', async ({ page, context, playwright }) => {
   const title = `学习闭环 ${crypto.randomUUID()}`
   await page.goto('/admin')
-  await expect(page).toHaveURL(/\/admin\/learning$/)
+  await expect(page).toHaveURL(/\/admin$/)
+  await expect(page.getByRole('heading', { name: '私人工程与知识总控台', exact: true })).toBeVisible()
   await page.getByRole('link', { name: '记一条', exact: true }).click()
   await expect(page.getByRole('dialog', { name: '新建学习记录' })).toBeVisible()
   await page.getByLabel('记录标题', { exact: true }).fill(title)
