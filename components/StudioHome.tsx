@@ -115,11 +115,12 @@ export function StudioHome({
 
   const rawEyebrow = content.profile.eyebrow
   const brandLabel =
-    !rawEyebrow || /studio|工作室|工作台/i.test(rawEyebrow)
+    !rawEyebrow || /channing|studio|工作室|工作台/i.test(rawEyebrow)
       ? PUBLIC_PROFILE.brand
       : rawEyebrow
   const cleanSubtitle =
-    content.profile.subtitle && !/studio|工作室|工作台/i.test(content.profile.subtitle)
+    content.profile.subtitle &&
+    !/channing|studio|工作室|工作台/i.test(content.profile.subtitle)
       ? content.profile.subtitle
       : PUBLIC_PROFILE.role
 
@@ -162,9 +163,7 @@ export function StudioHome({
                     {PUBLIC_PROFILE.brand}
                     <span aria-hidden="true">.</span>
                   </span>
-                  <span className="atlas-role-pill">
-                    作者 · {PUBLIC_PROFILE.alias}
-                  </span>
+                  <span className="atlas-role-pill">AI 工程实战博客</span>
                 </div>
 
                 <h1 id="atlas-title" className="atlas-hero-headline">

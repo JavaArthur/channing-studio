@@ -12,7 +12,9 @@ interface SiteFooterProps {
 export function SiteFooter({ subtitle, contactLinks = [] }: SiteFooterProps) {
   const year = new Date().getFullYear()
   const cleanSubtitle =
-    subtitle && !/studio|工作室|工作台/i.test(subtitle) ? subtitle : PUBLIC_PROFILE.role
+    subtitle && !/channing|studio|工作室|工作台/i.test(subtitle)
+      ? subtitle
+      : PUBLIC_PROFILE.role
 
   const mergedContacts = [...PUBLIC_PROFILE.contactLinks, ...contactLinks]
     .filter(
@@ -22,6 +24,14 @@ export function SiteFooter({ subtitle, contactLinks = [] }: SiteFooterProps) {
         !link.url.startsWith('/admin') &&
         !/studio|工作室|工作台/i.test(link.label),
     )
+    .map((link) => ({
+      ...link,
+      label: /channing/i.test(link.label)
+        ? /x\.com|twitter\.com/i.test(link.url)
+          ? 'X (Twitter)'
+          : link.label.replace(/channing/gi, PUBLIC_PROFILE.brand).trim()
+        : link.label,
+    }))
     .filter(
       (link, index, all) =>
         all.findIndex(

@@ -49,7 +49,7 @@ export function SiteHeader({ navLinks, initialTheme = 'light' }: Props) {
     (l) =>
       isSafeLink(l.url) &&
       !l.url.startsWith('/admin') &&
-      !/studio|工作台|工作室/i.test(l.label),
+      !/channing|studio|工作台|工作室/i.test(l.label),
   )
 
   const isActiveLink = (url: string) =>

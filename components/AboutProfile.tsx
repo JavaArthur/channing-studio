@@ -21,6 +21,14 @@ export function AboutProfile({
         !link.url.startsWith('/admin') &&
         !/studio|工作室|工作台/i.test(link.label),
     )
+    .map((link) => ({
+      ...link,
+      label: /channing/i.test(link.label)
+        ? /x\.com|twitter\.com/i.test(link.url)
+          ? 'X (Twitter)'
+          : link.label.replace(/channing/gi, PUBLIC_PROFILE.brand).trim()
+        : link.label,
+    }))
     .filter(
       (link, index, all) =>
         all.findIndex(
@@ -36,9 +44,7 @@ export function AboutProfile({
       <section className="about-identity" aria-label="作者背景">
         <div className="about-identity-name">
           <p className="about-label">00 // AUTHOR PROFILE</p>
-          <h2>
-            {PUBLIC_PROFILE.brand} · {PUBLIC_PROFILE.alias}
-          </h2>
+          <h2>{PUBLIC_PROFILE.brand}</h2>
           <p>{PUBLIC_PROFILE.role}</p>
         </div>
 

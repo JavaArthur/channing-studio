@@ -2,11 +2,11 @@
 export const PUBLIC_PROFILE = {
   brand: '晨启AI',
   tagline: 'AI 工程与实战手记',
-  alias: 'Channing',
+  alias: '晨启AI',
   role: 'AI Agent 架构 · Java 后端 · 技术博客',
   headline: '让 AI 接住业务，也接得住上线之后。',
   intro: '9 年 Java 后端到 AI Agent 架构实战。专注企业级 Agent 编排、知识检索与线上高可靠交付，把架构取舍与踩坑复盘写成可复用的技术长文。',
-  introduction: '「晨启AI」是一份记录 AI 工程落地与后端架构思考的个人技术博客（作者笔名 Channing）。过去 9 年深耕 Java 核心业务系统，近两年多主导企业级 AI 客服与 AI 能力平台从 0 到 1 建设，打通咨询、知识检索、工具执行、人工协作与工单履约完整链路。',
+  introduction: '「晨启AI」是一份记录 AI 工程落地与后端架构思考的个人技术博客。过去 9 年深耕 Java 核心业务系统，近两年多主导企业级 AI 客服与 AI 能力平台从 0 到 1 建设，打通咨询、知识检索、工具执行、人工协作与工单履约完整链路。',
   experience: '9 年后端 · 2 年多 AI 应用研发',
   experienceAsOf: '经验口径截至 2026.11',
   team: '曾带领最多 9 人跨职能团队，承担架构设计、核心编码与跨系统交付。',
@@ -15,7 +15,7 @@ export const PUBLIC_PROFILE = {
   email: 'xiekc0930@gmail.com',
   contactLinks: [
     { label: 'GitHub', url: 'https://github.com/JavaArthur' },
-    { label: 'X · @Channing_AI_X', url: 'https://x.com/Channing_AI_X' },
+    { label: 'X (Twitter)', url: 'https://x.com/Channing_AI_X' },
     { label: '技术博客', url: 'https://blog.aichanning.cn' },
     { label: 'CSDN', url: 'https://blog.csdn.net/qq_38423105' },
   ],
