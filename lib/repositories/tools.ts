@@ -32,15 +32,20 @@ function mapTool(row: ToolRow): Tool {
   return { ...row, tags: parseTags(row.tags) }
 }
 
-export async function getTools(db: Database, options: { includeHidden?: boolean } = {}): Promise<Tool[]> {
+export async function getTools(
+  db: Database,
+  options: { includeHidden?: boolean; limit?: number } = {},
+): Promise<Tool[]> {
   await ensureToolsSchema(db)
-  const { results } = await db
-    .prepare(
-      `SELECT ${options.includeHidden ? '*' : publicResourceColumns('tools')} FROM tools
-       ${options.includeHidden ? '' : 'WHERE is_hidden = 0 AND published_payload IS NOT NULL'}
-       ORDER BY is_pinned DESC, sort_order ASC, created_at DESC`,
-    )
-    .all<ToolRow>()
+  const limit = typeof options.limit === 'number' && Number.isFinite(options.limit)
+    ? Math.max(0, Math.min(Math.trunc(options.limit), 100))
+    : undefined
+  const query = db.prepare(
+    `SELECT ${options.includeHidden ? '*' : publicResourceColumns('tools')} FROM tools
+     ${options.includeHidden ? '' : 'WHERE is_hidden = 0 AND published_payload IS NOT NULL'}
+     ORDER BY is_pinned DESC, sort_order ASC, created_at DESC${limit === undefined ? '' : ' LIMIT ?'}`,
+  )
+  const { results } = await (limit === undefined ? query : query.bind(limit)).all<ToolRow>()
   return results.map(mapTool)
 }
 

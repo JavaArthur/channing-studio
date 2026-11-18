@@ -2,7 +2,7 @@ import { mapPostWithTags } from '@/lib/repositories/post-mappers'
 import type { Database } from '@/lib/repositories/schema'
 import type { Post, PostWithTags } from '@/lib/repositories/types'
 
-// 全文搜索（FTS5，回退 LIKE）
+// 全文搜索（FTS5，回退 LIKE；超出 D1 模式长度时使用子串匹配）
 export async function searchPosts(
   db: Database,
   query: string,
@@ -36,15 +36,22 @@ export async function searchPosts(
     results = ftsResult.results
   } catch {
     const pattern = `%${query}%`
+    // D1 caps LIKE/GLOB patterns at 50 UTF-8 bytes, including the surrounding %.
+    // Keep the whole query for longer text instead of truncating Chinese titles or tags.
+    const useSubstring = new TextEncoder().encode(pattern).length > 50
+    const match = useSubstring
+      ? 'instr(lower(title), lower(?)) > 0 OR instr(lower(content), lower(?)) > 0'
+      : 'title LIKE ? OR content LIKE ?'
+    const searchValue = useSubstring ? query : pattern
     const likeResult = await db
       .prepare(
         `SELECT * FROM posts
-         WHERE (title LIKE ? OR content LIKE ?)
+         WHERE (${match})
          ${whereClause}
          ORDER BY published_at DESC
          LIMIT ?`,
       )
-      .bind(pattern, pattern, limit)
+      .bind(searchValue, searchValue, limit)
       .all<Post>()
     results = likeResult.results
   }

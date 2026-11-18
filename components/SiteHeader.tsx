@@ -79,16 +79,16 @@ export function SiteHeader({ navLinks, initialTheme = 'light' }: Props) {
             Channing<span className="brand-subtitle"> / Studio</span>
           </span>
         </Link>
-        <nav aria-label="主导航" className="hidden items-center gap-7 md:flex">
+        <nav aria-label="主导航" className="public-desktop-nav">
           {renderLinks()}
         </nav>
-        <div className="flex items-center gap-4">
+        <div className="public-header-controls">
           <SearchEntry />
           <ThemeDropdown initialTheme={initialTheme} />
           <button
             ref={menuButton}
             type="button"
-            className="min-h-11 min-w-11 public-menu-toggle md:hidden"
+            className="min-h-11 min-w-11 public-menu-toggle"
             aria-label={open ? '关闭菜单' : '打开菜单'}
             aria-controls={menuId}
             aria-expanded={open}
@@ -102,7 +102,7 @@ export function SiteHeader({ navLinks, initialTheme = 'light' }: Props) {
         id={menuId}
         aria-label="移动导航"
         hidden={!open}
-        className="public-mobile-nav md:hidden"
+        className="public-mobile-nav"
       >
         {renderLinks()}
       </nav>

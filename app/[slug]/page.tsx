@@ -16,6 +16,7 @@ import { resolveRequestTheme } from '@/lib/server-appearance'
 import { formatDate } from '@/lib/format-date'
 import { stripLeadingTitleHeading } from '@/lib/post-render'
 import { RelatedPosts } from '@/components/RelatedPosts'
+import 'katex/dist/katex.min.css'
 
 // Cloudflare Workers 缓存策略
 export const dynamic = 'force-dynamic' // Password checks must never share a rendered response
@@ -110,7 +111,7 @@ export default async function PostPage({
   if (needsPassword) {
     if (!pwd) {
       return (
-        <div className="min-h-screen bg-[var(--background)] flex flex-col">
+        <div className="public-article min-h-screen bg-[var(--background)] flex flex-col">
           <SiteHeader
             initialTheme={requestTheme}
             navLinks={headerData.navLinks}
@@ -132,7 +133,7 @@ export default async function PostPage({
     if (!isValid) {
       passwordError = '密码错误，请重试'
       return (
-        <div className="min-h-screen bg-[var(--background)] flex flex-col">
+        <div className="public-article min-h-screen bg-[var(--background)] flex flex-col">
           <SiteHeader
             initialTheme={requestTheme}
             navLinks={headerData.navLinks}
@@ -161,7 +162,7 @@ export default async function PostPage({
   const renderedHtml = stripLeadingTitleHeading(post.html, post.title)
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex flex-col">
+    <div className="public-article min-h-screen bg-[var(--background)] flex flex-col">
       <SiteHeader
         initialTheme={requestTheme}
         navLinks={headerData.navLinks}

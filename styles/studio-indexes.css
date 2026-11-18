@@ -1,0 +1,83 @@
+/* Directory pages only. The shared StudioShell supplies the Atlas theme. */
+.studio-index-page { --index-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+.studio-index-page :is(.index-projects, .index-writing-list, .index-lab-list, .index-tags) { list-style: none; padding: 0; margin: 0; }
+.studio-index-page :is(.index-project, .index-writing-entry, .index-lab-entry, .index-resource-section, .public-prompt-card) { scroll-margin-top: 6rem; }
+.studio-index-page :is(.index-project-main, .index-tool-heading > div, .index-writing-entry article, .index-lab-entry article) { min-width: 0; }
+.studio-index-page :is(.index-project-title, .index-tool-entry, .index-tags, .index-section-heading, .index-contents) { overflow-wrap: anywhere; }
+.studio-index-page .index-register { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: .75rem 2rem; padding-block: .25rem 1rem; border-bottom: 1px solid var(--editor-ink); color: var(--editor-muted); font-size: .8125rem; line-height: 1.8; }
+.studio-index-page .index-meta { font-size: .8125rem; line-height: 1.8; color: var(--editor-muted); }
+.studio-index-page .index-project { display: grid; grid-template-columns: 4rem minmax(0, 1fr) 8rem; gap: clamp(1rem, 3vw, 3rem); padding-block: 2.5rem; border-bottom: 1px solid var(--editor-line); }
+.studio-index-page .index-project-number { color: var(--editor-link); font-family: "Bodoni MT", "Didot", "Times New Roman", serif; font-size: 2.5rem; line-height: 1; padding-top: .25rem; }
+.studio-index-page .index-project-topline { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem 1.5rem; margin-bottom: .75rem; }
+.studio-index-page .index-slug { font-family: var(--index-mono); font-size: .8125rem; color: var(--editor-muted); overflow-wrap: anywhere; }
+.studio-index-page .index-status { display: inline-flex; align-items: center; gap: .5rem; color: var(--editor-muted); font-size: .8125rem; }
+.studio-index-page .index-status::before { content: ""; width: 5px; height: 5px; border: 1px solid currentColor; border-radius: 50%; }
+.studio-index-page .index-status:is([data-status="active"], [data-status="maintained"])::before { background: currentColor; }
+.studio-index-page .index-project-title { font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.4; font-weight: 500; letter-spacing: -.025em; }
+.studio-index-page .index-title-link { display: inline-flex; align-items: baseline; gap: .75rem; }
+.studio-index-page .index-title-link svg { flex-shrink: 0; }
+.studio-index-page .index-project-summary { max-width: 44rem; margin-top: .875rem; color: var(--editor-muted); font-size: 1rem; line-height: 1.85; }
+.studio-index-page .index-tags { display: flex; flex-wrap: wrap; gap: .375rem 1rem; margin-top: 1.25rem; font-size: .8125rem; line-height: 1.8; color: var(--editor-muted); }
+.studio-index-page .index-tags li::before { content: "/ "; color: var(--editor-link); }
+.studio-index-page .index-location { display: block; margin-top: .75rem; color: var(--editor-muted); font-family: var(--index-mono); font-size: .8125rem; line-height: 1.8; overflow-wrap: anywhere; }
+.studio-index-page .index-project-links { display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; padding-top: 2rem; }
+.studio-index-page .index-text-link { display: inline-flex; align-items: center; gap: .625rem; min-height: 44px; color: var(--editor-link); font-size: .875rem; text-underline-offset: .3em; }
+.studio-index-page .index-text-link svg { flex-shrink: 0; }
+.studio-index-page .index-writing-entry { display: grid; grid-template-columns: 9rem minmax(0, 1fr) 1.5rem; align-items: start; gap: 2rem; padding-block: 2rem; border-bottom: 1px solid var(--editor-line); }
+.studio-index-page .index-writing-date { font-family: var(--index-mono); font-size: .8125rem; color: var(--editor-muted); padding-top: .2rem; line-height: 1.8; }
+.studio-index-page .index-category { display: inline-block; font-size: .8125rem; color: var(--editor-link); margin-bottom: .625rem; }
+.studio-index-page :is(.index-writing-entry, .index-lab-entry) h2 { font-size: clamp(1.25rem, 2.3vw, 1.625rem); line-height: 1.55; font-weight: 500; letter-spacing: -.015em; }
+.studio-index-page :is(.index-writing-entry, .index-lab-entry) p { max-width: 48rem; margin-top: .625rem; color: var(--editor-muted); font-size: 1rem; line-height: 1.85; }
+.studio-index-page .index-entry-arrow { margin-top: .3rem; color: var(--editor-link); }
+.studio-index-page .index-contents { display: flex; flex-wrap: wrap; gap: .25rem 1.5rem; padding-block: .5rem 1rem; }
+.studio-index-page .index-contents a { display: inline-flex; align-items: center; gap: .75rem; min-height: 44px; font-size: .875rem; }
+.studio-index-page .index-contents a > span:last-child { color: var(--editor-link); font-family: var(--index-mono); font-size: .8125rem; }
+.studio-index-page .index-resource-section { margin-top: 2rem; }
+.studio-index-page .index-resource-section + .index-resource-section { margin-top: 3.5rem; }
+.studio-index-page .index-section-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: .5rem 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--editor-ink); }
+.studio-index-page .index-section-heading h2 { flex: 1; font-size: 1.5rem; font-weight: 500; line-height: 1.5; }
+.studio-index-page .index-section-number { font-family: var(--index-mono); font-size: .8125rem; line-height: 1.8; color: var(--editor-link); }
+.studio-index-page .index-tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2.75rem; }
+.studio-index-page .index-tool-entry { min-width: 0; display: flex; flex-direction: column; padding-block: 1.75rem; border-bottom: 1px solid var(--editor-line); }
+.studio-index-page .index-tool-heading { display: flex; align-items: flex-start; gap: .875rem; }
+.studio-index-page .index-tool-heading > div { flex: 1; }
+.studio-index-page .index-tool-heading > svg { flex-shrink: 0; color: var(--editor-link); }
+.studio-index-page .index-tool-heading h3 { font-size: 1.25rem; font-weight: 500; line-height: 1.5; }
+.studio-index-page .index-tool-heading .index-location { margin-top: .25rem; }
+.studio-index-page .index-tool-icon { flex-shrink: 0; width: 36px; height: 36px; object-fit: cover; border: 1px solid var(--editor-line); border-radius: 0; }
+.studio-index-page .index-tool-initial { display: grid; place-items: center; color: var(--editor-muted); background: var(--editor-soft); font-family: var(--index-mono); }
+.studio-index-page .index-tool-entry > p { margin-top: 1rem; color: var(--editor-muted); font-size: 1rem; line-height: 1.8; }
+.studio-index-page .index-pinned { align-self: flex-start; margin-top: .875rem; font-size: .8125rem; color: var(--editor-link); }
+.studio-index-page .index-tool-entry .index-tags { padding-top: 1rem; margin-top: auto; }
+.studio-index-page .index-prompt-list .public-prompt-card { padding-block: 2rem; }
+.studio-index-page .index-prompt-list .public-prompt-heading h2 { font-size: 1.375rem; font-weight: 500; }
+.studio-index-page .index-prompt-list .public-prompt-card > p { max-width: 48rem; }
+.studio-index-page .index-prompt-list .public-prompt-body { border-left: 2px solid var(--editor-link); }
+.studio-index-page .index-lab-entry { display: grid; grid-template-columns: 3rem minmax(0, 1fr) 1.5rem; align-items: start; gap: 1.5rem; padding-block: 2rem; border-bottom: 1px solid var(--editor-line); }
+.studio-index-page .index-lab-entry > .index-section-number { padding-top: .1rem; }
+.studio-index-page .index-related { margin-top: 3.5rem; }
+.studio-index-page .index-related-links { display: flex; flex-wrap: wrap; gap: .5rem 2rem; padding-top: 1rem; }
+@media (hover: hover) {
+  .studio-index-page :is(.index-title-link, .index-text-link, .index-contents a):hover { color: var(--editor-link); text-decoration: underline; text-underline-offset: .3em; }
+  .studio-index-page :is(.index-writing-entry, .index-lab-entry):hover h2,
+  .studio-index-page .index-tool-entry[href]:hover h3 { color: var(--editor-link); text-decoration: underline; text-underline-offset: .25em; }
+}
+@media (max-width: 50rem) {
+  .studio-index-page .index-project { grid-template-columns: 2.5rem minmax(0, 1fr); gap: 1rem; }
+  .studio-index-page .index-project-links { grid-column: 2; flex-direction: row; flex-wrap: wrap; gap: .25rem 1.5rem; padding-top: 0; }
+  .studio-index-page .index-writing-entry { grid-template-columns: 7.5rem minmax(0, 1fr) 1.25rem; gap: 1rem; }
+  .studio-index-page .index-tool-grid { column-gap: 1.5rem; }
+}
+@media (max-width: 40rem) {
+  .studio-index-page .index-project { padding-block: 1.75rem; }
+  .studio-index-page .index-project-number { font-size: 1.75rem; }
+  .studio-index-page .index-writing-entry { grid-template-columns: minmax(0, 1fr) 1.25rem; gap: .5rem 1rem; padding-block: 1.5rem; }
+  .studio-index-page .index-writing-date { grid-column: 1; }
+  .studio-index-page .index-writing-entry article { grid-column: 1; }
+  .studio-index-page .index-writing-entry .index-entry-arrow { grid-column: 2; grid-row: 2; }
+  .studio-index-page .index-tool-grid { grid-template-columns: minmax(0, 1fr); }
+  .studio-index-page .index-lab-entry { grid-template-columns: 1.75rem minmax(0, 1fr) 1.25rem; gap: .75rem; }
+  .studio-index-page .index-contents { column-gap: 1.25rem; }
+  .studio-index-page .index-section-heading { column-gap: .75rem; }
+  .studio-index-page .index-section-heading h2 { font-size: 1.25rem; }
+}

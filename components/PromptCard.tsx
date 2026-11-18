@@ -5,7 +5,7 @@ import { StudioCardLabel, StudioLink } from '@/components/StudioSection'
 
 export function PromptCard({ prompt }: { prompt: Prompt }) {
   return (
-    <article className="public-prompt-card">
+    <article id={`prompt-${prompt.id}`} className="public-prompt-card">
       <div className="public-prompt-heading">
         <div>
           <h2 className="font-serif font-medium studio-card-title">{prompt.title}</h2>

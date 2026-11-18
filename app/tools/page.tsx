@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { ArrowUpRight } from 'lucide-react'
 import { getTools } from '@/lib/repositories/tools'
 import { ResourceTabs } from '@/components/ResourceTabs'
 import { isHttpUrl, isSafeLink } from '@/lib/url'
@@ -7,6 +8,7 @@ import { StudioLink, StudioShell } from '@/components/StudioSection'
 import { getSiteHeaderData } from '@/lib/site'
 import { getSiteUrl } from '@/lib/site-config'
 import { resolveRequestTheme } from '@/lib/server-appearance'
+import '@/styles/studio-indexes.css'
 
 const BASE_URL = getSiteUrl()
 
@@ -15,15 +17,15 @@ export const dynamic = 'force-dynamic'
 
 export const metadata = {
   title: '工具收藏',
-  description: '收藏的好用工具、仓库、Mac 软件和可直接复用的提示词。',
+  description: '按类型整理的工具、代码仓库与 Mac 软件收藏。',
   alternates: { canonical: `${BASE_URL}/tools` },
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  url: '工具',
-  repo: '仓库',
-  'mac-app': 'Mac',
-  other: '其他',
+  url: '在线工具',
+  repo: '代码仓库',
+  'mac-app': 'Mac 软件',
+  other: '其他收藏',
 }
 
 function host(url: string | null): string | null {
@@ -44,93 +46,60 @@ export default async function ToolsPage() {
     getSiteHeaderData(env.DB),
   ])
   const requestTheme = await resolveRequestTheme(headerData.defaultTheme)
+  const types = [...new Set(tools.map((tool) => tool.type))]
+  const groups = types.map((type) => ({ type, tools: tools.filter((tool) => tool.type === type) }))
 
   return (
     <StudioShell
-      title="值得留下的工具。"
-      description={tools.length ? `我在工作中使用并推荐的 ${tools.length} 件工具。` : '我在工作中使用并推荐的工具。'}
+      eyebrow="RESOURCES / 工具收藏"
+      className="studio-index-page"
+      title="工具架"
+      description="在线工具、代码仓库与 Mac 软件。按类型浏览收藏，再沿着标签和原始链接继续探索。"
       navLinks={headerData.navLinks}
       initialTheme={requestTheme}
     >
       <ResourceTabs active="tools" />
-      <section>
-        <h2 className="sr-only">工具收藏</h2>
-        {tools.length === 0 ? (
-          <div className="studio-empty-state">
-            <p>工具箱还是空的</p>
-            <span>公开收藏正在整理中。</span>
-            <StudioLink href="/prompts">浏览提示词</StudioLink>
-          </div>
-        ) : (
-          <div className="public-tool-grid">
-            {tools.map((tool) => {
-              const h = host(tool.url)
-              const safeUrl = tool.url && isHttpUrl(tool.url) ? tool.url : null
-              const Wrapper = safeUrl ? 'a' : 'div'
-              return (
-                <Wrapper
-                  key={tool.id}
-                  {...(safeUrl
-                    ? { href: safeUrl, target: '_blank', rel: 'noopener noreferrer nofollow' }
-                    : {})}
-                  className="public-tool-entry group"
-                >
-                  <div className="flex items-start gap-3">
-                    {tool.icon && isSafeLink(tool.icon) ? (
-                      <img
-                        src={tool.icon}
-                        alt=""
-                        loading="lazy"
-                         width={36}
-                         height={36}
-                        className="w-9 h-9 rounded-lg object-cover border border-[var(--editor-line)] bg-[var(--editor-panel)] flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-9 h-9 rounded-lg bg-[var(--editor-soft)] flex items-center justify-center text-[var(--stone-gray)] text-sm font-semibold flex-shrink-0">
-                        {tool.name.slice(0, 1).toUpperCase()}
+      {tools.length === 0 ? (
+        <div className="studio-empty-state">
+          <p>工具箱还是空的</p>
+          <span>公开收藏正在整理中。</span>
+          <StudioLink href="/prompts">浏览提示词</StudioLink>
+        </div>
+      ) : (
+        <>
+          {groups.length > 1 && (
+            <nav className="index-contents" aria-label="工具分类目录">
+              {groups.map((group, index) => <a key={group.type} href={`#tool-group-${index}`}><span>{TYPE_LABELS[group.type] ?? group.type}</span><span>{group.tools.length}</span></a>)}
+            </nav>
+          )}
+          {groups.map((group, index) => (
+            <section key={group.type} id={`tool-group-${index}`} className="index-resource-section" aria-labelledby={`tool-heading-${index}`}>
+              <div className="index-section-heading"><span className="index-section-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><h2 id={`tool-heading-${index}`}>{TYPE_LABELS[group.type] ?? group.type}</h2><span className="index-meta">{group.tools.length} 项</span></div>
+              <div className="index-tool-grid">
+                {group.tools.map((tool) => {
+                  const h = host(tool.url)
+                  const safeUrl = tool.url && isHttpUrl(tool.url) ? tool.url : null
+                  const Wrapper = safeUrl ? 'a' : 'div'
+                  return (
+                    <Wrapper key={tool.id} {...(safeUrl ? { href: safeUrl, target: '_blank', rel: 'noopener noreferrer nofollow' } : {})} className="index-tool-entry">
+                      <div className="index-tool-heading">
+                        {tool.icon && isSafeLink(tool.icon) ? (
+                          <img src={tool.icon} alt="" loading="lazy" width={36} height={36} className="index-tool-icon" />
+                        ) : <span className="index-tool-icon index-tool-initial" aria-hidden="true">{tool.name.slice(0, 1).toUpperCase()}</span>}
+                        <div><h3>{tool.name}</h3>{h && <span className="index-location">{h}</span>}</div>
+                        {safeUrl && <ArrowUpRight size={18} aria-hidden="true" />}
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h2 className="font-serif font-medium text-[var(--editor-ink)] leading-snug break-words group-hover:text-[var(--editor-accent)] transition-colors">
-                          {tool.name}
-                        </h2>
-                        {tool.is_pinned === 1 && (
-                          <span className="public-tool-pinned">置顶</span>
-                        )}
-                      </div>
-                      <div className="text-xs text-[var(--stone-gray)] mt-0.5 flex items-center gap-1.5 flex-wrap">
-                        <span className="px-1.5 py-0.5 rounded-md bg-[var(--editor-accent)]/8 text-[var(--editor-accent)] border border-[var(--editor-accent)]/15">
-                          {TYPE_LABELS[tool.type] ?? tool.type}
-                        </span>
-                        {h && <span className="truncate">{h}</span>}
-                      </div>
-                    </div>
-                  </div>
-                  {tool.description && (
-                    <p className="public-tool-description">
-                      {tool.description}
-                    </p>
-                  )}
-                  {tool.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-auto pt-1">
-                      {tool.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="public-tool-tag"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </Wrapper>
-              )
-            })}
-          </div>
-        )}
-      </section>
-
+                      {tool.is_pinned === 1 && <span className="index-pinned">置顶收藏</span>}
+                      {tool.description && <p>{tool.description}</p>}
+                      {tool.tags.length > 0 && <ul className="index-tags" aria-label="标签">{tool.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>}
+                    </Wrapper>
+                  )
+                })}
+              </div>
+            </section>
+          ))}
+        </>
+      )}
     </StudioShell>
   )
 }

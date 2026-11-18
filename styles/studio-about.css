@@ -1,0 +1,92 @@
+/* About-only dossier. Shared public theme owns color and navigation. */
+.studio-about.public-page .studio-page-heading { padding-bottom: clamp(28px, 4vw, 52px); }
+.studio-about.public-page .studio-page-title { max-width: 14em; font-size: clamp(36px, 5.6vw, 76px); line-height: 1.25; letter-spacing: -.045em; text-wrap: balance; white-space: pre-line; }
+.studio-about.public-page .studio-page-description { max-width: 51em; margin-top: 28px; font-size: clamp(16px, 1.25vw, 18px); line-height: 1.95; }
+.studio-about.public-page .public-page-content { margin-top: 0; }
+.studio-about .about-profile :where(h2, h3, p, dl, dd) { margin: 0; }
+.studio-about .about-profile :is(h2, h3, p, a, dt, dd, span) { overflow-wrap: anywhere; }
+.studio-about .about-profile :is(h2, h3) { font-weight: 500; }
+.studio-about .about-label { color: var(--editor-muted); font-family: var(--public-mono); font-size: 12px; line-height: 1.7; letter-spacing: .06em; }
+.studio-about .about-identity { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.35fr) auto; align-items: center; gap: 24px 48px; padding-block: 28px; border-bottom: 1px solid var(--editor-line); }
+.studio-about .about-identity-name h2 { margin-top: 5px; font-size: 25px; letter-spacing: .03em; }
+.studio-about .about-identity-name > p:last-child { margin-top: 8px; color: var(--editor-muted); font-size: 14px; line-height: 1.8; }
+.studio-about .about-experience > p:first-child { font-size: 18px; line-height: 1.6; }
+.studio-about .about-experience > span { display: block; margin-top: 5px; font-size: 12px; line-height: 1.8; color: var(--editor-muted); }
+.studio-about .about-experience .about-team { margin-top: 10px; max-width: 34em; color: var(--editor-muted); font-size: 14px; line-height: 1.85; text-wrap: pretty; }
+.studio-about .about-case-jump { display: inline-flex; align-items: center; gap: 20px; min-height: 44px; width: fit-content; border-bottom: 1px solid var(--editor-line); font-size: 14px; color: var(--editor-ink); }
+.studio-about .about-case-jump svg { flex-shrink: 0; }
+.studio-about .about-records { padding-top: clamp(42px, 5vw, 72px); scroll-margin-top: 24px; }
+.studio-about .about-section-heading { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 18px 32px; padding-bottom: 28px; }
+.studio-about .about-section-heading h2 { margin-top: 12px; font-size: clamp(24px, 2.8vw, 36px); line-height: 1.4; letter-spacing: -.025em; }
+.studio-about .about-section-heading > p { color: var(--editor-muted); font-size: 14px; line-height: 1.8; }
+.studio-about .about-case { border-top: 1px solid var(--editor-ink); padding-block: 24px 48px; }
+.studio-about .about-case + .about-case { margin-top: 12px; }
+.studio-about .about-case-heading { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.65fr) minmax(0, .9fr); align-items: baseline; gap: 20px 44px; padding-bottom: 25px; }
+.studio-about .about-case-index { display: flex; gap: 16px; color: var(--editor-muted); font-size: 12px; line-height: 1.8; }
+.studio-about .about-case-index > span { color: var(--editor-link); font-family: var(--public-mono); }
+.studio-about .about-case-heading h3 { font-size: clamp(24px, 2.7vw, 36px); line-height: 1.3; letter-spacing: -.035em; }
+.studio-about .about-case-heading .about-case-period { margin-top: 10px; color: var(--editor-muted); font-size: 12px; line-height: 1.8; font-family: var(--public-mono); }
+.studio-about .about-case-role { justify-self: end; max-width: 15em; color: var(--editor-muted); text-align: right; font-size: 13px; line-height: 1.8; }
+.studio-about .about-case-body { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 2.55fr); gap: 44px; }
+.studio-about .about-evidence { align-self: start; padding: 16px; background: var(--editor-sand); border-top: 3px solid var(--editor-accent); }
+.studio-about .about-evidence .about-evidence-number { margin-top: 10px; font-family: var(--public-serif); font-size: clamp(48px, 4vw, 60px); line-height: 1; letter-spacing: -.05em; font-variant-numeric: lining-nums tabular-nums; }
+.studio-about .about-evidence-number > span { display: inline-block; margin-left: 10px; font-family: var(--font-body), sans-serif; font-size: 13px; line-height: 1.7; letter-spacing: 0; }
+.studio-about .about-evidence .about-evidence-label { margin-top: 2px; font-size: 17px; line-height: 1.8; }
+.studio-about .about-evidence .about-evidence-note { margin-top: 18px; color: var(--editor-muted); font-size: 13px; line-height: 1.9; }
+.studio-about .about-evidence .about-evidence-date { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--editor-line); color: var(--editor-muted); font-family: var(--public-mono); font-size: 12px; line-height: 1.8; }
+.studio-about .about-case-story { min-width: 0; padding-top: 2px; }
+.studio-about .about-case-headline { font-size: clamp(20px, 2vw, 27px); line-height: 1.6; letter-spacing: -.025em; }
+.studio-about .about-case-story .about-case-summary { margin-top: 15px; max-width: 47em; font-size: 16px; line-height: 1.95; color: var(--editor-muted); }
+.studio-about .about-case-story .about-technologies { margin-top: 22px; font-family: var(--public-mono); color: var(--editor-muted); font-size: 12px; line-height: 1.8; }
+.studio-about .about-closing { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 2.55fr); gap: 24px 44px; padding-block: 40px 16px; border-top: 1px solid var(--editor-ink); }
+.studio-about .about-closing h2 { max-width: 20em; font-size: clamp(25px, 3vw, 40px); line-height: 1.55; letter-spacing: -.025em; }
+.studio-about .about-closing .about-closing-copy { margin-top: 20px; max-width: 44em; color: var(--editor-muted); font-size: 16px; line-height: 1.95; }
+.studio-about .about-links { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 24px; }
+.studio-about .about-link { display: inline-flex; align-items: center; gap: 20px; min-height: 44px; min-width: 44px; color: var(--editor-ink); border-bottom: 1px solid var(--editor-line); font-size: 14px; text-decoration: none; }
+.studio-about .about-link svg { flex-shrink: 0; }
+.studio-about .about-contact { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px 28px; margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--editor-line); }
+.studio-about .about-contact > p { color: var(--editor-muted); font-size: 13px; }
+.studio-about .about-contact .about-links { margin-top: 0; }
+.studio-about .about-profile :focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 5px; }
+@media (hover: hover) {
+  .studio-about :is(.about-link, .about-case-jump):hover { color: var(--editor-link); border-color: currentColor; }
+}
+@media (max-width: 1000px) {
+  .studio-about .about-identity { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 22px 32px; }
+  .studio-about .about-case-jump { grid-column: 2; }
+  .studio-about .about-case-heading { grid-template-columns: minmax(0, .9fr) minmax(0, 2fr); gap: 16px 32px; }
+  .studio-about .about-case-role { grid-column: 2; justify-self: start; max-width: none; text-align: left; }
+  .studio-about .about-case-body, .studio-about .about-closing { grid-template-columns: minmax(0, .9fr) minmax(0, 2fr); gap: 32px; }
+  .studio-about .about-evidence { padding-inline: 18px; }
+}
+@media (max-width: 640px) {
+  .studio-about.public-page .studio-page-title { font-size: clamp(34px, 9.5vw, 46px); line-height: 1.3; letter-spacing: -.04em; }
+  .studio-about.public-page .studio-page-description { margin-top: 24px; font-size: 15px; }
+  .studio-about .about-identity { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 25px; }
+  .studio-about .about-identity-name { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 20px; align-items: baseline; }
+  .studio-about .about-identity-name .about-label { grid-column: 2; grid-row: 1; }
+  .studio-about .about-identity-name h2 { margin-top: 0; grid-column: 1; grid-row: 1; }
+  .studio-about .about-identity-name > p:last-child { grid-column: 1 / -1; margin-top: 0; }
+  .studio-about .about-experience > p:first-child { font-size: 17px; }
+  .studio-about .about-case-jump { grid-column: 1; }
+  .studio-about .about-section-heading { padding-bottom: 24px; }
+  .studio-about .about-section-heading h2 { font-size: 25px; }
+  .studio-about .about-case { padding-block: 20px 34px; }
+  .studio-about .about-case-heading { grid-template-columns: minmax(0, 1fr); gap: 13px; padding-bottom: 22px; }
+  .studio-about .about-case-role { grid-column: 1; }
+  .studio-about .about-case-heading h3 { font-size: 28px; }
+  .studio-about .about-case-heading .about-case-period { margin-top: 7px; }
+  .studio-about .about-case-body { grid-template-columns: minmax(0, 1fr); gap: 25px; }
+  .studio-about .about-evidence { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); align-items: start; gap: 5px 18px; padding: 18px; }
+  .studio-about .about-evidence > .about-label { grid-column: 2; }
+  .studio-about .about-evidence .about-evidence-number { grid-column: 1; grid-row: 1 / span 3; margin-top: 0; font-size: clamp(44px, 13vw, 64px); white-space: nowrap; }
+  .studio-about .about-evidence-number > span { display: block; margin-left: 0; margin-top: 7px; font-size: 13px; }
+  .studio-about .about-evidence .about-evidence-label { grid-column: 2; margin-top: 0; font-size: 16px; }
+  .studio-about .about-evidence .about-evidence-note { grid-column: 2; margin-top: 4px; font-size: 12px; line-height: 1.8; }
+  .studio-about .about-evidence .about-evidence-date { grid-column: 1 / -1; margin-top: 10px; }
+  .studio-about .about-case-headline { font-size: 21px; }
+  .studio-about .about-case-story .about-case-summary { font-size: 15px; }
+  .studio-about .about-closing { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-top: 30px; }
+  .studio-about .about-closing h2 { font-size: 27px; }
+  .studio-about .about-closing .about-closing-copy { font-size: 15px; }
+}

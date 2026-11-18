@@ -37,6 +37,7 @@
     "open-source/overrides",
     "ecosystem",
     "tests",
+    ".agents",
     ".claude",
     ".wolf"
   ]

@@ -1,150 +1,82 @@
-# 性能优化记录
+# 性能与验收记录
 
-## 问题诊断
+更新：2026-11-09。当前首页为 Taste Skill 方案 A「个人工程作品档案」，此前被否定的蓝白首页只作为历史基线。选定版在独立 `studio-taste-atlas` worktree 完成生产构建与测量；未发布，未修改生产数据库。
 
-### 1. MaxListenersExceededWarning
-**原因**：Next.js 默认使用 11 个 worker 进程进行并行构建，超过了 Node.js 默认的 10 个事件监听器限制。
+## 当前首页资源
 
-**解决方案**：
-- 在 `next.config.ts` 中限制 worker 数量为 4
-- 禁用 worker threads 以减少内存开销
+通过 ego-browser 的 Chromium Performance API 采集，浏览器缓存禁用。初始旧版为线上 `https://note.aichanning.cn`；Taste 版为 OpenNext 生产 Worker `http://127.0.0.1:3111`，桌面 1440×1000，使用独立本地 D1 的 QA fixtures。
 
-```typescript
-experimental: {
-  workerThreads: false,
-  cpus: 4,
-}
-```
+资源体积能说明产物变化，但环境、内容和压缩条件存在差异，**不能把本地与线上耗时相除，宣称线上加速比例**。下表只含首页加载的 CSS 与字体，不含 HTML、JS、图片及 Next.js 后续预取。
 
-### 2. TLS/ECONNRESET 错误
-**原因**：Wrangler 尝试连接 `tail.developers.workers.dev` 进行实时日志推送时网络超时。
+| 项目 | 最初线上旧版 | 第一轮蓝白版（历史） | 当前 Taste 版 | 相对最初旧版减少 |
+|---|---:|---:|---:|---:|
+| CSS 解码字节 | 178,591 | 101,710 | 121,117 | 32.2% |
+| CSS 编码后响应字节 | 35,368 | 18,093 | 21,998 | 37.8% |
+| 字体解码字节 | 199,804 | 78,932 | 78,932 | 60.5% |
+| 字体编码后响应字节 | 107,227 | 78,932 | 78,932 | 26.4% |
 
-**解决方案**：
-- 在 `package.json` 的 preview 命令中添加 `WRANGLER_SEND_METRICS=false` 环境变量
-- 这会禁用遥测和 tail consumer，避免不必要的网络连接
+Taste 首页独立样式增加解码 16,074 字节、编码后 3,240 字节。首页保持 Server Component，没有新增动画库、客户端组件、图片资源或字体下载；展示字使用本机衬线栈。实际仍加载 3 份 Geist WOFF2。WOFF2 本身是压缩格式，不能将解码体积减少 60.5% 说成网络流量减少 60.5%。初始公共 JS 主体未作大幅缩减。
 
-### 3. 页面响应慢
-**原因**：
-1. 每次请求都执行数据库 schema 迁移检查
-2. 远程 D1 数据库延迟（`remote = true`）
-3. 没有启用页面缓存
+## 主题修正前的加载测量（历史）
 
-**解决方案**：
+Next.js 16.2.3 + OpenNext Cloudflare 1.19.1，通过 Wrangler 运行构建后的 Worker，非 Next 开发服务器。每组 3 次、浏览器缓存禁用，结果是实验室测量，不代表线上用户 P75。
 
-#### 3.1 优化数据库迁移逻辑
-- 使用 `migrationPromise` 避免并发迁移
-- 简化迁移操作，移除不必要的检查
-- 使用 `db.batch()` 批量执行 SQL 减少往返次数
+| 条件 | TTFB（ms） | LCP（ms） | load（ms） | CLS |
+|---|---|---|---|---|
+| 桌面 1440×1000，CPU 1× | 147.2 / 22.0 / 16.6 | 368 / 104 / 84 | 505.9 / 172.8 / 150.5 | 每次约 0.0000065 |
+| 手机 390×844，CPU 4×，模拟限速 | 15.7 / 93.3 / 122.5 | 648 / 664 / 736 | 1881.5 / 1943.3 / 1994.3 | 每次约 0.0000476 |
 
-```typescript
-// 优化前：每次都执行多个独立查询
-await db.prepare("CREATE TABLE...").run()
-await db.prepare("SELECT...").all()
-await db.prepare("ALTER TABLE...").run()
+LCP 中位数：桌面 104ms，手机模拟条件 664ms。手机 CDP 设置下载 200,000 B/s、上传 93,750 B/s、延迟 150ms；本地导航 TTFB 未完整体现配置延迟，不能视作真实移动网络或真机分数。六次均无横向溢出，观测到的 window error 列表为空。
 
-// 优化后：批量执行
-await db.batch([
-  db.prepare("CREATE TABLE IF NOT EXISTS..."),
-  db.prepare("CREATE TABLE IF NOT EXISTS..."),
-])
-```
+最初线上单次参考为 TTFB 1200.5ms、LCP 1824ms、load 4982.1ms，仅作历史留档。第一轮蓝白版桌面/手机 LCP 中位数 120/532ms 也属于不同构图、不同采样时间的历史值。没有测量线上新版本、真实设备 INP、生产 D1 P95 或用户流量下的缓存命中率。
 
-#### 3.2 启用页面缓存
-- 首页：60秒缓存 + 部分预渲染（PPR）
-- 文章详情页：5分钟缓存 + PPR
+## 保留的全局优化
 
-```typescript
-export const experimental_ppr = true
-export const revalidate = 60 // 或 300
-```
+- 后台、学习工作台、运营 CSS 从根布局移到 `app/admin/layout.tsx`；编辑器在 `app/editor/layout.tsx` 加载所需后台样式。
+- KaTeX 只在文章详情、后台、编辑器入口加载。普通首页和归档不再承担数学排版 CSS。
+- 删除没有消费者的旧首页 `styles/studio-library.css` 和学习样式中的残留规则。公共品牌、按钮和富文本共享样式保持完整。
+- Geist Sans / Mono 的 400/500/600/700 从原 TTF 转成 WOFF2，保留来源和许可证；`font-display: swap`，不预加载全部字体。
+- 首页工具 SQL `LIMIT 3`；提示词仅取公开快照的 `id/title/description`、`LIMIT 2`，不读正文或私有工作副本。归档仍完整。
+- 首页跳过不用的文章分类汇总；精选文章在设置返回后并行读取。最近 25 篇候选保留，用于超过 10 个精选 slug 的兼容回退。
+- 提示词卡片补齐锚点，使首页入口可定位实际条目。
+- D1 搜索 FTS 失败时，短查询保留 LIKE，超过 50 UTF-8 字节的模式使用 `instr(lower(...), lower(?))`，保留权限过滤、排序和限额。
+- Turbopack 把 `juice` / `cheerio` 解析到 `juice/client` / `cheerio/slim`，避免公众号格式导出依赖把 Undici 动态 WASM 带进 Worker。此前 6 组复杂 HTML 新旧输出逐字节一致；仅覆盖当前 Turbopack 构建，不覆盖手动 Webpack/原生 Node 调用。
 
-## 性能指标预期
+## 工程与视觉验收
 
-### 优化前
-- 首页加载：~800-1200ms
-- 文章详情：~600-1000ms
-- 每次请求都执行 schema 检查：~100-200ms
+- 选定 worktree 全量 ESLint 通过。整合后原项目再次运行 `npm run lint`、`npx tsc --noEmit`、`git diff --check` 均通过；原项目补充 `.agents` 的 ESLint / TypeScript 排除，避免嵌套候选目录重复参与检查。
+- Vitest 53 个文件、280 项测试通过，包括首页限额、公开快照过滤、分类查询跳过、精选回退和 D1 50 字节边界回归。
+- 本轮默认 Vitest 配置打包停在 Rolldown 初始化，取消后使用 `npx vitest run --configLoader native` 完成同一全量测试；没有通过删测试或修改断言规避。未修改项目依赖与测试配置。
+- Next.js 生产编译、TypeScript 和 OpenNext Cloudflare 打包通过，56 个静态页面生成。
+- 两个实现 Agent 独立制作 Atlas 与 Signal，作者交叉自审后由第三个 Agent 看同尺寸实拍。选择 Atlas，修正实际项目数量分栏、手机内容读序、正文/标签字号与暗色卡片链接对比。
+- 最终明暗模式各拍桌面 1440×1000 与手机 390×844。项目索引两列均分约 640.6px；技术标签和日期 12px；手机文章位于工作方向前，且 DOM 同序。2026-11-09 卡片改为跟随主题：浅色深墨字、深色浅字；当前测量正文/标签最低对比4.95:1，链接最低11.27:1。
+- 最终全页高度桌面 2311px、手机 3287px。截图数据是独立 QA fixtures，不是新增的线上内容或运行声明。上一轮审核遗漏大面积明暗断层，用户反馈后撤回。主题修正后由 lead 和另一位审稿分别查看明暗交界、桌面/手机全页、菜单和搜索实拍。
+- 最终生产包在 320/390/768/820/1024/1440px 均无横向溢出；手机菜单打开、Escape 关闭与焦点归还通过，主题切换及重载记忆通过。
+- 首页客户端跳转 `/work` 后局部首页 class 正常移除；搜索 Agent 返回测试文章；`/work`、`/writing`、`/tools`、`/prompts#prompt-1`、`/about`、测试文章正常，提示词锚点存在，相关文章 API 200 且 success=true。
+- 独立复审通过后，将首页组件和局部 CSS 定向整合回原项目；逐字节核对与已构建的候选一致，原项目没有基线漂移。预览继续运行该独立 worktree 的生产包，未将旧主目录构建产物冒充新版本。
 
-### 优化后
-- 首页加载（缓存命中）：~100-200ms
-- 文章详情（缓存命中）：~80-150ms
-- Schema 检查（首次）：~50ms
-- Schema 检查（后续）：0ms（跳过）
+第一轮全局优化已检查公开页面、搜索、提示词锚点、手机菜单和主题记忆；认证后学习、资料库、运营、文章管理、编辑器正常，ProseMirror 实际挂载；未编辑或发布生产内容。重建后相关文章 API 正常返回两篇公开结果，公众号格式复制用内存 clipboard spy 验证 HTML 和纯文本，没有写系统剪贴板。第二轮只改首页，没有扩展私人工作台范围。
 
-## 进一步优化建议
+## 2026-11-09 主题修正验收
 
-### 1. 使用本地 D1 数据库进行开发
-在 `wrangler.toml` 中将 `remote = true` 改为 `remote = false`：
+- 白天全页 `#f2f2ee`，晚上全页 `#20231f`；导航、封面和阅读区同底色，卡片按模式作微差。
+- OpenNext 生产构建和 TypeScript 再次通过；纯 CSS 颜色修正没有重新运行此前280项业务测试，旧测试结果保留其原验证范围。
+- 桌面1440与手机390实拍无横向溢出，日夜切换、菜单开合及重载记忆通过。实际键盘触发卡片链接焦点可见，浅色有既有4px白色外环，深色描边清楚。
+- 主题变量与实际颜色记录见交付目录 `theme-continuity-checks.json`；本次资源数字取新CSS的非零响应记录，上表已更新。上述六次加载耗时属于修正前历史样本，未声称已复测当前线上速度。
+- 现行验收必须检查整页和区块交界，不能将无溢出、构建通过或对比度合格等同于视觉连续性通过。
 
-```toml
-[[d1_databases]]
-binding = "DB"
-database_name = "qmblog-db"
-database_id = "e0af8dca-153a-4f10-9925-b465f304c5c9"
-remote = false  # 开发时使用本地数据库
-```
+## 2026-11-09 公开页面与介绍扩展
 
-**优点**：
-- 延迟从 ~100ms 降到 ~5ms
-- 无需网络连接
-- 可以离线开发
+- 当前范围扩展为 About、作品、文章、工具、提示词、实验及共享公开主题。首页与 About 使用同一份经过 V7 履历核对的 `PUBLIC_PROFILE`；未复制完整私人简历或联系方式。About 的 131 家酒店、29 条生产工作流、350+ 酒店分别保留业务范围、时间或团队归属。
+- 全量 ESLint、Vitest 53 文件/280 项测试、Next.js / OpenNext 构建通过。最后的标题断句、孤字与单分类导航修正再次通过定向 ESLint、TypeScript 和生产构建。定向整合回原项目后，原项目全量 lint、`tsc --noEmit`、`git diff --check` 通过，16 个实现文件与已构建 worktree 逐字节一致。
+- ego-browser 验证 9 个路由 × 桌面1440/手机390 × 明暗两模式，共36种组合；另测6个栏目在320/768/1024宽度的18种组合。均无横向溢出或 Application error。最后4个受影响路由在两种尺寸、两种主题下再测16种组合，结果同样通过。
+- 手机菜单开合、Escape与焦点归还、搜索弹层的明暗主题及重载记忆通过。提示词展开/锚点/复制通过，复制使用内存 spy；文章第二页空态正常。客户端进入后台登录后公开主题正确退出，返回 About 后恢复。
+- 主题依赖公开根标记的 CSS `:has()`，覆盖挂载在 body 的搜索弹层，没有新增 JavaScript。后台沿用原主题。当前测试 Chromium 支持 `:has()`，未验证老旧不支持该选择器的浏览器。
+- 首页当前 CSS 为121,117解码字节/21,998编码后字节；About为114,395/20,668；工具和提示词为113,469/20,496。新增 About 与栏目样式按页面加载。上方六次 LCP 仍是旧首页的历史样本，不代表此次公开站点扩展后的重新测速。
+- 证据保存在交付目录 `studio-public-20261109`：`public-route-checks.json`、`public-interaction-checks.json`、`final-refinement-checks.json` 及实际截图。公开列表使用独立 QA 数据；介绍文本来自已核对履历。没有发布、提交、推送或修改生产数据。
 
-**缺点**：
-- 需要手动同步生产数据到本地（如果需要）
+## 运行与缓存边界
 
-### 2. 使用 Wrangler Migrations
-将 `lib/db.ts` 中的 `ensureSchema()` 逻辑移到正式的迁移文件：
+首页及带密码检查的文章详情继续 `force-dynamic`。没有新增 PPR、60 秒整页缓存、公共共享缓存或生产迁移。测试数据库是 `/tmp/channing-studio-perf-20261108/state`；既有用户本地数据库和线上数据未覆盖。构建并发保持 `cpus: 1`、`workerThreads: false`。
 
-```bash
-wrangler d1 migrations create qmblog-db add_categories_table
-```
-
-**优点**：
-- 完全消除运行时 schema 检查开销
-- 更规范的数据库版本管理
-- 支持回滚
-
-### 3. 添加 KV 缓存层
-利用已有的 `CACHE` KV namespace 缓存热门文章：
-
-```typescript
-// 伪代码
-const cached = await env.CACHE.get(`post:${slug}`)
-if (cached) return JSON.parse(cached)
-
-const post = await getPostBySlug(db, slug)
-await env.CACHE.put(`post:${slug}`, JSON.stringify(post), {
-  expirationTtl: 300 // 5分钟
-})
-```
-
-### 4. 启用 Cloudflare Cache API
-在 API routes 中添加 Cache-Control headers：
-
-```typescript
-return new Response(JSON.stringify(data), {
-  headers: {
-    'Content-Type': 'application/json',
-    'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
-  }
-})
-```
-
-## 监控建议
-
-1. 添加性能监控：
-   - 使用 `console.time()` / `console.timeEnd()` 记录关键操作耗时
-   - 在生产环境启用 Cloudflare Analytics
-
-2. 定期检查：
-   - D1 数据库大小和查询性能
-   - KV 缓存命中率
-   - 页面加载时间（Core Web Vitals）
-
-## 回滚方案
-
-如果优化导致问题，可以快速回滚：
-
-1. 移除 `next.config.ts` 中的 `experimental` 配置
-2. 移除页面文件中的 `experimental_ppr` 和 `revalidate`
-3. 恢复 `lib/db.ts` 中的原始 `ensureSchema()` 逻辑
+系统衬线字体随平台存在外观差异，当前实拍来自 macOS Chromium；没有把该字体差异称为跨平台视觉完全一致。若后续获准发布，应在同一域名、内容及网络条件下再测 LCP/TTFB 与 D1 耗时。

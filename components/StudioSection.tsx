@@ -13,6 +13,8 @@ interface StudioShellProps {
   navLinks: SiteNavLink[]
   initialTheme: Theme
   children: ReactNode
+  eyebrow?: string
+  className?: string
 }
 
 export function StudioShell({
@@ -21,13 +23,16 @@ export function StudioShell({
   navLinks,
   initialTheme,
   children,
+  eyebrow,
+  className = '',
 }: StudioShellProps) {
   return (
-    <div className="studio-site public-page min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col">
+    <div className={`studio-site public-page min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col ${className}`}>
       <SiteHeader initialTheme={initialTheme} navLinks={navLinks} studioMode />
-      <main className="studio-page-main mx-auto w-full max-w-6xl flex-1 px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
+      <main id="main-content" tabIndex={-1} className="studio-page-main mx-auto w-full max-w-6xl flex-1 px-5 py-12 sm:px-8 sm:py-16 lg:px-10">
         <header className="studio-page-heading border-b border-[var(--editor-line)] pb-10 sm:pb-14">
-          <h1 className="font-serif font-medium studio-page-title max-w-4xl"><KeepWords text={title} /></h1>
+          {eyebrow && <p className="public-page-eyebrow">{eyebrow}</p>}
+          <h1 className="studio-page-title max-w-4xl"><KeepWords text={title} /></h1>
           <p className="studio-page-description mt-5 max-w-2xl">{description}</p>
         </header>
         <div className="public-page-content">{children}</div>

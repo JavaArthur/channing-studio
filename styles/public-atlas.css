@@ -1,0 +1,100 @@
+/* The public site shares Atlas colors, including body-portaled search dialogs.
+   :has follows route mounts without client state; private workspace tokens stay intact. */
+:root:has(.atlas-home, .public-page, .public-article) {
+  --public-paper: #f2f2ee;
+  --public-ink: #242522;
+  --public-muted: #62635d;
+  --public-line: #c9cbc3;
+  --public-surface: #e7e9e1;
+  --public-soft: #e2e5dc;
+  --public-accent: #a13f22;
+  --public-accent-hover: #823017;
+  --public-serif: "Bodoni MT", "Didot", "Times New Roman", serif;
+  --public-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --site-width: 1440px;
+  --site-gutter: clamp(20px, 4.4vw, 72px);
+  --background: var(--public-paper);
+  --foreground: var(--public-ink);
+  --editor-app-bg: var(--public-paper);
+  --editor-panel: var(--public-paper);
+  --editor-soft: var(--public-soft);
+  --editor-sand: var(--public-surface);
+  --editor-line: var(--public-line);
+  --editor-line-strong: var(--public-muted);
+  --editor-ink: var(--public-ink);
+  --editor-muted: var(--public-muted);
+  --stone-gray: var(--public-muted);
+  --editor-accent: var(--public-accent);
+  --editor-accent-ink: var(--public-paper);
+  --editor-link: var(--public-accent);
+  --cta-bg: var(--public-accent);
+  --cta-ink: var(--public-paper);
+  --cta-bg-hover: var(--public-accent-hover);
+  --cta-divider: var(--public-accent-hover);
+  --focus-ring: var(--public-accent);
+  --focus-ring-outer: var(--public-paper);
+  --editor-code-bg: var(--public-surface);
+  --editor-code-border: var(--public-line);
+  --editor-quote-bg: var(--public-surface);
+  --editor-selection: var(--public-soft);
+  --article-heading: var(--public-ink);
+  --article-body: var(--public-ink);
+  --article-quote: var(--public-muted);
+  --article-quote-border: var(--public-accent);
+  --article-quote-nested-border: var(--public-line);
+  --article-quote-nested-bg: var(--public-soft);
+}
+:root[data-color-mode="dark"]:has(.atlas-home, .public-page, .public-article) {
+  --public-paper: #20231f;
+  --public-ink: #e8eae2;
+  --public-muted: #b6baae;
+  --public-line: #474d42;
+  --public-surface: #2a2f27;
+  --public-soft: #30362c;
+  --public-accent: #f89b7a;
+  --public-accent-hover: #ffb99f;
+}
+:is(.public-page, .public-article) .public-header {
+  position: relative;
+  background: var(--background);
+  border-bottom: 0;
+}
+:is(.public-page, .public-article) .public-header-inner { min-height: 76px; }
+:is(.public-page, .public-article) .public-header .brand { font-size: 14px; letter-spacing: .01em; }
+:is(.public-page, .public-article) .public-header .brand-mark {
+  border-radius: 0;
+  background: transparent;
+  color: var(--editor-link);
+  border: 1px solid var(--editor-line);
+  font-family: var(--public-serif);
+  font-size: 25px;
+  font-weight: 400;
+}
+:is(.public-page, .public-article) .public-header .brand-subtitle { font-size: inherit; }
+:is(.public-page, .public-article) .public-nav-link { font-size: 14px; }
+:is(.public-page, .public-article) .color-mode-toggle { border-radius: 0; border: 0; }
+.public-page .studio-page-main { padding-top: 0; }
+.public-page .studio-page-heading {
+  border-top: 1px solid var(--editor-line);
+  padding-top: clamp(22px, 3vw, 38px);
+  padding-bottom: clamp(32px, 5vw, 64px);
+}
+.public-page-eyebrow {
+  margin-bottom: 24px;
+  font: 12px/1.8 var(--public-mono);
+  letter-spacing: .08em;
+  color: var(--editor-muted);
+}
+.public-page .studio-page-title { font-size: clamp(38px, 5.6vw, 76px); line-height: 1.15; font-weight: 500; max-width: 18em; }
+.public-page .studio-page-description { max-width: 44em; font-size: clamp(15px, 1.2vw, 18px); line-height: 1.9; }
+.public-page .public-page-content { margin-top: clamp(24px, 3.4vw, 48px); }
+:is(.public-page, .public-article) .public-footer { background: var(--background); }
+.public-page .public-archive-heading { border-top: 1px solid var(--editor-line); padding-top: 28px; }
+.public-page .public-archive-heading h1 { font-size: clamp(32px, 4.5vw, 60px); font-weight: 500; }
+.public-article .article-main { max-width: 840px; padding-top: clamp(40px, 5vw, 72px); }
+.public-article .article-display-title { font-weight: 500; font-size: clamp(30px, 4vw, 52px); line-height: 1.4; }
+@media (max-width: 40rem) {
+  .public-page .studio-page-title { font-size: 38px; }
+  .public-page-eyebrow { margin-bottom: 18px; }
+  .public-page .studio-page-description { margin-top: 20px; }
+}

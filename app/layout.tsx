@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css"
-import "@/styles/admin.css";
-import "@/styles/learning.css";
 import { GlobalShortcuts } from "@/components/GlobalShortcuts";
 import { ToastProvider } from "@/components/Toast";
 import { COLOR_MODE_SCRIPT } from "@/lib/appearance";
@@ -10,10 +8,10 @@ import { getSiteUrl, getSiteUrlObject } from "@/lib/site-config";
 
 const geistSans = localFont({
   src: [
-    { path: "./fonts/geist/Geist-Regular.ttf", weight: "400", style: "normal" },
-    { path: "./fonts/geist/Geist-Medium.ttf", weight: "500", style: "normal" },
-    { path: "./fonts/geist/Geist-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "./fonts/geist/Geist-Bold.ttf", weight: "700", style: "normal" },
+    { path: "./fonts/geist/Geist-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/geist/Geist-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/geist/Geist-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/geist/Geist-Bold.woff2", weight: "700", style: "normal" },
   ],
   variable: "--font-geist-sans",
   display: "swap",
@@ -23,10 +21,10 @@ const geistSans = localFont({
 
 const geistMono = localFont({
   src: [
-    { path: "./fonts/geist/GeistMono-Regular.ttf", weight: "400", style: "normal" },
-    { path: "./fonts/geist/GeistMono-Medium.ttf", weight: "500", style: "normal" },
-    { path: "./fonts/geist/GeistMono-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "./fonts/geist/GeistMono-Bold.ttf", weight: "700", style: "normal" },
+    { path: "./fonts/geist/GeistMono-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/geist/GeistMono-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/geist/GeistMono-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/geist/GeistMono-Bold.woff2", weight: "700", style: "normal" },
   ],
   variable: "--font-geist-mono",
   display: "swap",

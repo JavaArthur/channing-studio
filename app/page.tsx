@@ -1,6 +1,6 @@
 import { getPosts } from '@/lib/db'
 import { getTools, type Tool } from '@/lib/repositories/tools'
-import { getPrompts, type Prompt } from '@/lib/repositories/prompts'
+import { getPromptSummaries, type PromptSummary } from '@/lib/repositories/prompts'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getStudioContent } from '@/lib/studio-settings'
 import { getPublicPortfolio } from '@/lib/repositories/portfolio'
@@ -32,23 +32,29 @@ export default async function Home() {
   let posts: PostWithTags[] = []
   let navLinks: SiteNavLink[] = []
   let tools: Tool[] = []
-  let prompts: Prompt[] = []
+  let prompts: PromptSummary[] = []
   let defaultTheme: Theme = 'light'
 
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, studioContent, portfolioRows, recentPosts, toolRows, promptRows] = await Promise.all([
-        getSiteHeaderData(env.DB),
-        getStudioContent(env.DB),
+      // Only featured posts depend on settings; start them without waiting for the other lists.
+      const db = env.DB
+      const studioContentPromise = getStudioContent(db)
+      const featuredPostsPromise = studioContentPromise.then((studio) =>
+        getFeaturedPosts(db, studio.featuredPostSlugs),
+      )
+      const [headerData, studioContent, portfolioRows, recentPosts, toolRows, promptRows, featured] = await Promise.all([
+        getSiteHeaderData(env.DB, { includeCategories: false }),
+        studioContentPromise,
         getPublicPortfolio(env.DB),
         getPosts(env.DB, 25, 0, false, false, false, false, 'post'),
-        getTools(env.DB),
-        getPrompts(env.DB).catch(() => []),
+        getTools(env.DB, { limit: 3 }),
+        getPromptSummaries(env.DB, 2).catch(() => []),
+        featuredPostsPromise,
       ])
       content = studioContent
       portfolio = portfolioRows
-      const featured = await getFeaturedPosts(env.DB, content.featuredPostSlugs)
       posts = selectFeaturedPosts([...featured, ...recentPosts], content.featuredPostSlugs)
       tools = toolRows
       prompts = promptRows

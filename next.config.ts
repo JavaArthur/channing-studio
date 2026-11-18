@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
 
   turbopack: {
     root: resolve(process.cwd()),
+    // CSS inlining only needs string/DOM parsing. Node resource fetching pulls
+    // Undici's runtime-compiled WASM into Workers, where code generation is forbidden.
+    resolveAlias: {
+      juice: 'juice/client',
+      cheerio: 'cheerio/slim',
+    },
   },
 
   headers: async () => [

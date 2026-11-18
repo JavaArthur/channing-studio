@@ -1,14 +1,12 @@
-/* Hallmark · v2.0.0 · redesign: full · theme: brand (DESIGN.md locked) · genre: editorial · hero: Banner (/) · nav: studio index · footer: colophon */
+/* Channing Studio · shared foundations; public Atlas theme is route-scoped. */
 @import "tailwindcss";
-@import "katex/dist/katex.min.css";
 
 @import "../styles/tokens.css";
 @import "../styles/workspace.css";
-@import "../styles/studio-library.css";
 @import "../styles/portfolio.css";
-@import "../styles/operations.css";
 @import "../styles/public-pages.css";
 @import "../styles/hallmark.css";
+@import "../styles/public-atlas.css";
 @custom-variant dark (&:where([data-color-mode="dark"], [data-color-mode="dark"] *));
 @theme inline {
   --color-background: var(--background);
@@ -52,7 +50,7 @@
   --shadow-2xl: var(--shadow-whisper);
   --shadow-ring: 0 0 0 1px var(--editor-line-strong);
   --shadow-ring-subtle: 0 0 0 1px var(--editor-line);
-  --shadow-whisper: 0 0 0 1px var(--editor-line), rgba(20,20,19,0.05) 0 4px 24px;
+  --shadow-whisper: 0 0 0 1px var(--editor-line), rgba(20,40,70,0.06) 0 4px 24px;
 
 }
 

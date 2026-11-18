@@ -6,7 +6,8 @@ import { getStudioContent } from '@/lib/studio-settings'
 import { getTools, type Tool } from '@/lib/repositories/tools'
 import { selectStudioTools } from '@/lib/studio-home'
 import { ArrowUpRight } from 'lucide-react'
-import { StudioCardLabel, StudioLink, StudioShell } from '@/components/StudioSection'
+import { StudioLink, StudioShell } from '@/components/StudioSection'
+import '@/styles/studio-indexes.css'
 import { getSiteUrl } from '@/lib/site-config'
 import type { Theme } from '@/lib/appearance'
 import type { SiteNavLink } from '@/lib/site'
@@ -45,27 +46,29 @@ export default async function LabsPage() {
 
   return (
     <StudioShell
-      title="先把自己每天用的工具做好。"
-      description="实验室放正在验证的工作流、发布工具和 Agent 能力；它们不一定完美，但都能解决真实问题。"
+      eyebrow="LABS / 实验记录"
+      className="studio-index-page"
+      title="工具链实验室"
+      description="发布工具、工作流与 Agent 实验。这里保留各个组件的说明与入口，便于理解它们在流程中承担的工作。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
-      <div className="divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
-        {visibleLabs.map((lab) => (
-          <StudioLink key={lab.id} href={lab.href} className="block">
-            <article className="studio-lab-row public-lab-row">
-              <div>
-                <h2 className="font-serif font-medium text-xl text-[var(--editor-ink)]">{lab.title}</h2>
-                <StudioCardLabel>{LAB_TYPE_LABELS[lab.type] ?? lab.type}</StudioCardLabel>
-              </div>
-              <div className="public-lab-description">
-                <p className="max-w-lg text-base leading-7 text-[var(--editor-muted)]">{lab.description}</p>
-                <ArrowUpRight aria-hidden className="studio-card-arrow" size={20} />
-              </div>
-            </article>
-          </StudioLink>
-        ))}
-      </div>
+      {visibleLabs.length > 0 && (
+        <section aria-label="公开实验">
+          <div className="index-register"><span>组件与工作流</span><span>{visibleLabs.length} 项公开实验</span></div>
+          <ol className="index-lab-list">
+            {visibleLabs.map((lab, index) => (
+              <li key={lab.id}>
+                <StudioLink href={lab.href} className="index-lab-entry">
+                  <span className="index-section-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                  <article><span className="index-category">{LAB_TYPE_LABELS[lab.type] ?? lab.type}</span><h2>{lab.title}</h2><p>{lab.description}</p></article>
+                  <ArrowUpRight aria-hidden="true" className="index-entry-arrow" size={20} />
+                </StudioLink>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
       {visibleLabs.length === 0 && (
         <div className="studio-empty-state">
           <p>实验室正在整理中</p>
@@ -74,17 +77,14 @@ export default async function LabsPage() {
         </div>
       )}
       {tools.length > 0 && (
-        <div className="mt-14 border-t border-[var(--editor-line)] pt-10">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="font-serif font-medium studio-section-title">相关工具</h2>
-            <StudioLink href="/tools" className="min-h-11 min-w-11 inline-flex items-center gap-1">完整工具箱<ArrowUpRight aria-hidden size={16} /></StudioLink>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-1">
+        <section className="index-related" aria-labelledby="related-tools">
+          <div className="index-section-heading"><h2 id="related-tools">相关工具</h2><StudioLink href="/tools" className="index-text-link">完整工具架<ArrowUpRight aria-hidden size={16} /></StudioLink></div>
+          <div className="index-related-links">
             {selectStudioTools(tools).map((tool) => (
-              <StudioLink key={tool.id} href={tool.url || '/tools'} className="min-h-11 min-w-11 inline-flex items-center gap-1">{tool.name}<ArrowUpRight aria-hidden size={14} /></StudioLink>
+              <StudioLink key={tool.id} href={tool.url || '/tools'} className="index-text-link">{tool.name}<ArrowUpRight aria-hidden size={14} /></StudioLink>
             ))}
           </div>
-        </div>
+        </section>
       )}
     </StudioShell>
   )

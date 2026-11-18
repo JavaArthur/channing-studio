@@ -4,7 +4,7 @@ Channing 的个人工作室、技术写作和内容工具箱。
 
 这里记录三类东西：能真正交付的 AI 平台工程、把重复工作串起来的自动化工具，以及我愿意长期复用的工具和提示词。文章、工具和提示词都由 Cloudflare D1 动态管理，图片和媒体放在 R2。
 
-在线站点：<https://note.aichanning.cn>
+在线站点：<https://note.aichanning.cn> · [2026-11-09 Atlas 公开站点发布与线上验收](docs/release-20261109.md)
 
 Bot 接入：[MCP 指南（Agent 收录 → 私人取用）](docs/api/gorkbot-mcp-integration.md) · [现有 HTTP API](docs/api/gorkbot-workspace-integration.md) · [OpenAPI](docs/api/gorkbot-workspace.openapi.json) · [原 Flomo 同步](docs/api/gorkbot-hermes-integration.md)。MCP 使用独立读写凭据；现有 Agent API 沿用 Hermes Token，后台登录与公开发布仍由管理员控制。
 
@@ -12,7 +12,7 @@ Bot 接入：[MCP 指南（Agent 收录 → 私人取用）](docs/api/gorkbot-mc
 
 ![Channing Studio 生产首页（2026-11-08，桌面）](docs/screenshots/release-20261108/studio-production-1440-light-home.png)
 
-截图来自公开生产站点，不含私人后台内容。[手机截图](docs/screenshots/release-20261108/studio-production-375-light-home.png) · [本次发布与回滚记录](docs/release-20261108.md)
+以上为 2026-11-08 改版前生产截图，不含私人后台内容。[历史手机截图](docs/screenshots/release-20261108/studio-production-375-light-home.png) · [该版本发布与回滚记录](docs/release-20261108.md)
 
 ## 站点结构
 

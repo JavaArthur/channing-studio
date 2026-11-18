@@ -17,6 +17,7 @@ const eslintConfig = defineConfig([
     ".wrangler/**",
     "worker-configuration.d.ts",
     // Local agent/browser workspaces and logs:
+    ".agents/**",
     ".claude/**",
     ".wolf/**",
     ".playwright-mcp/**",

@@ -20,6 +20,25 @@ export interface Prompt extends Omit<PromptRow, 'tags'> {
   tags: string[]
 }
 
+export type PromptSummary = Pick<Prompt, 'id' | 'title' | 'description'>
+
+/** Homepage cards need only public metadata, never the prompt body or private working copy. */
+export async function getPromptSummaries(db: Database, limit = 2): Promise<PromptSummary[]> {
+  await ensureSchema(db)
+  const { results } = await db.prepare(
+    `SELECT id,
+      json_extract(published_payload, '$.title') AS title,
+      json_extract(published_payload, '$.description') AS description
+     FROM prompts
+     WHERE is_hidden = 0 AND published_payload IS NOT NULL
+     ORDER BY json_extract(published_payload, '$.is_pinned') DESC,
+       json_extract(published_payload, '$.sort_order') ASC, updated_at DESC
+     LIMIT ?`,
+  ).bind(Number.isFinite(limit) ? Math.max(0, Math.min(Math.trunc(limit), 100)) : 2)
+    .all<PromptSummary>()
+  return results
+}
+
 export interface PromptInput {
   title: string
   description?: string | null

@@ -13,7 +13,10 @@ export interface SiteCategoryLink {
   slug: string
 }
 
-export async function getSiteHeaderData(db: D1Database): Promise<{
+export async function getSiteHeaderData(
+  db: D1Database,
+  options: { includeCategories?: boolean } = {},
+): Promise<{
   navLinks: SiteNavLink[]
   categories: SiteCategoryLink[]
   defaultTheme: Theme
@@ -25,7 +28,7 @@ export async function getSiteHeaderData(db: D1Database): Promise<{
   try {
     const [navJson, categoryRows] = await Promise.all([
       getSetting(db, 'nav_links'),
-      getPublicCategories(db),
+      options.includeCategories === false ? [] : getPublicCategories(db),
     ])
 
     if (navJson) {

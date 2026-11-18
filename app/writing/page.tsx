@@ -4,7 +4,8 @@ import { type Theme } from '@/lib/appearance'
 import type { SiteNavLink } from '@/lib/site'
 import { getSiteHeaderData } from '@/lib/site'
 import { ArrowUpRight } from 'lucide-react'
-import { StudioCardLabel, StudioLink, StudioShell } from '@/components/StudioSection'
+import { StudioLink, StudioShell } from '@/components/StudioSection'
+import '@/styles/studio-indexes.css'
 import { Pagination } from '@/components/Pagination'
 import { formatDate } from '@/lib/format-date'
 import { getSiteUrl } from '@/lib/site-config'
@@ -54,8 +55,10 @@ export default async function WritingPage({
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
   return (
     <StudioShell
-      title="持续记录"
-      description="把实践、判断和还没想透的部分写下来。"
+      eyebrow="WRITING / 文字档案"
+      className="studio-index-page"
+      title="工程手记"
+      description="关于 AI、工程、产品和生活的记录。留下实践中的选择，也留下尚未解决的问题。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
@@ -67,25 +70,24 @@ export default async function WritingPage({
         </div>
       ) : (
         <>
-          <div className="divide-y divide-[var(--editor-line)] border-y border-[var(--editor-line)]">
+          <div className="index-register"><span>按发布时间排列 · {totalCount} 篇文章</span><span>第 {currentPage} / {totalPages} 页</span></div>
+          <ol className="index-writing-list">
             {posts.map((post) => (
-              <StudioLink key={post.slug} href={`/${post.slug}`} className="block">
-                <article className="studio-writing-row group">
-                  <div className="min-w-0">
-                    <h2 className="font-serif font-medium studio-writing-title">{post.title}</h2>
-                    {post.description && <p className="studio-writing-description mt-2">{post.description}</p>}
-                    <div className="public-entry-meta">
-                    <StudioCardLabel>{post.category || '随笔'}</StudioCardLabel>
-                    <time className="studio-writing-date" dateTime={new Date(post.published_at * 1000).toISOString()}>
-                      {formatDate(post.published_at)}
-                    </time>
-                    </div>
-                  </div>
-                  <ArrowUpRight aria-hidden className="studio-card-arrow" size={20} />
-                </article>
-              </StudioLink>
+              <li key={post.slug}>
+                <StudioLink href={`/${post.slug}`} className="index-writing-entry">
+                  <time className="index-writing-date" dateTime={new Date(post.published_at * 1000).toISOString()}>
+                    {formatDate(post.published_at)}
+                  </time>
+                  <article>
+                    <span className="index-category">{post.category || '随笔'}</span>
+                    <h2>{post.title}</h2>
+                    {post.description && <p>{post.description}</p>}
+                  </article>
+                  <ArrowUpRight aria-hidden="true" className="index-entry-arrow" size={20} />
+                </StudioLink>
+              </li>
             ))}
-          </div>
+          </ol>
           <Pagination currentPage={currentPage} totalPages={totalPages} basePath="/writing" />
         </>
       )}

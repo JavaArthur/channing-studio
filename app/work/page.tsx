@@ -8,6 +8,7 @@ import { getSiteUrl } from '@/lib/site-config'
 import type { Theme } from '@/lib/appearance'
 import type { SiteNavLink } from '@/lib/site'
 import type { PublicPortfolioProject } from '@/lib/portfolio'
+import '@/styles/studio-indexes.css'
 
 export const metadata = {
   title: '作品 · Channing Studio',
@@ -33,13 +34,18 @@ export default async function WorkPage() {
 
   return (
     <StudioShell
-      title="把判断变成可以继续运行的东西。"
-      description="这些项目都在真实使用：有的每天自动更新，有的只服务家人或少数读者。每一项都写明它在哪里运行。"
+      eyebrow="WORK / 作品档案"
+      className="studio-index-page"
+      title="作品与实践"
+      description="公开项目的用途、技术选择与当前状态。沿着项目入口，可以继续查看网站或公开源码。"
       navLinks={navLinks}
       initialTheme={defaultTheme}
     >
       {projects.length ? (
-        <PortfolioIndex projects={projects} headingLevel={2} />
+        <section aria-label="公开项目">
+          <div className="index-register"><span>项目目录</span><span>{projects.length} 个公开项目</span></div>
+          <PortfolioIndex projects={projects} headingLevel={2} />
+        </section>
       ) : (
         <div className="studio-empty-state">
           <p>作品整理中</p>
