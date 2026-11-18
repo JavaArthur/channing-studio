@@ -1,8 +1,52 @@
-import type { StudioContent } from './studio-content'
+import {
+  DEFAULT_STUDIO_CONTENT,
+  type HomeModulesConfig,
+  type StudioContent,
+} from './studio-content'
 import { isSafeLink } from './url'
+
+function validateHomeModules(raw: unknown): HomeModulesConfig {
+  if (raw === undefined) {
+    return { ...DEFAULT_STUDIO_CONTENT.homeModules }
+  }
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    throw new Error('首页模块配置格式错误')
+  }
+  const m = raw as Record<string, unknown>
+  const boolKeys = [
+    'featuredEssay',
+    'writing',
+    'focusAreas',
+    'projects',
+    'tools',
+    'prompts',
+  ] as const
+  for (const key of boolKeys) {
+    if (typeof m[key] !== 'boolean') {
+      throw new Error('首页模块开关格式错误')
+    }
+  }
+  if (typeof m.writingLimit !== 'number' || !Number.isFinite(m.writingLimit)) {
+    throw new Error('首页文章展示数量不正确')
+  }
+  if (typeof m.projectsLimit !== 'number' || !Number.isFinite(m.projectsLimit)) {
+    throw new Error('首页项目展示数量不正确')
+  }
+  return {
+    featuredEssay: m.featuredEssay as boolean,
+    writing: m.writing as boolean,
+    writingLimit: Math.min(12, Math.max(1, Math.trunc(m.writingLimit))),
+    focusAreas: m.focusAreas as boolean,
+    projects: m.projects as boolean,
+    projectsLimit: Math.min(6, Math.max(1, Math.trunc(m.projectsLimit))),
+    tools: m.tools as boolean,
+    prompts: m.prompts as boolean,
+  }
+}
+
 export function validateStudioContent(value: unknown): StudioContent {
   if (!value || typeof value !== 'object') throw new Error('配置格式错误')
-  const c = value as StudioContent
+  const c = value as Partial<StudioContent> & { profile?: StudioContent['profile'] }
   if (
     !c.profile ||
     !Array.isArray(c.labs) ||
@@ -47,5 +91,12 @@ export function validateStudioContent(value: unknown): StudioContent {
       throw new Error('能力说明不完整')
   if (c.featuredPostSlugs.some((slug) => !required(slug, 200) || !/^[a-zA-Z0-9_-]+$/.test(slug)))
     throw new Error('精选文章标识不正确')
-  return c
+
+  const homeModules = validateHomeModules(c.homeModules)
+  return {
+    profile: c.profile,
+    labs: c.labs,
+    featuredPostSlugs: c.featuredPostSlugs,
+    homeModules,
+  }
 }

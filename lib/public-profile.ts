@@ -1,15 +1,17 @@
-/** Public biography: reviewed career facts and existing chen-blog public contacts. */
+/** Public biography: reviewed career facts and verified public contacts for 晨启AI. */
 export const PUBLIC_PROFILE = {
+  brand: '晨启AI',
+  tagline: 'AI 工程与实战手记',
   alias: 'Channing',
-  role: 'AI Agent 开发者 · Java 后端 · 技术博主',
+  role: 'AI Agent 架构 · Java 后端 · 技术博客',
   headline: '让 AI 接住业务，也接得住上线之后。',
-  intro: '从 Java 后端到 AI Agent，专注企业级 AI 客服整体链路与平台工程。做架构、写核心代码，也把上线后的可靠性放进设计。',
-  introduction: '我是 Channing，一名做 AI Agent 的 Java 开发者，也是一名技术博主。主导过企业级 AI 客服从 0 到 1，负责架构、Agent 核心研发与跨团队交付，让咨询、知识检索、工具执行、人工协作与线下服务连成完整链路。',
+  intro: '9 年 Java 后端到 AI Agent 架构实战。专注企业级 Agent 编排、知识检索与线上高可靠交付，把架构取舍与踩坑复盘写成可复用的技术长文。',
+  introduction: '「晨启AI」是一份记录 AI 工程落地与后端架构思考的个人技术博客（作者笔名 Channing）。过去 9 年深耕 Java 核心业务系统，近两年多主导企业级 AI 客服与 AI 能力平台从 0 到 1 建设，打通咨询、知识检索、工具执行、人工协作与工单履约完整链路。',
   experience: '9 年后端 · 2 年多 AI 应用研发',
   experienceAsOf: '经验口径截至 2026.11',
   team: '曾带领最多 9 人跨职能团队，承担架构设计、核心编码与跨系统交付。',
-  writing: '在这里记录 Agent 架构、权限与工程实践，也分享 Java、微服务和技术成长中的思考。希望把复杂问题写清楚，让经验能被理解、复用。',
-  publication: '公众号：晨启AI · 分享 AI 技术与实战经验',
+  writing: '在这里记录 Agent 架构、权限边界与线上可靠性实践，也分享 Java、分布式系统与技术演进中的真实复盘。希望把复杂问题写清楚，让经验能被理解、验证与复用。',
+  publication: '公众号：晨启AI · 同步更新深度技术长文与实战经验',
   email: 'xiekc0930@gmail.com',
   contactLinks: [
     { label: 'GitHub', url: 'https://github.com/JavaArthur' },
@@ -68,5 +70,5 @@ export const PUBLIC_PROFILE = {
     },
   ],
   closingTitle: '写代码，也把经验留下来。',
-  closing: '关注 Agent 如何真正完成任务：权限是否清楚，失败如何恢复，结果能否验证。欢迎交流 AI 应用、Java 后端与平台工程，也欢迎聊聊把想法做成产品的过程。',
+  closing: '关注 Agent 如何真正完成任务：权限是否清楚，失败如何恢复，结果能否验证。欢迎交流 AI 应用、Java 后端与架构工程，也欢迎聊聊把想法落地成可靠系统的过程。',
 } as const

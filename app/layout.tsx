@@ -33,14 +33,15 @@ const geistMono = localFont({
 });
 
 const SITE_URL = getSiteUrl()
+const SITE_DESCRIPTION = '从 Java 后端到 AI Agent，记录企业级 AI 落地、架构取舍与实战复盘的个人技术博客。'
 
 export const metadata: Metadata = {
   metadataBase: getSiteUrlObject(),
   title: {
-    default: 'Channing Studio · 晨启AI',
-    template: '%s · Channing Studio',
+    default: '晨启AI · AI 工程与技术博客',
+    template: '%s · 晨启AI',
   },
-  description: 'AI 平台工程、内容自动化与真实交付的公开工作台。',
+  description: SITE_DESCRIPTION,
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -61,22 +62,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'zh_CN',
     url: SITE_URL,
-    siteName: 'Channing Studio',
-    title: 'Channing Studio · 晨启AI',
-    description: 'AI 平台工程、内容自动化与真实交付的公开工作台。',
+    siteName: '晨启AI',
+    title: '晨启AI · AI 工程与技术博客',
+    description: SITE_DESCRIPTION,
     images: [
       {
         url: '/icon-512.png',
         width: 512,
         height: 512,
-        alt: 'Channing Studio',
+        alt: '晨启AI',
       },
     ],
   },
   twitter: {
     card: 'summary',
-    title: 'Channing Studio · 晨启AI',
-    description: 'AI 平台工程、内容自动化与真实交付的公开工作台。',
+    title: '晨启AI · AI 工程与技术博客',
+    description: SITE_DESCRIPTION,
     images: ['/icon-512.png'],
   },
 };

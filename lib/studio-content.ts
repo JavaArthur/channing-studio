@@ -25,35 +25,59 @@ export interface StudioProfile {
   capabilities: StudioCapability[]
 }
 
+export interface HomeModulesConfig {
+  featuredEssay: boolean
+  writing: boolean
+  writingLimit: number
+  focusAreas: boolean
+  projects: boolean
+  projectsLimit: number
+  tools: boolean
+  prompts: boolean
+}
+
 export interface StudioContent {
   profile: StudioProfile
   labs: StudioLab[]
   featuredPostSlugs: string[]
+  homeModules: HomeModulesConfig
 }
 
 export const STUDIO_SETTING_KEYS = [
   'studio_profile',
   'studio_labs',
   'studio_featured_posts',
+  'studio_home_modules',
 ] as const
 
 export type StudioSettingKey = (typeof STUDIO_SETTING_KEYS)[number]
 export type StudioSettingValues = Partial<Record<StudioSettingKey, string | null | undefined>>
 
+export const DEFAULT_HOME_MODULES: HomeModulesConfig = {
+  featuredEssay: true,
+  writing: true,
+  writingLimit: 5,
+  focusAreas: true,
+  projects: true,
+  projectsLimit: 3,
+  tools: true,
+  prompts: true,
+}
+
 export const DEFAULT_STUDIO_CONTENT: StudioContent = {
   profile: {
-    eyebrow: 'CHANNING STUDIO',
-    title: '把复杂问题变成可交付系统。',
-    subtitle: 'AI 平台工程落地者 · 内容创作者',
-    statement: '我把重复三遍的事自动化，把工程判断写成可以复用的系统。',
+    eyebrow: '晨启AI',
+    title: '让 AI 接住业务，也接得住上线之后。',
+    subtitle: 'AI Agent 架构 · Java 后端 · 技术博客',
+    statement: '从 Java 后端到 AI Agent，把企业级落地与架构取舍写成可复用的实战手记。',
     contactLinks: [
-      { label: 'GitHub', url: 'https://github.com/JavaArthur/channing-studio', openInNewTab: true },
+      { label: 'GitHub', url: 'https://github.com/JavaArthur', openInNewTab: true },
       { label: 'RSS', url: '/feed.xml', openInNewTab: false },
     ],
     capabilities: [
-      { title: 'AI 平台工程', description: '从架构边界、数据链路到上线运维，关注能否真正交付。' },
-      { title: '内容自动化', description: '把剪藏、写作、排版和发布串成低心智成本的工作流。' },
-      { title: '产品化交付', description: '先解决用户真正要完成的事，再决定系统应该长什么样。' },
+      { title: 'AI Agent 与编排架构', description: '从多步状态机、工具调用权限边界到灰度回退与可观测链路。' },
+      { title: 'RAG 与企业知识工程', description: '围绕知识版本治理、混合检索重排与复杂业务问答准确率落地。' },
+      { title: 'Java 后端与高可靠交付', description: '在核心交易、并发一致性与跨系统集成中保持可验证的工程质量。' },
     ],
   },
   labs: [
@@ -83,6 +107,7 @@ export const DEFAULT_STUDIO_CONTENT: StudioContent = {
     },
   ],
   featuredPostSlugs: [],
+  homeModules: { ...DEFAULT_HOME_MODULES },
 }
 
 function cloneDefaultContent(): StudioContent {
@@ -94,6 +119,7 @@ function cloneDefaultContent(): StudioContent {
     },
     labs: DEFAULT_STUDIO_CONTENT.labs.map((lab) => ({ ...lab })),
     featuredPostSlugs: [...DEFAULT_STUDIO_CONTENT.featuredPostSlugs],
+    homeModules: { ...DEFAULT_STUDIO_CONTENT.homeModules },
   }
 }
 
@@ -112,6 +138,15 @@ function parseJson(value: string | null | undefined): unknown {
 
 function parseString(value: unknown, fallback: string): string {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback
+}
+
+function parseBoolean(value: unknown, fallback: boolean): boolean {
+  return typeof value === 'boolean' ? value : fallback
+}
+
+function clampInt(value: unknown, min: number, max: number, fallback: number): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback
+  return Math.min(max, Math.max(min, Math.trunc(value)))
 }
 
 function parseLinks(value: unknown, fallback: StudioLink[]): StudioLink[] {
@@ -160,6 +195,20 @@ function parseFeaturedPosts(value: unknown): string[] {
     .filter(Boolean)
 }
 
+function parseHomeModules(value: unknown, fallback: HomeModulesConfig): HomeModulesConfig {
+  if (!isRecord(value)) return { ...fallback }
+  return {
+    featuredEssay: parseBoolean(value.featuredEssay, fallback.featuredEssay),
+    writing: parseBoolean(value.writing, fallback.writing),
+    writingLimit: clampInt(value.writingLimit, 1, 12, fallback.writingLimit),
+    focusAreas: parseBoolean(value.focusAreas, fallback.focusAreas),
+    projects: parseBoolean(value.projects, fallback.projects),
+    projectsLimit: clampInt(value.projectsLimit, 1, 6, fallback.projectsLimit),
+    tools: parseBoolean(value.tools, fallback.tools),
+    prompts: parseBoolean(value.prompts, fallback.prompts),
+  }
+}
+
 export function parseStudioSettings(values: StudioSettingValues): StudioContent {
   const defaults = cloneDefaultContent()
   const profileValue = parseJson(values.studio_profile)
@@ -179,6 +228,7 @@ export function parseStudioSettings(values: StudioSettingValues): StudioContent 
     profile,
     labs: parseLabs(parseJson(values.studio_labs), defaults.labs),
     featuredPostSlugs: parseFeaturedPosts(parseJson(values.studio_featured_posts)),
+    homeModules: parseHomeModules(parseJson(values.studio_home_modules), defaults.homeModules),
   }
 }
 
@@ -187,5 +237,6 @@ export function serializeStudioSettings(content: StudioContent): Record<StudioSe
     studio_profile: JSON.stringify(content.profile),
     studio_labs: JSON.stringify(content.labs),
     studio_featured_posts: JSON.stringify(content.featuredPostSlugs),
+    studio_home_modules: JSON.stringify(content.homeModules ?? DEFAULT_STUDIO_CONTENT.homeModules),
   }
 }
