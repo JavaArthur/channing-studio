@@ -40,7 +40,9 @@ export function ApiTokensManager() {
     } catch {}
   }
 
-  useEffect(() => { loadTokens() }, [])
+  useEffect(() => {
+    loadTokens()
+  }, [])
 
   const createToken = async () => {
     if (creating || newToken || !newName.trim()) return false
@@ -54,7 +56,7 @@ export function ApiTokensManager() {
       if (!res.ok) throw new Error('创建失败')
       const data = (await res.json()) as CreateTokenResponse
       setNewToken(data.token)
-      setNewName((current) => current === newName ? '' : current)
+      setNewName((current) => (current === newName ? '' : current))
       toast.success('Token 已创建')
       loadTokens()
       return true
@@ -70,7 +72,7 @@ export function ApiTokensManager() {
   const guard = useUnsavedChanges(
     !!newToken || (open && !!newName.trim()),
     async () => {
-      if (newToken || await createToken()) throw new Error(tokenNotice)
+      if (newToken || (await createToken())) throw new Error(tokenNotice)
       return false
     },
     () => {
@@ -111,47 +113,120 @@ export function ApiTokensManager() {
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
       timeZone: 'Asia/Shanghai',
     })
   }
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-[var(--editor-muted)]">
-        API Token 用于 Obsidian 插件、Chrome 插件、Claude Skill 等外部工具发布文章。
+    <div className="space-y-5">
+      <p className="text-xs leading-relaxed text-[var(--editor-muted)]">
+        API Token 用于 Obsidian 插件、Chrome 插件、Claude Skill 等外部工具安全写入工作台。
       </p>
 
-      <div className="flex justify-between items-center"><h3>访问 Token</h3><Button variant="primary" onClick={() => setOpen(true)}>新增 Token</Button></div>
-      <Modal open={open} onOpenChange={value => value ? setOpen(true) : guard(() => setOpen(false))} title="新增 Token" sheet><div className="admin-form">
-        {newToken ? <><p>Token 只显示一次，请复制保存。</p><code className="break-all">{newToken}</code><Button onClick={() => copyToken(newToken)}>复制 Token</Button><Button onClick={() => { setNewToken(null); if (!newName.trim()) setOpen(false) }}>我已保存</Button></> : null}{(!newToken || !!newName.trim()) && <form className="admin-form" onSubmit={e => { e.preventDefault(); void createToken() }}><label>用途名称<Input value={newName} onChange={e => setNewName(e.target.value)} required placeholder="例如：Obsidian 发布" /></label><Button type="submit" variant="primary" disabled={creating || !!newToken || !newName.trim()}>{creating ? '创建中…' : '生成 Token'}</Button></form>}
-      </div></Modal>
+      <div className="flex items-center justify-between">
+        <h3>访问 Token</h3>
+        <Button
+          variant="primary"
+          className="atelier-cta-vermilion"
+          onClick={() => setOpen(true)}
+        >
+          新增 Token
+        </Button>
+      </div>
+
+      <Modal
+        open={open}
+        onOpenChange={(value) => (value ? setOpen(true) : guard(() => setOpen(false)))}
+        title="新增 Token"
+        sheet
+      >
+        <div className="admin-form">
+          {newToken ? (
+            <>
+              <p>Token 只显示一次，请立即复制保存。</p>
+              <code className="atelier-mono rounded-[var(--radius-sm)] border border-[var(--editor-line)] bg-[var(--editor-soft)] p-3 text-xs break-all">
+                {newToken}
+              </code>
+              <Button onClick={() => copyToken(newToken)}>复制 Token</Button>
+              <Button
+                variant="primary"
+                className="atelier-cta-vermilion"
+                onClick={() => {
+                  setNewToken(null)
+                  if (!newName.trim()) setOpen(false)
+                }}
+              >
+                我已保存
+              </Button>
+            </>
+          ) : null}
+          {(!newToken || !!newName.trim()) && (
+            <form
+              className="admin-form"
+              onSubmit={(e) => {
+                e.preventDefault()
+                void createToken()
+              }}
+            >
+              <label>
+                用途名称
+                <Input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  required
+                  placeholder="例如：Obsidian 发布"
+                />
+              </label>
+              <Button
+                type="submit"
+                variant="primary"
+                className="atelier-cta-vermilion"
+                disabled={creating || !!newToken || !newName.trim()}
+              >
+                {creating ? '创建中…' : '生成 Token'}
+              </Button>
+            </form>
+          )}
+        </div>
+      </Modal>
 
       {/* Token 列表 */}
       {tokens.length === 0 ? (
-        <p className="text-sm text-[var(--stone-gray)] text-center py-8">
+        <div className="rounded-[var(--radius-sm)] border border-dashed border-[var(--editor-line-strong)] py-8 text-center text-xs text-[var(--stone-gray)]">
           暂无 API Token
-        </p>
+        </div>
       ) : (
         <div className="space-y-2">
           {tokens.map((t) => (
             <div
               key={t.id}
-              className="flex items-center justify-between px-4 py-3 bg-[var(--editor-panel)] border border-[var(--editor-line)] rounded-lg"
+              className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] border border-[var(--editor-line)] bg-[var(--editor-panel)] px-4 py-3"
             >
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-[var(--editor-ink)]">
-                    {t.name}
-                  </span>
-                  <code className="text-xs text-[var(--stone-gray)] font-mono">
-                    {t.token_preview}
-                  </code>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className="atelier-beacon"
+                    data-tone={t.is_active ? 'healthy' : undefined}
+                    aria-hidden="true"
+                  />
+                  <span className="text-sm font-medium text-[var(--editor-ink)]">{t.name}</span>
+                  <code className="atelier-badge">{t.token_preview}</code>
                 </div>
-                <div className="text-xs text-[var(--stone-gray)] mt-0.5">
+                <div className="atelier-mono mt-1 text-[11px] text-[var(--stone-gray)]">
                   创建于 {formatDate(t.created_at)} · 最后使用 {formatDate(t.last_used_at)}
                 </div>
               </div>
-              <Menu label={`${t.name}的操作`} items={[{ label: '删除 Token', danger: true, onSelect: () => void deleteToken(t.id, t.name) }]} />
+              <Menu
+                label={`${t.name}的操作`}
+                items={[
+                  {
+                    label: '删除 Token',
+                    danger: true,
+                    onSelect: () => void deleteToken(t.id, t.name),
+                  },
+                ]}
+              />
             </div>
           ))}
         </div>

@@ -1,12 +1,14 @@
 'use client'
+
 import { useUnsavedChanges, type SaveContext } from '@/components/admin/UnsavedChanges'
 import { useWorkspace } from './WorkspaceState'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Folder, Plus } from 'lucide-react'
+import { Folder, Pin, Plus } from 'lucide-react'
 import { Button, Input, Menu, Modal } from '@/components/admin/ui'
 import { libraryRequest, type Collection } from './client'
+
 export function Collections({
   items,
   archived = false,
@@ -21,11 +23,13 @@ export function Collections({
   const [description, setDescription] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+
   const dirty =
     !!editing &&
     (title !== (editing === 'new' ? '' : editing.title) ||
       description !== (editing === 'new' ? '' : editing.description))
   const guard = useUnsavedChanges(dirty, save)
+
   async function save(context?: SaveContext) {
     if (busy) return false
     if (!title.trim()) {
@@ -36,18 +40,21 @@ export function Collections({
     setError('')
     try {
       if (!editing) return false
-      const result = editing === 'new'
-        ? await libraryRequest({ action: 'collection', title, description })
-        : await libraryRequest({
-          action: 'collection_update',
-          id: editing.id,
-          expected_revision: editing.revision,
-          title,
-          description,
-          archived,
-        })
+      const result =
+        editing === 'new'
+          ? await libraryRequest({ action: 'collection', title, description })
+          : await libraryRequest({
+              action: 'collection_update',
+              id: editing.id,
+              expected_revision: editing.revision,
+              title,
+              description,
+              archived,
+            })
       // Keep the saved identity/revision while preserving the live title and description.
-      setEditing(result.collection || { id: result.id, title, description, revision: 1, item_count: 0 })
+      setEditing(
+        result.collection || { id: result.id, title, description, revision: 1, item_count: 0 },
+      )
       await reload()
       if (!context || context.isCurrent()) setEditing(null)
       router.refresh()
@@ -59,12 +66,14 @@ export function Collections({
       setBusy(false)
     }
   }
+
   function edit(item: Collection | 'new') {
     setTitle(item === 'new' ? '' : item.title)
     setDescription(item === 'new' ? '' : item.description)
     setError('')
     setEditing(item)
   }
+
   async function archive(item: Collection) {
     setError('')
     try {
@@ -82,83 +91,98 @@ export function Collections({
       setError(e instanceof Error ? e.message : '保存失败')
     }
   }
+
   return (
-    <div>
+    <div className="atelier-surface-page">
       <header className="workspace-page-heading">
         <div>
+          <span className="atelier-eyebrow">ARCHIVE // COLLECTIONS</span>
           <h1>主题资料集</h1>
-          <p>同一主题，放在一起。</p>
+          <p>同一主题，放在一起 · 共 {items.length} 个{archived ? '已归档' : ''}资料集。</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap items-center gap-2.5">
           <Link
             className="admin-button admin-button-ghost"
             href={`/admin/collections${archived ? '' : '?archived=1'}`}
           >
             {archived ? '返回当前' : '已归档'}
           </Link>
-          <Button variant="primary" onClick={() => edit('new')}>
+          <Button variant="primary" className="atelier-cta-vermilion" onClick={() => edit('new')}>
             <Plus size={15} />
             新建资料集
           </Button>
         </div>
       </header>
-      {error && <p role="alert">{error}</p>}
-      <div className="collection-list">
-        {items.map((item) => (
-          <div className="collection-list-row" key={item.id}>
-            <Link href={`/admin/library?collection=${encodeURIComponent(item.id)}`}>
-              <Folder size={18} />
-              <div>
-                <h2>{item.title}</h2>
-                <p>{item.description || '暂无说明'}</p>
-              </div>
-            </Link>
-            <span>{item.item_count} 条</span>
-            <Menu
-              label={`${item.title}的操作`}
-              items={[
-                ...(!archived
-                  ? [
-                      {
-                        label: item.pinned ? '取消侧栏置顶' : '置顶到侧栏',
-                        onSelect: () =>
-                          void sync({
-                            action: 'collection',
-                            id: item.id,
-                            pinned: !item.pinned,
-                          }).then((ok) => {
-                            if (ok) router.refresh()
-                          }),
-                      },
-                      ...(item.pinned
-                        ? (['up', 'down'] as const).map((move) => ({
-                            label: move === 'up' ? '上移常用顺序' : '下移常用顺序',
-                            onSelect: () =>
-                              void sync({
-                                action: 'collection',
-                                id: item.id,
-                                pinned: true,
-                                move,
-                              }).then((ok) => {
-                                if (ok) router.refresh()
-                              }),
-                          }))
-                        : []),
-                    ]
-                  : []),
-                { label: '编辑名称与说明', onSelect: () => edit(item) },
-                {
-                  label: archived ? '恢复资料集' : '归档资料集',
-                  onSelect: () => void archive(item),
-                },
-              ]}
-            />
-          </div>
-        ))}
-      </div>
+      {error && (
+        <p role="alert" className="library-feedback">
+          {error}
+        </p>
+      )}
+      {!!items.length && (
+        <div className="collection-list">
+          {items.map((item) => (
+            <div className="collection-list-row" key={item.id}>
+              <Link href={`/admin/library?collection=${encodeURIComponent(item.id)}`}>
+                <span className="collection-folder-mark" aria-hidden="true">
+                  <Folder size={16} />
+                </span>
+                <div>
+                  <h2>
+                    {item.title}
+                    {!!item.pinned && <Pin size={12} className="collection-pin-mark" />}
+                  </h2>
+                  <p>{item.description || '暂无说明'}</p>
+                </div>
+              </Link>
+              <span className="atelier-badge">{item.item_count} 条</span>
+              <Menu
+                label={`${item.title}的操作`}
+                items={[
+                  ...(!archived
+                    ? [
+                        {
+                          label: item.pinned ? '取消侧栏置顶' : '置顶到侧栏',
+                          onSelect: () =>
+                            void sync({
+                              action: 'collection',
+                              id: item.id,
+                              pinned: !item.pinned,
+                            }).then((ok) => {
+                              if (ok) router.refresh()
+                            }),
+                        },
+                        ...(item.pinned
+                          ? (['up', 'down'] as const).map((move) => ({
+                              label: move === 'up' ? '上移常用顺序' : '下移常用顺序',
+                              onSelect: () =>
+                                void sync({
+                                  action: 'collection',
+                                  id: item.id,
+                                  pinned: true,
+                                  move,
+                                }).then((ok) => {
+                                  if (ok) router.refresh()
+                                }),
+                            }))
+                          : []),
+                      ]
+                    : []),
+                  { label: '编辑名称与说明', onSelect: () => edit(item) },
+                  {
+                    label: archived ? '恢复资料集' : '归档资料集',
+                    onSelect: () => void archive(item),
+                  },
+                ]}
+              />
+            </div>
+          ))}
+        </div>
+      )}
       {!items.length && (
-        <div className="library-empty">
-          <Folder size={28} />
+        <div className="library-empty atelier-crosshair">
+          <span className="library-empty-emblem" aria-hidden="true">
+            <Folder size={24} />
+          </span>
           <h2>{archived ? '没有归档的资料集' : '从一个常用主题开始'}</h2>
           <p>工具、文章、笔记和灵感都可以加入同一个资料集。</p>
         </div>
@@ -198,7 +222,7 @@ export function Collections({
             />
           </label>
           {error && <p role="alert">{error}</p>}
-          <Button type="submit" variant="primary" disabled={busy}>
+          <Button type="submit" variant="primary" className="atelier-cta-vermilion" disabled={busy}>
             保存资料集
           </Button>
         </form>

@@ -1,4 +1,5 @@
 'use client'
+
 import { useUnsavedChanges } from '@/components/admin/UnsavedChanges'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
@@ -31,7 +32,9 @@ import { libraryRequest, type Collection } from './client'
 import { useWorkspace, type Selection } from './WorkspaceState'
 import { HandoffDialog } from './HandoffDialog'
 import { AddCollectionItems } from './AddCollectionItems'
+
 export { libraryRequest, type Collection } from './client'
+
 const icons = {
   note: BookOpen,
   article: FileText,
@@ -42,11 +45,14 @@ const icons = {
   artifact: BookOpen,
   post: FileText,
 }
+
 const kinds = ['all', 'article', 'note', 'tool', 'prompt'] as const
+
 export function ItemIcon({ type, size = 16 }: { type: string; size?: number }) {
   const Icon = icons[type as keyof typeof icons] || BookOpen
   return <Icon size={size} aria-hidden="true" />
 }
+
 function Highlight({ text, terms = [] }: { text: string; terms?: string[] }) {
   if (!terms.length) return <>{text}</>
   const pattern = new RegExp(
@@ -71,6 +77,7 @@ function Highlight({ text, terms = [] }: { text: string; terms?: string[] }) {
     </>
   )
 }
+
 export function LibraryBrowser({
   items,
   total,
@@ -90,21 +97,22 @@ export function LibraryBrowser({
   html: string
   collections: Collection[]
 }) {
-  const router = useRouter(),
-    flush = useRef<(() => Promise<boolean>) | null>(null),
-    search = useRef<HTMLInputElement>(null)
+  const router = useRouter()
+  const flush = useRef<(() => Promise<boolean>) | null>(null)
+  const search = useRef<HTMLInputElement>(null)
   const { checked, setChecked, usage, sync } = useWorkspace()
   const guard = useUnsavedChanges(false, async () => true)
-  const [handoff, setHandoff] = useState<Selection | null>(null),
-    [creating, setCreating] = useState(false),
-    [adding, setAdding] = useState(false)
-  const [error, setError] = useState(''),
-    [focus, setFocus] = useState(false),
-    [filters, setFilters] = useState(false),
-    [history, setHistory] = useState(false),
-    [expanded, setExpanded] = useState(false)
-  const collection = collections.find((c) => c.id === query.collection),
-    selection = Object.values(checked)
+  const [handoff, setHandoff] = useState<Selection | null>(null)
+  const [creating, setCreating] = useState(false)
+  const [adding, setAdding] = useState(false)
+  const [error, setError] = useState('')
+  const [focus, setFocus] = useState(false)
+  const [filters, setFilters] = useState(false)
+  const [history, setHistory] = useState(false)
+  const [expanded, setExpanded] = useState(false)
+
+  const collection = collections.find((c) => c.id === query.collection)
+  const selection = Object.values(checked)
   const title =
     collection?.title ||
     (query.recent
@@ -114,6 +122,7 @@ export function LibraryBrowser({
         : query.decisions
           ? '待决定'
           : '资料库')
+
   function url(changes: Record<string, string | number | undefined>) {
     const params = new URLSearchParams()
     for (const [key, value] of Object.entries(query))
@@ -124,9 +133,11 @@ export function LibraryBrowser({
       else params.set(key, String(value))
     return `/admin/library?${params}`
   }
+
   async function navigate(href: string) {
     if (!flush.current || (await flush.current())) router.push(href, { scroll: false })
   }
+
   const selectedKey = selected ? libraryKey(selected) : ''
   const readRef = useRef(selected)
   useEffect(() => {
@@ -145,6 +156,7 @@ export function LibraryBrowser({
     window.addEventListener('studio:usage-focus', refresh)
     return () => window.removeEventListener('studio:usage-focus', refresh)
   }, [router, query.recent])
+
   const chips: [string, string][] = [
     ...(query.q ? [['q', `搜索：${query.q}`] as [string, string]] : []),
     ...(query.kind ? [['kind', libraryLabels[query.kind]] as [string, string]] : []),
@@ -152,6 +164,7 @@ export function LibraryBrowser({
     ...(collection ? [['collection', collection.title] as [string, string]] : []),
     ...(query.favorite ? [['favorite', '仅收藏'] as [string, string]] : []),
   ]
+
   async function pin(item: LibraryItem) {
     if (
       await sync({
@@ -164,6 +177,7 @@ export function LibraryBrowser({
     )
       router.refresh()
   }
+
   return (
     <div className={`library-workspace ${selected && focus ? 'library-focus' : ''}`}>
       <header className="library-heading">
@@ -182,7 +196,7 @@ export function LibraryBrowser({
               )
             }}
           >
-            <Search size={16} aria-hidden="true" />
+            <Search size={15} aria-hidden="true" />
             <input
               ref={search}
               key={query.q}
@@ -236,11 +250,16 @@ export function LibraryBrowser({
           )}
         </div>
         {collection && <Button onClick={() => setAdding(true)}>添加已有资料</Button>}
-        <Button variant="primary" onClick={() => setCreating(true)}>
+        <Button
+          variant="primary"
+          className="atelier-cta-vermilion"
+          onClick={() => setCreating(true)}
+        >
           <Plus size={15} />
           <span>手动收录</span>
         </Button>
       </header>
+
       <div className="library-filterbar">
         {selection.length ? (
           <div className="library-selection" role="region" aria-label="已选择资料">
@@ -272,7 +291,7 @@ export function LibraryBrowser({
           </nav>
         )}
         <div className="library-view-options">
-          <span>{total} 条</span>
+          <span className="library-total-count">{total} 条</span>
           <Button variant="ghost" aria-label="筛选资料" onClick={() => setFilters(true)}>
             <SlidersHorizontal size={15} />
           </Button>
@@ -303,17 +322,19 @@ export function LibraryBrowser({
             <Link
               title={query.archived ? '返回当前' : '归档内容'}
               aria-label={query.archived ? '返回当前' : '归档内容'}
+              className={query.archived ? 'is-archived-active' : undefined}
               href={url({
                 archived: query.archived ? undefined : 1,
                 item: undefined,
                 page: undefined,
               })}
             >
-              <Archive size={16} />
+              <Archive size={15} />
             </Link>
           )}
         </div>
       </div>
+
       {!!chips.length && (
         <div className="library-filter-chips">
           {chips.map(([key, label]) => (
@@ -323,6 +344,7 @@ export function LibraryBrowser({
             </Link>
           ))}
           <Link
+            className="library-chip-clear"
             href={url({
               q: undefined,
               kind: undefined,
@@ -337,6 +359,7 @@ export function LibraryBrowser({
           </Link>
         </div>
       )}
+
       {expanded && !!selection.length && (
         <div className="selected-items">
           {selection.map((ref) => (
@@ -357,16 +380,20 @@ export function LibraryBrowser({
           ))}
         </div>
       )}
+
       {error && (
         <p role="alert" className="library-feedback">
           {error}
         </p>
       )}
+
       <div className={`library-split ${selected ? 'has-detail' : ''}`}>
         <section className="library-list" aria-label="资料列表">
           {!items.length && (
-            <div className="library-empty">
-              <BookOpen size={28} />
+            <div className="library-empty atelier-crosshair">
+              <span className="library-empty-emblem" aria-hidden="true">
+                <BookOpen size={24} />
+              </span>
               <h2>
                 {query.q ? '没有找到匹配内容' : query.recent ? '还没有阅读记录' : '这里还没有内容'}
               </h2>
@@ -376,7 +403,7 @@ export function LibraryBrowser({
                   : '把文章或工具交给助手，说「保存到 Studio」。'}
               </p>
               {query.q ? (
-                <div>
+                <div className="library-empty-actions">
                   <Button onClick={() => search.current?.focus()}>修改关键词</Button>
                   <Link
                     className="admin-button"
@@ -386,10 +413,17 @@ export function LibraryBrowser({
                   </Link>
                 </div>
               ) : (
-                <Button onClick={() => setCreating(true)}>收录第一条内容</Button>
+                <Button
+                  variant="primary"
+                  className="atelier-cta-vermilion"
+                  onClick={() => setCreating(true)}
+                >
+                  收录第一条内容
+                </Button>
               )}
             </div>
           )}
+
           {items.map((item) => (
             <div
               className={`library-row content-row ${query.kind ? 'single-type' : ''} ${selectedKey === libraryKey(item) ? 'is-selected' : ''}`}
@@ -403,8 +437,8 @@ export function LibraryBrowser({
                   checked={!!checked[libraryKey(item)]}
                   onChange={() =>
                     setChecked((value) => {
-                      const next = { ...value },
-                        key = libraryKey(item)
+                      const next = { ...value }
+                      const key = libraryKey(item)
                       if (next[key]) delete next[key]
                       else next[key] = { kind: item.kind, id: item.id, title: item.title }
                       return next
@@ -417,14 +451,16 @@ export function LibraryBrowser({
                 href={url({ item: libraryKey(item) })}
                 scroll={false}
               >
-                <span className="library-row-icon">
-                  <ItemIcon type={item.content_type} />
+                <span className="library-row-icon" data-kind={item.content_type}>
+                  <ItemIcon type={item.content_type} size={15} />
                 </span>
                 <div className="library-row-text">
                   <h2 title={item.title}>
                     <Highlight text={item.title} terms={item.match?.terms} />
-                    {item.favorite && <Star size={12} fill="currentColor" />}
-                    {!!item.collection_pinned && <Pin size={12} />}
+                    {item.favorite && (
+                      <Star className="library-fav-star" size={12} fill="currentColor" />
+                    )}
+                    {!!item.collection_pinned && <Pin className="library-pin-icon" size={12} />}
                   </h2>
                   <p>
                     {item.match && (
@@ -523,6 +559,7 @@ export function LibraryBrowser({
               />
             </div>
           ))}
+
           {(page > 1 || hasMore) && (
             <nav className="library-pagination" aria-label="资料分页">
               {page > 1 ? (
@@ -543,6 +580,7 @@ export function LibraryBrowser({
             </nav>
           )}
         </section>
+
         {selected && (
           <section className="library-reader" aria-label="内容详情" key={selectedKey}>
             <LibraryDetail
@@ -564,6 +602,7 @@ export function LibraryBrowser({
           </section>
         )}
       </div>
+
       <Modal
         open={creating}
         onOpenChange={(open) => {
@@ -578,6 +617,7 @@ export function LibraryBrowser({
           onClose={() => setCreating(false)}
         />
       </Modal>
+
       {handoff && (
         <HandoffDialog
           refs={handoff}
@@ -585,6 +625,7 @@ export function LibraryBrowser({
           flush={() => (flush.current ? flush.current() : Promise.resolve(true))}
         />
       )}
+
       {adding && collection && (
         <AddCollectionItems
           collection={collection}
@@ -592,6 +633,7 @@ export function LibraryBrowser({
           onSaved={() => router.refresh()}
         />
       )}
+
       <Modal open={filters} onOpenChange={setFilters} title="筛选资料">
         <form
           className="admin-form"
@@ -643,7 +685,7 @@ export function LibraryBrowser({
             <input type="checkbox" name="favorite" defaultChecked={query.favorite} />
             仅收藏
           </label>
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" className="atelier-cta-vermilion">
             应用筛选
           </Button>
         </form>

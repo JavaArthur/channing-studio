@@ -1,11 +1,12 @@
 'use client'
-import type { SaveContext } from '@/components/admin/UnsavedChanges'
 
+import type { SaveContext } from '@/components/admin/UnsavedChanges'
 import { Button, Input, Menu } from '@/components/admin/ui'
 import { ManualSheet } from '@/components/admin/ManualSheet'
 import { PublicationEditor } from '@/components/library/PublicationEditor'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { MessageSquare, Pin, Plus } from 'lucide-react'
 import type { Prompt } from '@/lib/repositories/prompts'
 
 interface FormState {
@@ -36,7 +37,7 @@ const EMPTY: FormState = {
 
 export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] }) {
   const [open, setOpen] = useState(false)
-  const [publication,setPublication] = useState<string|null>(null)
+  const [publication, setPublication] = useState<string | null>(null)
   const router = useRouter()
   const [form, setForm] = useState<FormState>(EMPTY)
   const [saving, setSaving] = useState(false)
@@ -133,112 +134,165 @@ export function PromptsManager({ initialPrompts }: { initialPrompts: Prompt[] })
         <p>工作版本与公开快照分别保存。</p>
         <Button
           variant="primary"
+          className="atelier-cta-vermilion"
           onClick={() => {
             setForm(EMPTY)
             setError('')
             setOpen(true)
           }}
         >
+          <Plus size={15} aria-hidden="true" />
           添加提示词
         </Button>
       </div>
+
       {message && (
         <p className="library-feedback" role="status">
           {message}
         </p>
       )}
-      <div className="resource-list">
-        {initialPrompts.map((prompt) => (
-          <div className="resource-row" id={String(prompt.id)} key={prompt.id}>
-            <div>
-              <h2>{prompt.title}</h2>
-              <p>{prompt.description || prompt.prompt}</p>
+
+      {!!initialPrompts.length && (
+        <div className="resource-list">
+          {initialPrompts.map((prompt) => (
+            <div className="resource-row" id={String(prompt.id)} key={prompt.id}>
+              <div>
+                <div className="resource-row-head">
+                  <h2>{prompt.title}</h2>
+                  {prompt.is_pinned === 1 && (
+                    <Pin size={12} className="text-[var(--atelier-vermilion)]" aria-hidden="true" />
+                  )}
+                  {prompt.category && (
+                    <span className="resource-meta-tag">{prompt.category}</span>
+                  )}
+                </div>
+                <p>{prompt.description || prompt.prompt}</p>
+              </div>
+              <span className="atelier-badge">
+                <span
+                  className="atelier-beacon"
+                  data-tone={prompt.is_hidden ? undefined : 'healthy'}
+                  aria-hidden="true"
+                />
+                {prompt.is_hidden ? '私密' : '已公开'}
+              </span>
+              <div className="resource-row-actions">
+                <Button variant="ghost" onClick={() => setPublication(String(prompt.id))}>
+                  编辑公开版本
+                </Button>
+                <Button variant="ghost" onClick={() => edit(prompt)}>
+                  编辑
+                </Button>
+                <Menu
+                  label={`${prompt.title}的操作`}
+                  items={[{ label: '删除提示词', danger: true, onSelect: () => void remove(prompt) }]}
+                />
+              </div>
             </div>
-            <span>{prompt.is_hidden ? '私密' : '已公开'}</span>
-            <Button variant="ghost" onClick={() => setPublication(String(prompt.id))}>编辑公开版本</Button>
-            <Button variant="ghost" onClick={() => edit(prompt)}>
-              编辑
-            </Button>
-            <Menu
-              label={`${prompt.title}的操作`}
-              items={[{ label: '删除提示词', danger: true, onSelect: () => void remove(prompt) }]}
-            />
-          </div>
-        ))}
-      </div>
-      {!initialPrompts.length && (
-        <div className="library-empty">还没有提示词，添加第一条收藏。</div>
-      )}
-      {open && <ManualSheet value={{ ...form, id: undefined }} onSave={save} onClose={()=>setOpen(false)} title={editing ? '编辑提示词' : '添加提示词'}>
-        <div className="admin-form">
-          <label>
-            标题
-            <Input
-              required
-              value={form.title}
-              onChange={(e) => setField('title', e.target.value)}
-            />
-          </label>
-          <label>
-            适用场景
-            <textarea
-              className="admin-input"
-              rows={3}
-              value={form.description}
-              onChange={(e) => setField('description', e.target.value)}
-            />
-          </label>
-          <label>
-            提示词正文
-            <textarea
-              className="admin-input"
-              rows={10}
-              value={form.prompt}
-              onChange={(e) => setField('prompt', e.target.value)}
-            />
-          </label>
-          <label>
-            分类
-            <Input value={form.category} onChange={(e) => setField('category', e.target.value)} />
-          </label>
-          <label>
-            标签
-            <Input value={form.tags} onChange={(e) => setField('tags', e.target.value)} />
-          </label>
-          <label>
-            来源链接
-            <Input
-              type="url"
-              value={form.source_url}
-              onChange={(e) => setField('source_url', e.target.value)}
-            />
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={form.is_pinned}
-              onChange={(e) => setField('is_pinned', e.target.checked)}
-            />
-            置顶
-          </label>
-          <label>
-            排序
-            <Input
-              type="number"
-              value={form.sort_order}
-              onChange={(e) => setField('sort_order', Number(e.target.value) || 0)}
-            />
-          </label>
-          {error && <p role="alert">{error}</p>}
-          <p>提示词正文仅保存在 Studio。确认公开会更新公开快照。</p>
-          <div className="admin-form-actions">
-            <Button disabled={saving} onClick={() => void save()}>
-              保存工作版本
-            </Button>
-          </div>
+          ))}
         </div>
-      </ManualSheet>}
-      {publication && <PublicationEditor kind="prompt" id={publication} onClose={()=>setPublication(null)} onSaved={()=>router.refresh()} />}
+      )}
+
+      {!initialPrompts.length && (
+        <div className="library-empty atelier-crosshair">
+          <span className="library-empty-emblem" aria-hidden="true">
+            <MessageSquare size={24} />
+          </span>
+          <h2>还没有提示词</h2>
+          <p>添加第一条收藏，提示词正文仅保存在你的私人 Studio 中。</p>
+        </div>
+      )}
+
+      {open && (
+        <ManualSheet
+          value={{ ...form, id: undefined }}
+          onSave={save}
+          onClose={() => setOpen(false)}
+          title={editing ? '编辑提示词' : '添加提示词'}
+        >
+          <div className="admin-form">
+            <label>
+              标题
+              <Input
+                required
+                value={form.title}
+                onChange={(e) => setField('title', e.target.value)}
+              />
+            </label>
+            <label>
+              适用场景
+              <textarea
+                className="admin-input"
+                rows={3}
+                value={form.description}
+                onChange={(e) => setField('description', e.target.value)}
+              />
+            </label>
+            <label>
+              提示词正文
+              <textarea
+                className="admin-input font-mono"
+                rows={10}
+                value={form.prompt}
+                onChange={(e) => setField('prompt', e.target.value)}
+              />
+            </label>
+            <label>
+              分类
+              <Input value={form.category} onChange={(e) => setField('category', e.target.value)} />
+            </label>
+            <label>
+              标签
+              <Input value={form.tags} onChange={(e) => setField('tags', e.target.value)} />
+            </label>
+            <label>
+              来源链接
+              <Input
+                type="url"
+                value={form.source_url}
+                onChange={(e) => setField('source_url', e.target.value)}
+              />
+            </label>
+            <label className="hub-check">
+              <input
+                type="checkbox"
+                checked={form.is_pinned}
+                onChange={(e) => setField('is_pinned', e.target.checked)}
+              />
+              置顶
+            </label>
+            <label>
+              排序
+              <Input
+                type="number"
+                value={form.sort_order}
+                onChange={(e) => setField('sort_order', Number(e.target.value) || 0)}
+              />
+            </label>
+            {error && <p role="alert">{error}</p>}
+            <p>提示词正文仅保存在 Studio。确认公开会更新公开快照。</p>
+            <div className="admin-form-actions">
+              <Button
+                variant="primary"
+                className="atelier-cta-vermilion"
+                disabled={saving}
+                onClick={() => void save()}
+              >
+                保存工作版本
+              </Button>
+            </div>
+          </div>
+        </ManualSheet>
+      )}
+
+      {publication && (
+        <PublicationEditor
+          kind="prompt"
+          id={publication}
+          onClose={() => setPublication(null)}
+          onSaved={() => router.refresh()}
+        />
+      )}
     </div>
   )
 }

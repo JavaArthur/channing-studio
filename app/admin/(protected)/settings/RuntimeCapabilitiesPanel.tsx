@@ -4,13 +4,12 @@ import type { RuntimeCapabilities } from '@/lib/runtime-capabilities'
 
 function StatusBadge({ active }: { active: boolean }) {
   return (
-    <span
-      className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${
-        active
-          ? 'bg-[var(--success-soft-bg)] text-[var(--success)]'
-          : 'bg-[var(--editor-soft)] text-[var(--editor-muted)]'
-      }`}
-    >
+    <span className="atelier-badge">
+      <span
+        className="atelier-beacon"
+        data-tone={active ? 'healthy' : undefined}
+        aria-hidden="true"
+      />
       {active ? '可用' : '未绑定'}
     </span>
   )
@@ -18,13 +17,12 @@ function StatusBadge({ active }: { active: boolean }) {
 
 function FeatureBadge({ enabled }: { enabled: boolean }) {
   return (
-    <span
-      className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium ${
-        enabled
-          ? 'bg-[var(--editor-accent)]/10 text-[var(--editor-accent)]'
-          : 'bg-[var(--warning-soft-bg)] text-[var(--warning)]'
-      }`}
-    >
+    <span className="atelier-badge" data-tone={enabled ? 'vermilion' : undefined}>
+      <span
+        className="atelier-beacon"
+        data-tone={enabled ? 'healthy' : 'warning'}
+        aria-hidden="true"
+      />
       {enabled ? '已启用' : '已降级'}
     </span>
   )
@@ -72,40 +70,93 @@ export function RuntimeCapabilitiesPanel({ capabilities }: { capabilities: Runti
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="runtime-capability-summary"><div>私人资料保存 <strong>{capabilities.bindings.d1?'已配置':'尚未配置'}</strong></div><div>图片上传 <strong>{capabilities.bindings.images?'已配置':'尚未配置'}</strong></div><div>文章智能处理 <strong>{capabilities.features.aiInference.enabled?'已启用':'按模型配置启用'}</strong></div></div>
-      <details className="runtime-technical"><summary>技术详情</summary>
-      <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
-        <div className="font-serif mb-3 text-sm font-medium text-[var(--editor-ink)]">运行时绑定探测</div>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {bindingItems.map((item) => (
-            <div key={item.key} className="flex items-center justify-between rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2">
-              <span className="text-sm text-[var(--editor-ink)]">{item.label}</span>
-              <StatusBadge active={item.active} />
-            </div>
-          ))}
+    <div className="space-y-5">
+      <div className="runtime-capability-summary">
+        <div>
+          <span>私人资料保存</span>
+          <strong>
+            <span
+              className="atelier-beacon mr-1.5"
+              data-tone={capabilities.bindings.d1 ? 'healthy' : 'warning'}
+              aria-hidden="true"
+            />
+            {capabilities.bindings.d1 ? '已配置' : '尚未配置'}
+          </strong>
+        </div>
+        <div>
+          <span>图片上传</span>
+          <strong>
+            <span
+              className="atelier-beacon mr-1.5"
+              data-tone={capabilities.bindings.images ? 'healthy' : 'warning'}
+              aria-hidden="true"
+            />
+            {capabilities.bindings.images ? '已配置' : '尚未配置'}
+          </strong>
+        </div>
+        <div>
+          <span>文章智能处理</span>
+          <strong>
+            <span
+              className="atelier-beacon mr-1.5"
+              data-tone={capabilities.features.aiInference.enabled ? 'healthy' : undefined}
+              aria-hidden="true"
+            />
+            {capabilities.features.aiInference.enabled ? '已启用' : '按模型配置启用'}
+          </strong>
         </div>
       </div>
 
-      <div className="rounded-xl border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
-        <div className="font-serif mb-3 text-sm font-medium text-[var(--editor-ink)]">增强能力与回退策略</div>
-        <div className="space-y-3">
-          {featureItems.map((item) => (
-            <div key={item.key} className="rounded-lg border border-[var(--editor-line)] bg-[var(--background)] p-3">
-              <div className="flex items-center justify-between gap-3">
-                <div className="font-serif text-sm font-medium text-[var(--editor-ink)]">{item.label}</div>
-                <FeatureBadge enabled={item.enabled} />
-              </div>
-              <div className="mt-1 text-xs text-[var(--editor-muted)]">当前策略：`{item.strategy}`</div>
-              <div className="mt-2 text-sm text-[var(--editor-muted)]">{item.note}</div>
+      <details className="runtime-technical">
+        <summary>技术详情</summary>
+        <div className="mt-3 space-y-4">
+          <div className="rounded-[var(--radius-md)] border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
+            <div className="mb-3 text-xs font-semibold text-[var(--editor-ink)]">运行时绑定探测</div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {bindingItems.map((item) => (
+                <div
+                  key={item.key}
+                  className="flex items-center justify-between rounded-[var(--radius-sm)] border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2"
+                >
+                  <span className="atelier-mono text-xs text-[var(--editor-ink)]">
+                    {item.label}
+                  </span>
+                  <StatusBadge active={item.active} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      <div className="rounded-lg border border-dashed border-[var(--editor-line)] bg-[var(--background)] px-4 py-3 text-sm text-[var(--editor-muted)]">
-        开源部署建议：默认只要求 `D1 + R2` 即可运行，`Queues / Workers AI / Vectorize` 都应作为可选增强，通过环境变量显式开启。
-      </div>
+          <div className="rounded-[var(--radius-md)] border border-[var(--editor-line)] bg-[var(--editor-panel)] p-4">
+            <div className="mb-3 text-xs font-semibold text-[var(--editor-ink)]">
+              增强能力与回退策略
+            </div>
+            <div className="space-y-2.5">
+              {featureItems.map((item) => (
+                <div
+                  key={item.key}
+                  className="rounded-[var(--radius-sm)] border border-[var(--editor-line)] bg-[var(--background)] p-3"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-sm font-medium text-[var(--editor-ink)]">{item.label}</div>
+                    <FeatureBadge enabled={item.enabled} />
+                  </div>
+                  <div className="atelier-mono mt-1 text-xs text-[var(--stone-gray)]">
+                    当前策略：{item.strategy}
+                  </div>
+                  <div className="mt-1.5 text-xs leading-relaxed text-[var(--editor-muted)]">
+                    {item.note}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[var(--radius-sm)] border border-dashed border-[var(--editor-line-strong)] bg-[var(--background)] px-4 py-3 text-xs leading-relaxed text-[var(--editor-muted)]">
+            开源部署建议：默认只要求 <code className="atelier-mono">D1 + R2</code> 即可运行，
+            <code className="atelier-mono">Queues / Workers AI / Vectorize</code> 都作为可选增强，通过环境变量显式开启。
+          </div>
+        </div>
       </details>
     </div>
   )

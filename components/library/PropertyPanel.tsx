@@ -1,7 +1,9 @@
 'use client'
+
 import { useEffect, useState, type ReactNode } from 'react'
 import { Button, Modal } from '@/components/admin/ui'
 import { X } from 'lucide-react'
+
 export function PropertyPanel({
   open,
   onOpenChange,
@@ -32,11 +34,17 @@ export function PropertyPanel({
     window.addEventListener('keydown', key)
     return () => window.removeEventListener('keydown', key)
   }, [wide, open, onOpenChange])
+
   if (wide)
     return open ? (
       <aside className="reader-property-aside" aria-label="属性">
         <header>
-          <h3>属性</h3>
+          <div>
+            <span className="property-inspector-kicker" aria-hidden="true">
+              INSPECTOR //
+            </span>
+            <h3>属性</h3>
+          </div>
           <Button variant="ghost" aria-label="关闭属性" onClick={() => onOpenChange(false)}>
             <X size={16} />
           </Button>
@@ -44,6 +52,7 @@ export function PropertyPanel({
         {children}
       </aside>
     ) : null
+
   return (
     <Modal open={open} onOpenChange={onOpenChange} title="属性" sheet>
       {children}

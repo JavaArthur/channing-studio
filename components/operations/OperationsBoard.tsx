@@ -18,6 +18,7 @@ import {
 import { countXChars, isHttpUrl, SOURCE_TYPES, X_CHAR_LIMIT } from '@/lib/x-drafts/text'
 
 type Status = keyof typeof OPERATION_STATUSES
+
 function receivedAt(time: number) {
   return new Intl.DateTimeFormat('zh-CN', {
     timeZone: 'Asia/Shanghai',
@@ -25,11 +26,20 @@ function receivedAt(time: number) {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   }).format(time * 1000)
 }
+
 function sourceLabel(type: string) {
   return Object.hasOwn(SOURCE_TYPES, type) ? SOURCE_TYPES[type as keyof typeof SOURCE_TYPES] : type
 }
+
+function beaconToneForStatus(status: Status): 'healthy' | 'warning' | 'vermilion' | undefined {
+  if (status === 'posted') return 'healthy'
+  if (status === 'pending') return 'warning'
+  return undefined
+}
+
 function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
   const router = useRouter()
   const toast = useToast()
@@ -43,10 +53,13 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
   const [preview, setPreview] = useState('')
   const [polishing, setPolishing] = useState(false)
   const controller = useRef<AbortController | null>(null)
+
   useEffect(() => () => controller.current?.abort(), [])
+
   const dirty = text !== (current.edited_content ?? current.content)
   const count = countXChars(text)
   const valid = !!text.trim() && text.length <= 10000
+
   async function save(status?: Status, context?: SaveContext): Promise<boolean> {
     if (saving.current || !valid) return false
     saving.current = true
@@ -82,11 +95,13 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
       setBusy(false)
     }
   }
+
   useUnsavedChanges(
     dirty,
     (context) => save(undefined, context),
     () => setText(current.edited_content ?? current.content),
   )
+
   async function polish() {
     if (controller.current || !valid) return
     const abort = new AbortController()
@@ -121,7 +136,10 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
       controller.current = null
     }
   }
+
   const accountLabel = X_ACCOUNTS[current.account_id]
+  const tone = beaconToneForStatus(current.status)
+
   return (
     <section className="operations-editor" aria-label="文案编辑区">
       <header className="operations-editor-heading">
@@ -130,14 +148,27 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
         </Link>
         <div>
           <h2>准备这条文案</h2>
-          <p>
-            {sourceLabel(current.source_type)} · {receivedAt(current.created_at)}
+          <p className="operations-editor-meta">
+            <span>{sourceLabel(current.source_type)}</span>
+            <span>·</span>
+            <time dateTime={new Date(current.created_at * 1000).toISOString()}>
+              {receivedAt(current.created_at)}
+            </time>
+            <span>·</span>
+            <code>#{current.id.slice(0, 8)}</code>
           </p>
         </div>
-        <span className="operations-status">{OPERATION_STATUSES[current.status]}</span>
+        <span className="operations-status" data-status={current.status}>
+          <span className="atelier-beacon" data-tone={tone} aria-hidden="true" />
+          {OPERATION_STATUSES[current.status]}
+        </span>
       </header>
+
       <section className="operations-handoff" aria-label="前往 X">
-        <h3>用「{accountLabel}」去互动</h3>
+        <div className="operations-handoff-top">
+          <h3>用「{accountLabel}」去互动</h3>
+          <span className="atelier-badge">DISPATCH</span>
+        </div>
         <p>跳转后请核对 X 当前登录账号，再回复或发帖。</p>
         <div className="operations-actions">
           <Button
@@ -188,10 +219,12 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
           </a>
         )}
       </section>
+
       <details className="operations-original">
         <summary>查看 Agent 原稿</summary>
         <p>{current.content}</p>
       </details>
+
       <div className="operations-writing">
         <label htmlFor="operations-working-copy">工作文案</label>
         <textarea
@@ -215,13 +248,26 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
         <span className={count > X_CHAR_LIMIT ? 'operations-warning' : ''}>
           {count} / {X_CHAR_LIMIT} 加权字符{count > X_CHAR_LIMIT && ' · 超出常规短帖长度，仍可保存'}
         </span>
-        <span>{dirty ? '未保存' : '已保存'}</span>
+        <span className="operations-dirty-state" data-dirty={dirty ? 'true' : 'false'}>
+          <span
+            className="atelier-beacon"
+            data-tone={dirty ? 'warning' : 'healthy'}
+            aria-hidden="true"
+          />
+          {dirty ? '未保存' : '已保存'}
+        </span>
       </div>
       <div className="operations-actions">
-        <Button variant="primary" disabled={busy || !valid || !dirty} onClick={() => void save()}>
+        <Button
+          variant="primary"
+          className="atelier-cta-vermilion"
+          disabled={busy || !valid || !dirty}
+          onClick={() => void save()}
+        >
           {busy ? '保存中…' : '保存文案'}
         </Button>
       </div>
+
       <div className="operations-polish">
         <label htmlFor="polish-instructions">AI 润色的补充要求（可选）</label>
         <div>
@@ -245,6 +291,8 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
             <p>{preview}</p>
             <div className="operations-actions">
               <Button
+                variant="primary"
+                className="atelier-cta-vermilion"
                 disabled={busy}
                 onClick={() => {
                   setText(preview)
@@ -281,6 +329,7 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
           )}
         </div>
       </footer>
+
       {feedback && (
         <p role="status" className="operations-feedback">
           {feedback}
@@ -294,6 +343,7 @@ function DraftEditor({ draft, backHref }: { draft: XDraft; backHref: string }) {
     </section>
   )
 }
+
 export function OperationsBoard({
   items,
   total,
@@ -315,6 +365,7 @@ export function OperationsBoard({
 }) {
   const router = useRouter()
   const guard = useUnsavedChanges(false, async () => true)
+
   function href(changes: Record<string, string> = {}) {
     const params = new URLSearchParams({
       account_id: account,
@@ -326,43 +377,62 @@ export function OperationsBoard({
     for (const [key, value] of [...params]) if (!value) params.delete(key)
     return `/admin/operations?${params}`
   }
+
   return (
     <div className={`operations-workspace ${selected ? 'operations-has-selection' : ''}`}>
       <header className="workspace-page-heading">
         <div>
+          <span className="atelier-eyebrow">
+            <span className="atelier-beacon" data-tone="vermilion" aria-hidden="true" />
+            MISSION CONTROL // X OPERATIONS
+          </span>
           <h1>运营</h1>
           <p>挑选文案，加入自己的表达，再去 X 参与讨论。</p>
         </div>
-        <span className="operations-current">当前运营：{X_ACCOUNTS[account]}</span>
+        <span className="operations-current">
+          <span className="atelier-beacon" data-tone="healthy" aria-hidden="true" />
+          当前运营：{X_ACCOUNTS[account]}
+        </span>
       </header>
+
       <nav className="operations-accounts" aria-label="运营账号">
-        {Object.entries(X_ACCOUNTS).map(([id, name]) => (
+        {Object.entries(X_ACCOUNTS).map(([id, name], idx) => (
           <Link
             key={id}
             href={href({ account_id: id, page: '1', q: '', status: 'pending' })}
             aria-current={id === account ? 'page' : undefined}
           >
             <span className="operations-account-mark">{id === 'ai' ? 'AI' : '聊'}</span>
-            <span>
+            <span className="operations-account-copy">
               <strong>{name}</strong>
               <small>{id === 'ai' ? '开发实践与技术交流' : '娱乐话题与日常闲聊'}</small>
+            </span>
+            <span className="operations-account-code" aria-hidden="true">
+              CH-0{idx + 1}
             </span>
           </Link>
         ))}
       </nav>
+
       <div className="operations-columns">
         <aside className="operations-queue" aria-label="运营内容列表">
           <nav className="operations-filters" aria-label="处理状态">
-            {Object.entries(OPERATION_STATUSES).map(([id, label]) => (
+            {(Object.entries(OPERATION_STATUSES) as [Status, string][]).map(([id, label]) => (
               <Link
                 key={id}
                 href={href({ status: id, page: '1' })}
                 aria-current={id === status ? 'page' : undefined}
               >
+                <span
+                  className="atelier-beacon"
+                  data-tone={beaconToneForStatus(id)}
+                  aria-hidden="true"
+                />
                 {label}
               </Link>
             ))}
           </nav>
+
           <form
             className="operations-search"
             onSubmit={(e) => {
@@ -381,9 +451,11 @@ export function OperationsBoard({
             />
             <Button type="submit">搜索</Button>
           </form>
+
           <p className="operations-count">
             {OPERATION_STATUSES[status]} · {total} 条
           </p>
+
           <div className="operations-list">
             {items.map((item) => (
               <Link
@@ -394,7 +466,7 @@ export function OperationsBoard({
               >
                 <p>{item.edited_content ?? item.content}</p>
                 <span>
-                  <span>{sourceLabel(item.source_type)}</span>
+                  <span className="operations-source-tag">{sourceLabel(item.source_type)}</span>
                   <time dateTime={new Date(item.created_at * 1000).toISOString()}>
                     {receivedAt(item.created_at)}
                   </time>
@@ -402,6 +474,7 @@ export function OperationsBoard({
               </Link>
             ))}
           </div>
+
           {!items.length && (
             <div className="operations-empty">
               <h2>
@@ -417,12 +490,14 @@ export function OperationsBoard({
               {(query || page > 1) && <Link href={href({ q: '', page: '1' })}>清除筛选</Link>}
             </div>
           )}
+
           <nav className="operations-pagination" aria-label="运营分页">
             {page > 1 && <Link href={href({ page: String(page - 1) })}>上一页</Link>}
             <span>第 {page} 页</span>
             {has_more && <Link href={href({ page: String(page + 1) })}>下一页</Link>}
           </nav>
         </aside>
+
         {selected ? (
           <DraftEditor
             key={`${selected.id}:${selected.revision}`}
@@ -431,7 +506,9 @@ export function OperationsBoard({
           />
         ) : (
           <div className="operations-placeholder">
-            <MessageCircle size={28} />
+            <span className="operations-placeholder-emblem" aria-hidden="true">
+              <MessageCircle size={24} />
+            </span>
             <h2>选一条，开始今天的互动</h2>
             <p>直接使用 Agent 的文案，或按自己的想法修改。</p>
             <p>回复与发帖都由你在 X 上完成。</p>

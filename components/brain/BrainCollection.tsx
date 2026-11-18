@@ -12,6 +12,7 @@ const labels = {
   notes: ['知识笔记', '把值得留下的内容整理成自己的知识。', '新建笔记'],
   projects: ['我的项目', '记录下一步，让重要的事情持续向前。', '新建项目'],
 }
+
 const blank = {
   title: '',
   content: '',
@@ -20,6 +21,7 @@ const blank = {
   source_url: '',
   status: 'active',
 }
+
 export function BrainCollection({
   kind,
   items,
@@ -42,6 +44,7 @@ export function BrainCollection({
   const [feedback, setFeedback] = useState('')
   const [title, description, action] = labels[kind]
   const set = (key: keyof typeof blank, value: string) => setForm((f) => ({ ...f, [key]: value }))
+
   const open = (item?: BrainItem) => {
     setEditing(item?.id ?? null)
     setForm(
@@ -58,6 +61,7 @@ export function BrainCollection({
     )
     setFeedback('')
   }
+
   async function mutate(body: Record<string, unknown>) {
     setBusy(true)
     setFeedback('')
@@ -80,20 +84,28 @@ export function BrainCollection({
       setBusy(false)
     }
   }
+
   const base = `/admin/${kind}`
+
   return (
-    <div className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-5">
+    <div className="atelier-surface-page space-y-6">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-[var(--editor-line)] pb-5">
         <div>
-          <p className="brain-kicker">Personal workspace</p>
-          <h1 className="font-serif font-medium mt-3 text-3xl tracking-tight">{title}</h1>
-          <p className="mt-3 text-sm text-[var(--editor-muted)]">{description}</p>
+          <p className="atelier-kicker">
+            <span className="atelier-beacon" data-tone="vermilion" aria-hidden="true" />
+            WORKBENCH // PRIVATE VAULT
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-[var(--editor-ink)]">
+            {title}
+          </h1>
+          <p className="mt-1.5 text-sm text-[var(--editor-muted)]">{description}</p>
         </div>
         <button className="min-h-11 min-w-11 brain-button brain-cta" onClick={() => open()}>
           <Plus size={16} />
           {action}
         </button>
       </header>
+
       <div className="flex flex-wrap items-center justify-between gap-4">
         <form className="flex gap-2" action={base}>
           <input
@@ -106,72 +118,95 @@ export function BrainCollection({
           {archived && <input type="hidden" name="archived" value="1" />}
           <button className="min-h-11 min-w-11 brain-secondary">搜索</button>
         </form>
-        <div className="flex items-center gap-4 text-sm">
-          <Link className={`min-h-11 min-w-11 inline-flex items-center ${!archived ? 'text-[var(--editor-accent)]' : ''}`} href={base}>
+        <div className="flex items-center gap-4 text-xs">
+          <Link
+            className={`min-h-11 min-w-11 inline-flex items-center ${
+              !archived
+                ? 'font-semibold text-[var(--atelier-vermilion)]'
+                : 'text-[var(--editor-muted)]'
+            }`}
+            href={base}
+          >
             当前
           </Link>
           <Link
-            className={`min-h-11 min-w-11 inline-flex items-center ${archived ? 'text-[var(--editor-accent)]' : ''}`}
+            className={`min-h-11 min-w-11 inline-flex items-center ${
+              archived
+                ? 'font-semibold text-[var(--atelier-vermilion)]'
+                : 'text-[var(--editor-muted)]'
+            }`}
             href={`${base}?archived=1`}
           >
             已归档
           </Link>
-          <span className="text-[var(--editor-muted)]">{total} 项</span>
+          <span className="atelier-mono text-[var(--stone-gray)]">{total} 项</span>
         </div>
       </div>
+
       {feedback && (
-        <p role="status" className="rounded-xl border border-[var(--editor-line)] p-4 text-sm">
+        <p
+          role="status"
+          className="rounded-[var(--radius-sm)] border border-[var(--editor-line)] bg-[var(--editor-soft)] px-4 py-3 text-xs text-[var(--editor-ink)]"
+        >
           {feedback}
         </p>
       )}
+
       {editing !== undefined && (
         <form
-          className="brain-panel space-y-4"
+          className="atelier-dossier space-y-4 p-5"
           onSubmit={(e) => {
             e.preventDefault()
             void mutate({ ...form, id: editing ?? undefined, action: 'save' })
           }}
         >
-          <div className="flex justify-between">
-            <h2 className="font-serif font-medium">{editing ? '编辑' : action}</h2>
-            <button type="button" aria-label="关闭编辑" onClick={() => setEditing(undefined)} className="min-h-11 min-w-11">
+          <div className="flex items-center justify-between border-b border-[var(--editor-line)] pb-3">
+            <h2 className="text-sm font-semibold text-[var(--editor-ink)]">
+              {editing ? '编辑' : action}
+            </h2>
+            <button
+              type="button"
+              aria-label="关闭编辑"
+              onClick={() => setEditing(undefined)}
+              className="min-h-11 min-w-11 inline-flex items-center justify-center text-[var(--stone-gray)] hover:text-[var(--editor-ink)]"
+            >
               <X size={18} />
             </button>
           </div>
-          <label className="block text-sm">
+          <label className="block text-xs text-[var(--editor-muted)]">
             标题
             <input
               autoFocus
               required
               maxLength={200}
-              className="min-h-11 min-w-11 brain-input mt-2"
+              className="min-h-11 min-w-11 brain-input mt-1.5"
               value={form.title}
               onChange={(e) => set('title', e.target.value)}
             />
           </label>
           {kind === 'projects' ? (
             <>
-              <label className="block text-sm">
+              <label className="block text-xs text-[var(--editor-muted)]">
                 私人项目说明
                 <textarea
-                  className="min-h-11 min-w-11 brain-input mt-2 min-h-32"
+                  className="min-h-11 min-w-11 brain-input mt-1.5 min-h-32"
                   value={form.description}
                   onChange={(e) => set('description', e.target.value)}
                 />
               </label>
-              <label className="block text-sm">
+              <label className="block text-xs text-[var(--editor-muted)]">
                 下一步
                 <input
-                  className="min-h-11 min-w-11 brain-input mt-2"
+                  className="min-h-11 min-w-11 brain-input mt-1.5"
                   value={form.next_action}
                   onChange={(e) => set('next_action', e.target.value)}
                   placeholder="写下一件可以行动的小事"
                 />
               </label>
-              <label className="block text-sm">
+              <label className="block text-xs text-[var(--editor-muted)]">
                 状态
                 <select
-                  className="min-h-11 min-w-11 brain-input mt-2"
+                  className="min-h-11 min-w-11 brain-input mt-1.5"
                   value={form.status}
                   onChange={(e) => set('status', e.target.value)}
                 >
@@ -183,84 +218,83 @@ export function BrainCollection({
             </>
           ) : (
             <>
-              <label className="block text-sm">
+              <label className="block text-xs text-[var(--editor-muted)]">
                 内容
                 <textarea
-                  className="min-h-11 min-w-11 brain-input mt-2 min-h-48"
+                  className="min-h-11 min-w-11 brain-input mt-1.5 min-h-48"
                   value={form.content}
                   onChange={(e) => set('content', e.target.value)}
                 />
               </label>
-              <label className="block text-sm">
+              <label className="block text-xs text-[var(--editor-muted)]">
                 来源链接（可选）
                 <input
                   type="url"
-                  className="min-h-11 min-w-11 brain-input mt-2"
+                  className="min-h-11 min-w-11 brain-input mt-1.5"
                   value={form.source_url}
                   onChange={(e) => set('source_url', e.target.value)}
                 />
               </label>
             </>
           )}
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-2 text-xs text-[var(--editor-muted)]">
-              <LockKeyhole size={14} />
+          <div className="flex items-center justify-between border-t border-[var(--editor-line)] pt-3">
+            <span className="flex items-center gap-1.5 text-xs text-[var(--stone-gray)]">
+              <LockKeyhole size={13} />
               仅自己可见
             </span>
-            <button className="min-h-11 min-w-11 brain-button" disabled={busy}>
+            <button className="min-h-11 min-w-11 brain-button brain-cta" disabled={busy}>
               保存
             </button>
           </div>
         </form>
       )}
+
       <div className={kind === 'projects' ? 'grid gap-4 lg:grid-cols-2' : 'space-y-3'}>
         {items.length === 0 && (
-          <div className="brain-panel col-span-full py-14 text-center">
-            <BookOpen className="mx-auto mb-4 text-[var(--editor-muted)]" size={28} />
-            <h2 className="font-serif font-medium">
+          <div className="atelier-dossier atelier-crosshair col-span-full py-14 text-center">
+            <BookOpen className="mx-auto mb-4 text-[var(--stone-gray)]" size={26} />
+            <h2 className="font-medium text-[var(--editor-ink)]">
               {query
                 ? '没有找到匹配内容'
                 : archived
                   ? '还没有归档内容'
                   : '从一条值得留下的内容开始'}
             </h2>
-            <p className="mt-2 text-sm text-[var(--editor-muted)]">
+            <p className="mt-2 text-xs text-[var(--editor-muted)]">
               {query ? '试试其他关键词。' : '不必一次整理完，先保存下来就好。'}
             </p>
           </div>
         )}
         {items.map((item) => (
-          <article id={item.id} className="brain-panel scroll-mt-24" key={item.id}>
-            <div className="flex justify-between gap-4">
-              <h2 className="font-serif font-medium">{item.title}</h2>
-              <span className="shrink-0 text-xs text-[var(--editor-muted)]">
-                {item.status === 'organized'
-                    ? '已整理'
-                    : '私密'}
+          <article id={item.id} className="atelier-dossier scroll-mt-24 p-5" key={item.id}>
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="font-semibold text-[var(--editor-ink)]">{item.title}</h2>
+              <span className="atelier-badge shrink-0">
+                {item.status === 'organized' ? '已整理' : '私密'}
               </span>
             </div>
             <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--editor-muted)]">
               {item.description || item.content || '暂时只有一个标题。'}
             </p>
             {item.next_action && (
-              <p className="mt-5 rounded-lg bg-[var(--editor-soft)] p-3 text-sm">
+              <p className="mt-4 rounded-[var(--radius-sm)] border border-[var(--editor-line)] bg-[var(--editor-soft)] p-3 text-xs text-[var(--editor-ink)]">
                 下一步 · {item.next_action}
               </p>
             )}
             {item.source_url && (
               <a
-                className="min-h-11 min-w-11 mt-3 inline-flex items-center gap-1 text-sm text-[var(--editor-accent)]"
+                className="min-h-11 min-w-11 mt-3 inline-flex items-center gap-1 text-xs text-[var(--atelier-vermilion)] hover:underline"
                 href={item.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 查看来源
-                <ArrowUpRight size={14} />
+                <ArrowUpRight size={13} />
               </a>
             )}
             {item.target_id && (
               <Link
-                className="min-h-11 min-w-11 mt-3 block text-sm text-[var(--editor-accent)]"
+                className="min-h-11 min-w-11 mt-3 block text-xs text-[var(--atelier-vermilion)] hover:underline"
                 href={
                   item.target_type === 'post'
                     ? `/editor?edit=${encodeURIComponent(item.target_id)}`
@@ -270,21 +304,26 @@ export function BrainCollection({
                 打开整理后的内容 →
               </Link>
             )}
-            <div className="mt-6 flex flex-wrap gap-4 text-xs text-[var(--editor-muted)]">
-              <button disabled={busy} onClick={() => open(item)} className="min-h-11 min-w-11">
+            <div className="mt-5 flex flex-wrap gap-3 border-t border-[var(--editor-line)] pt-3 text-xs text-[var(--editor-muted)]">
+              <button
+                disabled={busy}
+                onClick={() => open(item)}
+                className="min-h-11 min-w-11 hover:text-[var(--editor-ink)]"
+              >
                 编辑
               </button>
               {kind === 'inbox' && item.status === 'inbox' && (
                 <>
                   <button
                     disabled={busy}
-                    onClick={() => void mutate({ id: item.id, action: 'convert', target: 'note' })} className="min-h-11 min-w-11"
+                    onClick={() => void mutate({ id: item.id, action: 'convert', target: 'note' })}
+                    className="min-h-11 min-w-11 hover:text-[var(--editor-ink)]"
                   >
                     整理为笔记
                   </button>
                   <button
                     disabled={busy}
-                    className="min-h-11 min-w-11 inline-flex items-center gap-1"
+                    className="min-h-11 min-w-11 inline-flex items-center gap-1 hover:text-[var(--editor-ink)]"
                     onClick={() => void mutate({ id: item.id, action: 'convert', target: 'post' })}
                   >
                     <FilePenLine size={13} />
@@ -295,14 +334,15 @@ export function BrainCollection({
               {kind === 'notes' && !archived && (
                 <button
                   disabled={busy}
-                  onClick={() => void mutate({ id: item.id, action: 'draft' })} className="min-h-11 min-w-11"
+                  onClick={() => void mutate({ id: item.id, action: 'draft' })}
+                  className="min-h-11 min-w-11 hover:text-[var(--editor-ink)]"
                 >
                   转为文章草稿
                 </button>
               )}
               <button
                 disabled={busy}
-                className="min-h-11 min-w-11 ml-auto inline-flex items-center gap-1"
+                className="min-h-11 min-w-11 ml-auto inline-flex items-center gap-1 hover:text-[var(--editor-ink)]"
                 onClick={() =>
                   void mutate({ id: item.id, action: archived ? 'restore' : 'archive' })
                 }
@@ -315,23 +355,26 @@ export function BrainCollection({
           </article>
         ))}
       </div>
+
       {total > 30 && (
-        <nav className="flex justify-between text-sm">
+        <nav className="flex items-center justify-between text-xs">
           {page > 1 ? (
             <Link
-              href={`${base}?page=${page - 1}&q=${encodeURIComponent(query)}&archived=${archived ? '1' : '0'}`} className="min-h-11 min-w-11 inline-flex items-center"
+              href={`${base}?page=${page - 1}&q=${encodeURIComponent(query)}&archived=${archived ? '1' : '0'}`}
+              className="min-h-11 min-w-11 inline-flex items-center text-[var(--atelier-vermilion)]"
             >
               上一页
             </Link>
           ) : (
             <span />
           )}
-          <span>
+          <span className="atelier-mono text-[var(--stone-gray)]">
             {page} / {Math.ceil(total / 30)}
           </span>
           {page * 30 < total && (
             <Link
-              href={`${base}?page=${page + 1}&q=${encodeURIComponent(query)}&archived=${archived ? '1' : '0'}`} className="min-h-11 min-w-11 inline-flex items-center"
+              href={`${base}?page=${page + 1}&q=${encodeURIComponent(query)}&archived=${archived ? '1' : '0'}`}
+              className="min-h-11 min-w-11 inline-flex items-center text-[var(--atelier-vermilion)]"
             >
               下一页
             </Link>

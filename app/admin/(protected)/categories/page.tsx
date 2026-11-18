@@ -1,3 +1,5 @@
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 import { getCategories } from '@/lib/db'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { CategoryManager } from './CategoryManager'
@@ -17,15 +19,19 @@ export default async function CategoriesPage() {
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="font-serif font-medium text-xl text-[var(--editor-ink)]">分类管理</h1>
-        <p className="text-sm text-[var(--editor-muted)] mt-0.5">
-          共 {categories.length} 个分类
-        </p>
-      </div>
+    <div className="atelier-surface-page">
+      <header className="workspace-page-heading">
+        <div>
+          <span className="atelier-eyebrow">TAXONOMY // CATEGORIES</span>
+          <h1>分类管理</h1>
+          <p>共 {categories.length} 个分类 · 用于公开文章归档与检索。</p>
+        </div>
+        <Link href="/admin/publish" className="admin-button">
+          <ArrowLeft size={14} />
+          返回公开管理
+        </Link>
+      </header>
       <CategoryManager initialCategories={categories} />
     </div>
   )
 }
-

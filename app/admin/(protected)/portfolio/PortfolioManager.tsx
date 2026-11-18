@@ -1,9 +1,9 @@
 'use client'
-import type { SaveContext } from '@/components/admin/UnsavedChanges'
 
+import type { SaveContext } from '@/components/admin/UnsavedChanges'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowUpRight, Copy, FolderOpen, Lock, Plus, Search, Trash2 } from 'lucide-react'
+import { ArrowUpRight, Copy, FolderKanban, FolderOpen, Lock, Plus, Search, Trash2 } from 'lucide-react'
 import { Button, Input, Menu, Select } from '@/components/admin/ui'
 import { ManualSheet } from '@/components/admin/ManualSheet'
 import { useToast } from '@/components/Toast'
@@ -121,13 +121,18 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
   )
   const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
   const visible = indexed
-    .filter(({ project, text }) =>
-      (status === 'all' ? project.status !== 'archived' : project.status === status) &&
-      terms.every((term) => text.includes(term)),
+    .filter(
+      ({ project, text }) =>
+        (status === 'all' ? project.status !== 'archived' : project.status === status) &&
+        terms.every((term) => text.includes(term)),
     )
     .map(({ project }) => project)
 
-  async function send(body: Record<string, unknown>, success: string, onSaved?: (data: { id?: number }) => void) {
+  async function send(
+    body: Record<string, unknown>,
+    success: string,
+    onSaved?: (data: { id?: number }) => void,
+  ) {
     setBusy(true)
     try {
       const response = await fetch('/api/admin/portfolio', {
@@ -159,7 +164,10 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
       title: form.title,
       summary: form.summary,
       status: form.status,
-      tags: form.tags.split(/[,，]/).map((tag) => tag.trim()).filter(Boolean),
+      tags: form.tags
+        .split(/[,，]/)
+        .map((tag) => tag.trim())
+        .filter(Boolean),
       site_url: form.site_url,
       repo_url: form.repo_url,
       repo_public: form.repo_public,
@@ -195,11 +203,12 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
   }
 
   const setLink = (index: number, patch: Partial<PortfolioLink>) =>
-    setForm((current) =>
-      current && {
-        ...current,
-        links: current.links.map((link, i) => (i === index ? { ...link, ...patch } : link)),
-      },
+    setForm(
+      (current) =>
+        current && {
+          ...current,
+          links: current.links.map((link, i) => (i === index ? { ...link, ...patch } : link)),
+        },
     )
 
   return (
@@ -233,115 +242,168 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
             </option>
           ))}
         </Select>
-        <Button variant="primary" onClick={() => setForm({ ...EMPTY })}>
+        <Button
+          variant="primary"
+          className="atelier-cta-vermilion"
+          onClick={() => setForm({ ...EMPTY })}
+        >
           <Plus size={15} aria-hidden="true" />
           新建项目
         </Button>
       </div>
       {query && (
         <p className="hub-hint" aria-live="polite">
-          {visible.length ? `找到 ${visible.length} 个项目，回车打开第一个的网址。` : '没有匹配的项目。'}
+          {visible.length
+            ? `找到 ${visible.length} 个项目，回车打开第一个的网址。`
+            : '没有匹配的项目。'}
         </p>
       )}
 
-      <ul className="hub-list">
-        {visible.map((project) => {
-          const publicHref = project.published && portfolioHref(project.published)
-          return (
-            <li key={project.id} className="hub-row" id={project.slug}>
-              <div className="hub-main">
-                <div className="hub-title">
-                  <h2>{project.title}</h2>
-                  <span className="hub-status" data-status={project.status}>
-                    {PORTFOLIO_STATUS_LABELS[project.status]}
-                  </span>
+      {!!visible.length && (
+        <ul className="hub-list">
+          {visible.map((project) => {
+            const publicHref = project.published && portfolioHref(project.published)
+            return (
+              <li key={project.id} className="hub-row" id={project.slug}>
+                <div className="hub-main">
+                  <div className="hub-title">
+                    <h2>{project.title}</h2>
+                    <span className="hub-status" data-status={project.status}>
+                      {PORTFOLIO_STATUS_LABELS[project.status]}
+                    </span>
+                  </div>
+                  {project.summary && <p>{project.summary}</p>}
                 </div>
-                {project.summary && <p>{project.summary}</p>}
-              </div>
-              <div className="hub-links">
-                {project.site_url && (
-                  <HubLink label="网站" url={project.site_url} onCopy={copy} />
-                )}
-                {project.repo_url && (
-                  <HubLink
-                    label="仓库"
-                    url={project.repo_url}
-                    privateLink={!project.repo_public}
-                    onCopy={copy}
-                  />
-                )}
-                {project.links.map((link) => (
-                  <HubLink key={link.url} label={link.label} url={link.url} onCopy={copy} />
-                ))}
-                {project.local_path && (
-                  <span className="hub-link hub-path">
-                    <FolderOpen size={13} aria-hidden="true" />
-                    <code>{project.local_path}</code>
-                    <button
-                      type="button"
-                      aria-label={`复制${project.title}的本地目录`}
-                      title="复制本地目录"
-                      onClick={() => void copy(project.local_path!, '本地目录')}
-                    >
-                      <Copy size={13} />
-                    </button>
+                <div className="hub-links">
+                  {project.site_url && (
+                    <HubLink label="网站" url={project.site_url} onCopy={copy} />
+                  )}
+                  {project.repo_url && (
+                    <HubLink
+                      label="仓库"
+                      url={project.repo_url}
+                      privateLink={!project.repo_public}
+                      onCopy={copy}
+                    />
+                  )}
+                  {project.links.map((link) => (
+                    <HubLink key={link.url} label={link.label} url={link.url} onCopy={copy} />
+                  ))}
+                  {project.local_path && (
+                    <span className="hub-link hub-path">
+                      <FolderOpen size={13} aria-hidden="true" />
+                      <code>{project.local_path}</code>
+                      <button
+                        type="button"
+                        aria-label={`复制${project.title}的本地目录`}
+                        title="复制本地目录"
+                        onClick={() => void copy(project.local_path!, '本地目录')}
+                      >
+                        <Copy size={13} />
+                      </button>
+                    </span>
+                  )}
+                  {!project.site_url &&
+                    !project.repo_url &&
+                    !project.links.length &&
+                    !project.local_path && (
+                      <span className="hub-empty-links">还没有记录网址</span>
+                    )}
+                </div>
+                <div
+                  className="hub-publish"
+                  data-state={
+                    project.publish_stale ? 'stale' : project.published ? 'public' : 'private'
+                  }
+                >
+                  <span>
+                    <span
+                      className="atelier-beacon"
+                      data-tone={
+                        project.publish_stale
+                          ? 'warning'
+                          : project.published
+                            ? 'healthy'
+                            : undefined
+                      }
+                      aria-hidden="true"
+                    />
+                    {project.publish_stale
+                      ? '公开版本待更新'
+                      : project.published
+                        ? '作品集已公开'
+                        : '未公开'}
                   </span>
-                )}
-                {!project.site_url && !project.repo_url && !project.links.length && !project.local_path && (
-                  <span className="hub-empty-links">还没有记录网址</span>
-                )}
-              </div>
-              <div className="hub-publish" data-state={project.publish_stale ? 'stale' : project.published ? 'public' : 'private'}>
-                {project.publish_stale ? '公开版本待更新' : project.published ? '作品集已公开' : '未公开'}
-                {publicHref && (
-                  <a href={`/work#${encodeURIComponent(project.slug)}`} target="_blank" rel="noreferrer">
-                    查看
-                  </a>
-                )}
-              </div>
-              <div className="hub-actions">
-                <Button onClick={() => setForm(toForm(project))}>编辑</Button>
-                <Menu
-                  label={`${project.title}的更多操作`}
-                  items={[
-                    project.published
-                      ? {
-                          label: project.publish_stale ? '更新公开版本' : '重新发布公开版本',
-                          disabled: busy,
-                          onSelect: () => void send({ action: 'publish', id: project.id, publish: true }, '公开版本已更新'),
-                        }
-                      : {
-                          label: '公开到作品集',
-                          disabled: busy,
-                          onSelect: () => void send({ action: 'publish', id: project.id, publish: true }, '已公开到作品集'),
-                        },
-                    ...(project.published
-                      ? [
-                          {
-                            label: '从作品集撤下',
+                  {publicHref && (
+                    <a
+                      href={`/work#${encodeURIComponent(project.slug)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      查看
+                    </a>
+                  )}
+                </div>
+                <div className="hub-actions">
+                  <Button onClick={() => setForm(toForm(project))}>编辑</Button>
+                  <Menu
+                    label={`${project.title}的更多操作`}
+                    items={[
+                      project.published
+                        ? {
+                            label: project.publish_stale ? '更新公开版本' : '重新发布公开版本',
                             disabled: busy,
-                            onSelect: () => void send({ action: 'publish', id: project.id, publish: false }, '已从作品集撤下'),
+                            onSelect: () =>
+                              void send(
+                                { action: 'publish', id: project.id, publish: true },
+                                '公开版本已更新',
+                              ),
+                          }
+                        : {
+                            label: '公开到作品集',
+                            disabled: busy,
+                            onSelect: () =>
+                              void send(
+                                { action: 'publish', id: project.id, publish: true },
+                                '已公开到作品集',
+                              ),
                           },
-                        ]
-                      : []),
-                    {
-                      label: '删除项目',
-                      danger: true,
-                      disabled: busy,
-                      onSelect: () => {
-                        if (confirm(`删除「${project.title}」？公开版本会一起移除，无法恢复。`))
-                          void send({ action: 'delete', id: project.id }, '项目已删除')
+                      ...(project.published
+                        ? [
+                            {
+                              label: '从作品集撤下',
+                              disabled: busy,
+                              onSelect: () =>
+                                void send(
+                                  { action: 'publish', id: project.id, publish: false },
+                                  '已从作品集撤下',
+                                ),
+                            },
+                          ]
+                        : []),
+                      {
+                        label: '删除项目',
+                        danger: true,
+                        disabled: busy,
+                        onSelect: () => {
+                          if (confirm(`删除「${project.title}」？公开版本会一起移除，无法恢复。`))
+                            void send({ action: 'delete', id: project.id }, '项目已删除')
+                        },
                       },
-                    },
-                  ]}
-                />
-              </div>
-            </li>
-          )
-        })}
-      </ul>
+                    ]}
+                  />
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+
       {!projects.length && (
-        <div className="library-empty">
+        <div className="library-empty atelier-crosshair">
+          <span className="library-empty-emblem" aria-hidden="true">
+            <FolderKanban size={24} />
+          </span>
           <h2>还没有项目</h2>
           <p>新建一个项目，把网站、仓库和本地目录放在一起。</p>
         </div>
@@ -356,7 +418,11 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
         >
           <label>
             名称
-            <Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+            <Input
+              required
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
           </label>
           <label>
             标识（作品页锚点）
@@ -378,7 +444,10 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
           </label>
           <label>
             状态
-            <Select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as PortfolioStatus })}>
+            <Select
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value as PortfolioStatus })}
+            >
               {PORTFOLIO_STATUSES.map((value) => (
                 <option key={value} value={value}>
                   {PORTFOLIO_STATUS_LABELS[value]}
@@ -400,7 +469,11 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
           </label>
           <label>
             仓库地址
-            <Input type="url" value={form.repo_url} onChange={(e) => setForm({ ...form, repo_url: e.target.value })} />
+            <Input
+              type="url"
+              value={form.repo_url}
+              onChange={(e) => setForm({ ...form, repo_url: e.target.value })}
+            />
           </label>
           <label className="hub-check">
             <input
@@ -438,7 +511,9 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
                 <Button
                   variant="ghost"
                   aria-label={`删除第 ${index + 1} 个链接`}
-                  onClick={() => setForm({ ...form, links: form.links.filter((_, i) => i !== index) })}
+                  onClick={() =>
+                    setForm({ ...form, links: form.links.filter((_, i) => i !== index) })
+                  }
                 >
                   <Trash2 size={15} />
                 </Button>
@@ -470,7 +545,12 @@ export function PortfolioManager({ projects }: { projects: PortfolioProject[] })
           </label>
           <p>保存只更新后台记录；作品集里的内容要通过「公开到作品集」或「更新公开版本」确认。</p>
           <div className="admin-form-actions">
-            <Button variant="primary" disabled={busy} onClick={() => void save()}>
+            <Button
+              variant="primary"
+              className="atelier-cta-vermilion"
+              disabled={busy}
+              onClick={() => void save()}
+            >
               {busy ? '保存中…' : '保存'}
             </Button>
           </div>
@@ -501,7 +581,12 @@ function HubLink({
         <span className="hub-link-url">{shortUrl(url)}</span>
         <ArrowUpRight size={13} aria-hidden="true" />
       </a>
-      <button type="button" aria-label={`复制${label}地址`} title={`复制${label}地址`} onClick={() => void onCopy(url, `${label}地址`)}>
+      <button
+        type="button"
+        aria-label={`复制${label}地址`}
+        title={`复制${label}地址`}
+        onClick={() => void onCopy(url, `${label}地址`)}
+      >
         <Copy size={13} />
       </button>
     </span>

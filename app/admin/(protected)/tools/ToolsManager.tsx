@@ -1,11 +1,12 @@
 'use client'
-import type { SaveContext } from '@/components/admin/UnsavedChanges'
 
+import type { SaveContext } from '@/components/admin/UnsavedChanges'
 import { Button, Input, Select, Menu } from '@/components/admin/ui'
 import { ManualSheet } from '@/components/admin/ManualSheet'
 import { PublicationEditor } from '@/components/library/PublicationEditor'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Pin, Plus, Wrench } from 'lucide-react'
 import { useToast } from '@/components/Toast'
 import type { Tool, ToolType } from '@/lib/repositories/tools'
 
@@ -15,6 +16,13 @@ const TYPE_OPTIONS: { value: ToolType; label: string }[] = [
   { value: 'mac-app', label: 'Mac 软件' },
   { value: 'other', label: '其他' },
 ]
+
+const TYPE_LABELS: Record<ToolType, string> = {
+  url: '网页工具',
+  repo: '代码仓库',
+  'mac-app': 'Mac 软件',
+  other: '其他',
+}
 
 interface FormState {
   id: number | null
@@ -40,7 +48,7 @@ const EMPTY: FormState = {
 
 export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
   const [open, setOpen] = useState(false)
-  const [publication,setPublication] = useState<string|null>(null)
+  const [publication, setPublication] = useState<string | null>(null)
   const router = useRouter()
   const toast = useToast()
   const [form, setForm] = useState<FormState>(EMPTY)
@@ -173,112 +181,164 @@ export function ToolsManager({ initialTools }: { initialTools: Tool[] }) {
         <p>工作版本与公开快照分别保存。</p>
         <Button
           variant="primary"
+          className="atelier-cta-vermilion"
           onClick={() => {
             setForm(EMPTY)
             setOpen(true)
           }}
         >
+          <Plus size={15} aria-hidden="true" />
           添加工具
         </Button>
       </div>
-      <div className="resource-list">
-        {initialTools.map((tool) => (
-          <div className="resource-row" id={String(tool.id)} key={tool.id}>
-            <div>
-              <h2>{tool.name}</h2>
-              <p>{tool.description || tool.url}</p>
+
+      {!!initialTools.length && (
+        <div className="resource-list">
+          {initialTools.map((tool) => (
+            <div className="resource-row" id={String(tool.id)} key={tool.id}>
+              <div>
+                <div className="resource-row-head">
+                  <h2>{tool.name}</h2>
+                  {tool.is_pinned === 1 && (
+                    <Pin size={12} className="text-[var(--atelier-vermilion)]" aria-hidden="true" />
+                  )}
+                  <span className="resource-meta-tag">{TYPE_LABELS[tool.type] || tool.type}</span>
+                </div>
+                <p>{tool.description || tool.url || '暂无说明'}</p>
+              </div>
+              <span className="atelier-badge">
+                <span
+                  className="atelier-beacon"
+                  data-tone={tool.is_hidden ? undefined : 'healthy'}
+                  aria-hidden="true"
+                />
+                {tool.is_hidden ? '私密' : '已公开'}
+              </span>
+              <div className="resource-row-actions">
+                <Button variant="ghost" onClick={() => setPublication(String(tool.id))}>
+                  编辑公开版本
+                </Button>
+                <Button variant="ghost" onClick={() => edit(tool)}>
+                  编辑
+                </Button>
+                <Menu
+                  label={`${tool.name}的操作`}
+                  items={[
+                    {
+                      label: '删除工具',
+                      danger: true,
+                      onSelect: () => void remove(tool.id, tool.name),
+                    },
+                  ]}
+                />
+              </div>
             </div>
-            <span>{tool.is_hidden ? '私密' : '已公开'}</span>
-            <Button variant="ghost" onClick={() => setPublication(String(tool.id))}>编辑公开版本</Button>
-            <Button variant="ghost" onClick={() => edit(tool)}>
-              编辑
-            </Button>
-            <Menu
-              label={`${tool.name}的操作`}
-              items={[
-                {
-                  label: '删除工具',
-                  danger: true,
-                  onSelect: () => void remove(tool.id, tool.name),
-                },
-              ]}
-            />
-          </div>
-        ))}
-      </div>
-      {!initialTools.length && <div className="library-empty">还没有工具，添加第一件收藏。</div>}
-      {open && <ManualSheet value={{ ...form, id: undefined }} onSave={save} onClose={()=>setOpen(false)} title={isEditing ? '编辑工具' : '添加工具'}>
-        <div className="admin-form">
-          <label>
-            名称
-            <Input
-              required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-          </label>
-          <label>
-            链接
-            <Input
-              type="url"
-              value={form.url}
-              onChange={(e) => setForm({ ...form, url: e.target.value })}
-            />
-          </label>
-          <Button disabled={fetching} onClick={autoFetch}>
-            {fetching ? '抓取中…' : '从链接填充信息'}
-          </Button>
-          <label>
-            类型
-            <Select
-              value={form.type}
-              onChange={(e) => setForm({ ...form, type: e.target.value as ToolType })}
-            >
-              {TYPE_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </Select>
-          </label>
-          <label>
-            介绍
-            <textarea
-              className="admin-input"
-              rows={5}
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-            />
-          </label>
-          <label>
-            标签
-            <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
-          </label>
-          <label>
-            图标链接
-            <Input
-              type="url"
-              value={form.icon}
-              onChange={(e) => setForm({ ...form, icon: e.target.value })}
-            />
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={form.is_pinned}
-              onChange={(e) => setForm({ ...form, is_pinned: e.target.checked })}
-            />
-            置顶
-          </label>
-          <p>确认公开会更新访客看到的快照。</p>
-          <div className="admin-form-actions">
-            <Button disabled={saving} onClick={() => void save()}>
-              保存工作版本
-            </Button>
-          </div>
+          ))}
         </div>
-      </ManualSheet>}
-      {publication && <PublicationEditor kind="tool" id={publication} onClose={()=>setPublication(null)} onSaved={()=>router.refresh()} />}
+      )}
+
+      {!initialTools.length && (
+        <div className="library-empty atelier-crosshair">
+          <span className="library-empty-emblem" aria-hidden="true">
+            <Wrench size={24} />
+          </span>
+          <h2>还没有工具</h2>
+          <p>添加第一件收藏，工作版本与公开快照始终独立维护。</p>
+        </div>
+      )}
+
+      {open && (
+        <ManualSheet
+          value={{ ...form, id: undefined }}
+          onSave={save}
+          onClose={() => setOpen(false)}
+          title={isEditing ? '编辑工具' : '添加工具'}
+        >
+          <div className="admin-form">
+            <label>
+              名称
+              <Input
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </label>
+            <label>
+              链接
+              <Input
+                type="url"
+                value={form.url}
+                onChange={(e) => setForm({ ...form, url: e.target.value })}
+              />
+            </label>
+            <Button disabled={fetching} onClick={autoFetch}>
+              {fetching ? '抓取中…' : '从链接填充信息'}
+            </Button>
+            <label>
+              类型
+              <Select
+                value={form.type}
+                onChange={(e) => setForm({ ...form, type: e.target.value as ToolType })}
+              >
+                {TYPE_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <label>
+              介绍
+              <textarea
+                className="admin-input"
+                rows={5}
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
+            </label>
+            <label>
+              标签
+              <Input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
+            </label>
+            <label>
+              图标链接
+              <Input
+                type="url"
+                value={form.icon}
+                onChange={(e) => setForm({ ...form, icon: e.target.value })}
+              />
+            </label>
+            <label className="hub-check">
+              <input
+                type="checkbox"
+                checked={form.is_pinned}
+                onChange={(e) => setForm({ ...form, is_pinned: e.target.checked })}
+              />
+              置顶
+            </label>
+            <p>确认公开会更新访客看到的快照。</p>
+            <div className="admin-form-actions">
+              <Button
+                variant="primary"
+                className="atelier-cta-vermilion"
+                disabled={saving}
+                onClick={() => void save()}
+              >
+                保存工作版本
+              </Button>
+            </div>
+          </div>
+        </ManualSheet>
+      )}
+
+      {publication && (
+        <PublicationEditor
+          kind="tool"
+          id={publication}
+          onClose={() => setPublication(null)}
+          onSaved={() => router.refresh()}
+        />
+      )}
     </div>
   )
 }

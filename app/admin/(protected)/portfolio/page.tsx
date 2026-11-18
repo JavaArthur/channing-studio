@@ -11,9 +11,10 @@ export default async function AdminPortfolioPage() {
   const projects = await listPortfolioProjects(env.DB)
   const published = projects.filter((project) => project.published).length
   return (
-    <div>
+    <div className="atelier-surface-page">
       <header className="workspace-page-heading">
         <div>
+          <span className="atelier-eyebrow">SYSTEMS // PORTFOLIO HUB</span>
           <h1>项目导航</h1>
           <p>
             {projects.length} 个项目 · {published} 个在作品集公开。网址、仓库和本地目录都在这里。

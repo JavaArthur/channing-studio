@@ -1,9 +1,18 @@
 'use client'
+
 import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowUpRight, Copy, Maximize2, Minimize2, PanelRight, Star } from 'lucide-react'
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  Copy,
+  Maximize2,
+  Minimize2,
+  PanelRight,
+  Star,
+} from 'lucide-react'
 import { PropertyPanel } from './PropertyPanel'
 import { PublicationEditor } from './PublicationEditor'
 import { Button, Input, Menu, Modal } from '@/components/admin/ui'
@@ -11,10 +20,12 @@ import { libraryLabels, sourceHost, type LibraryItem } from '@/lib/library/types
 import { renderLibraryMarkdown } from '@/lib/library/markdown'
 import { useLibrarySave } from './useLibrarySave'
 import { copyText, fetchItem, libraryRequest, type Collection } from './client'
+
 const DocumentEditor = dynamic(() => import('./DocumentEditor'), {
   ssr: false,
   loading: () => <p role="status">正在加载编辑器…</p>,
 })
+
 const statusLabels = {
   saved: '已保存',
   pending: '等待保存',
@@ -22,6 +33,7 @@ const statusLabels = {
   error: '保存失败',
   conflict: '版本冲突',
 }
+
 export function LibraryDetail({
   item: original,
   html,
@@ -58,10 +70,12 @@ export function LibraryDetail({
       editing ? '' : item.content === original.content ? html : renderLibraryMarkdown(item.content),
     [editing, item.content, original.content, html],
   )
+
   useEffect(() => {
     registerFlush(() => queue.flush())
     return () => registerFlush(null)
   }, [queue, registerFlush])
+
   async function act(action: () => Promise<void>) {
     setBusy(true)
     setError('')
@@ -73,10 +87,19 @@ export function LibraryDetail({
       setBusy(false)
     }
   }
+
   async function ready() {
     if (!(await queue.flush())) throw new Error('请先处理未保存的修改')
     return queue.getSnapshot().item
   }
+
+  const createdDate = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(item.created_at * 1000)
+
   return (
     <>
       <div className="reader-topline">
@@ -86,7 +109,7 @@ export function LibraryDetail({
           href={closeHref}
           scroll={false}
         >
-          <ArrowLeft size={17} />
+          <ArrowLeft size={16} />
         </Link>
         <span className="reader-kind">{libraryLabels[item.content_type] || '资料'}</span>
         <span className={`save-state save-${status}`} role="status" aria-live="polite">
@@ -96,6 +119,7 @@ export function LibraryDetail({
           <Button onClick={onHandoff}>复制给助手</Button>
           <Button
             variant="ghost"
+            className={item.favorite ? 'is-favorite-active' : undefined}
             aria-label={item.favorite ? '取消收藏' : '收藏内容'}
             aria-pressed={item.favorite}
             onClick={() => queue.patch({ favorite: !item.favorite })}
@@ -171,6 +195,7 @@ export function LibraryDetail({
           />
           {!readOnly && (
             <Button
+              variant={editing ? 'primary' : 'secondary'}
               onClick={() =>
                 void act(async () => {
                   if (editing) await ready()
@@ -183,8 +208,13 @@ export function LibraryDetail({
           )}
         </div>
       </div>
+
       <div className="reader-scroll">
-        {draftStorageError && <p role="alert" className="library-feedback">浏览器无法保留恢复草稿，请勿刷新；先保存或复制本地正文。</p>}
+        {draftStorageError && (
+          <p role="alert" className="library-feedback">
+            浏览器无法保留恢复草稿，请勿刷新；先保存或复制本地正文。
+          </p>
+        )}
         {(message || error) && (
           <p role={error ? 'alert' : 'status'} className="library-feedback">
             {error || message}
@@ -224,24 +254,35 @@ export function LibraryDetail({
           )}
           <div className="reader-byline">
             <span>{item.submitted_by === 'agent' ? 'Agent 提交' : '私人资料'}</span>
+            <time dateTime={new Date(item.created_at * 1000).toISOString()}>{createdDate}</time>
             {item.source_url && (
               <a href={item.source_url} target="_blank" rel="noopener noreferrer">
                 {sourceHost(item.source_url)}
                 <ArrowUpRight size={12} />
               </a>
             )}
+            {item.topics.slice(0, 4).map((topic) => (
+              <span key={topic} className="reader-topic-chip">
+                #{topic}
+              </span>
+            ))}
           </div>
           {item.source_status === 'unavailable' && (
             <p className="reader-warning">原文尚未成功读取。当前仅保留已知信息与来源链接。</p>
           )}
           {item.decision_question && (
             <div className="reader-decision">
-              <strong>需要你的决定</strong>
+              <strong>
+                <span className="atelier-beacon" data-tone="vermilion" aria-hidden="true" />
+                需要你的决定
+              </strong>
               <p>{item.decision_question}</p>
-              <Button onClick={onHandoff}>带着上下文回复助手</Button>
-              <Button variant="ghost" onClick={() => queue.patch({ decision_question: '' })}>
-                不再需要决定
-              </Button>
+              <div className="reader-decision-actions">
+                <Button onClick={onHandoff}>带着上下文回复助手</Button>
+                <Button variant="ghost" onClick={() => queue.patch({ decision_question: '' })}>
+                  不再需要决定
+                </Button>
+              </div>
             </div>
           )}
           {/* Editing stays mounted across saves, focus changes and property edits. */}
@@ -278,6 +319,7 @@ export function LibraryDetail({
           )}
         </div>
       </div>
+
       <PropertyPanel open={properties} onOpenChange={setProperties}>
         <div className="admin-form reader-properties">
           <span className={`save-state save-${status}`} role="status">
@@ -331,7 +373,7 @@ export function LibraryDetail({
             <span>类型</span>
             <span>{libraryLabels[item.content_type]}</span>
           </div>
-          <fieldset>
+          <fieldset className="property-collections-fieldset">
             <legend>所属资料集</legend>
             <div className="collection-options">
               {collectionOptions.map((c) => (
@@ -365,6 +407,7 @@ export function LibraryDetail({
           {error && <p role="alert">{error}</p>}
         </div>
       </PropertyPanel>
+
       <Modal
         open={!!remote}
         onOpenChange={(open) => {
@@ -426,6 +469,7 @@ export function LibraryDetail({
           </div>
         )}
       </Modal>
+
       {publishing && (item.kind === 'tool' || item.kind === 'prompt') && (
         <PublicationEditor
           kind={item.kind}
@@ -440,6 +484,7 @@ export function LibraryDetail({
     </>
   )
 }
+
 function TopicsInput({
   initial,
   onChange,

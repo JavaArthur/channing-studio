@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { PenLine, Search, X } from 'lucide-react'
 import { Dropdown } from '@/components/Dropdown'
 import { Tooltip } from '@/components/Tooltip'
 
@@ -76,7 +77,9 @@ export function FilterBar({
 
   const activeStatus = currentStatus || 'all'
   const activeCategory = currentCategory || 'all'
-  const hasActiveFilters = Boolean(query.trim() || activeStatus !== 'all' || activeCategory !== 'all')
+  const hasActiveFilters = Boolean(
+    query.trim() || activeStatus !== 'all' || activeCategory !== 'all',
+  )
 
   const categoryOptions = [
     { value: 'all', label: '全部分类' },
@@ -94,8 +97,23 @@ export function FilterBar({
   ] as const
 
   return (
-    <div className="posts-filter"><header className="workspace-page-heading"><h1>文章管理</h1><Link className="admin-button admin-button-primary" href="/editor?new=1">新建文章</Link></header>
-      <div className="flex flex-col gap-4">
+    <div className="posts-filter">
+      <header className="workspace-page-heading">
+        <div>
+          <span className="atelier-eyebrow">PUBLICATION // WRITING LEDGER</span>
+          <h1>文章管理</h1>
+          <p>管理工作草稿与已发布手稿，共 {counts.all} 篇记录。</p>
+        </div>
+        <Link
+          className="admin-button admin-button-primary atelier-cta-vermilion"
+          href="/editor?new=1"
+        >
+          <PenLine size={15} />
+          新建文章
+        </Link>
+      </header>
+
+      <div className="flex flex-col gap-3.5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <form onSubmit={handleSearch} className="flex-1">
             <div className="relative">
@@ -105,48 +123,36 @@ export function FilterBar({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="搜索标题、摘要或正文…"
-                className="min-h-11 min-w-11 w-full rounded-lg border border-[var(--editor-line)] bg-[var(--background)] px-3 py-2 pl-9 pr-9 text-sm text-[var(--editor-ink)] placeholder:text-[var(--editor-muted)] transition-all focus:border-[var(--focus-ring)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]/20"
+                className="min-h-11 min-w-11 w-full rounded-[var(--radius-sm)] border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2 pr-9 pl-9 text-sm text-[var(--editor-ink)] placeholder:text-[var(--stone-gray)] transition-colors focus:border-[var(--focus-ring)] focus:outline-none"
               />
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--stone-gray)]"
-              >
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-              </svg>
+              <Search
+                size={15}
+                aria-hidden="true"
+                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--stone-gray)]"
+              />
               {query && (
                 <Tooltip label="清除搜索">
                   <button
                     type="button"
                     onClick={handleClear}
-                    className="min-h-11 min-w-11 absolute right-3 top-1/2 -translate-y-1/2 text-[var(--stone-gray)] transition-colors hover:text-[var(--editor-ink)]"
+                    className="min-h-11 min-w-11 absolute top-1/2 right-2 inline-flex -translate-y-1/2 items-center justify-center text-[var(--stone-gray)] transition-colors hover:text-[var(--editor-ink)]"
                     aria-label="清除搜索"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
+                    <X size={14} />
                   </button>
                 </Tooltip>
               )}
             </div>
           </form>
 
-          <div className="flex items-center gap-3">
-            <div className="min-w-[160px]">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="min-w-[168px] flex-1 sm:flex-initial">
               <Dropdown
                 options={categoryOptions}
                 value={activeCategory}
                 onChange={(value) => updateFilter('category', value)}
                 placeholder="全部分类"
-                className="w-full"
+                className="w-full [&_button]:whitespace-nowrap [&_button>span]:truncate [&_button>svg]:shrink-0"
               />
             </div>
 
@@ -157,7 +163,7 @@ export function FilterBar({
                   setQuery('')
                   router.push('/admin/posts')
                 }}
-                className="min-h-11 min-w-11 shrink-0 rounded-lg border border-[var(--editor-line)] px-3 py-2 text-sm text-[var(--editor-muted)] transition hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)]"
+                className="min-h-11 min-w-11 shrink-0 rounded-[var(--radius-sm)] border border-[var(--editor-line)] bg-[var(--editor-panel)] px-3 py-2 text-xs text-[var(--editor-muted)] transition-colors hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)]"
               >
                 清空筛选
               </button>
@@ -165,29 +171,36 @@ export function FilterBar({
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2">
-            {statusItems.map((item) => (
-              <button
-                key={item.value}
-                onClick={() => updateFilter('status', item.value)}
-                className={`min-h-11 min-w-11 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
-                  activeStatus === item.value
-                    ? 'bg-[var(--editor-accent)] text-[var(--editor-accent-ink)] font-medium'
-                    : 'bg-[var(--editor-panel)] text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)]'
-                }`}
-              >
-                <span>{item.label}</span>
-                <span className={`rounded-full px-1.5 py-0.5 text-xs tabular-nums ${
-                  activeStatus === item.value ? 'bg-[var(--editor-panel)]/15 text-[var(--editor-accent-ink)]' : 'bg-[var(--background)] text-[var(--editor-muted)]'
-                }`}>
-                  {item.count}
-                </span>
-              </button>
-            ))}
+        <div className="flex flex-col gap-3 border-b border-[var(--editor-line)] pb-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap gap-1.5">
+            {statusItems.map((item) => {
+              const active = activeStatus === item.value
+              return (
+                <button
+                  key={item.value}
+                  onClick={() => updateFilter('status', item.value)}
+                  className={`min-h-11 min-w-11 inline-flex items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-1.5 text-xs transition-colors ${
+                    active
+                      ? 'border-[var(--editor-accent)] bg-[var(--editor-accent)] font-medium text-[var(--editor-accent-ink)]'
+                      : 'border-[var(--editor-line)] bg-[var(--editor-panel)] text-[var(--editor-muted)] hover:bg-[var(--editor-soft)] hover:text-[var(--editor-ink)]'
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  <span
+                    className={`atelier-mono rounded-[var(--radius-xs)] px-1.5 py-0.5 text-[11px] ${
+                      active
+                        ? 'bg-[var(--editor-panel)]/18 text-[var(--editor-accent-ink)]'
+                        : 'bg-[var(--editor-soft)] text-[var(--stone-gray)]'
+                    }`}
+                  >
+                    {item.count}
+                  </span>
+                </button>
+              )
+            })}
           </div>
 
-          <div className="text-xs text-[var(--stone-gray)]">
+          <div className="atelier-mono text-xs text-[var(--stone-gray)]">
             当前结果 {resultCount} 篇
           </div>
         </div>

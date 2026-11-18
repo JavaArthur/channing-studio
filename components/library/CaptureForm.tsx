@@ -1,10 +1,12 @@
 'use client'
+
 import { useUnsavedChanges, type SaveContext } from '@/components/admin/UnsavedChanges'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
 import { libraryLabels, type LibraryItem } from '@/lib/library/types'
 import { libraryRequest } from './client'
+
 export function CaptureForm({
   collection,
   onClose,
@@ -28,10 +30,8 @@ export function CaptureForm({
   const [requestKey, setRequestKey] = useState(() => crypto.randomUUID())
   const [savedForm, setSavedForm] = useState(() => JSON.stringify(form))
   const [savedCapture, setSavedCapture] = useState<{ item: LibraryItem; type: string } | null>(null)
-  const guard = useUnsavedChanges(
-    JSON.stringify(form) !== savedForm,
-    save,
-  )
+  const guard = useUnsavedChanges(JSON.stringify(form) !== savedForm, save)
+
   async function save(context?: SaveContext) {
     if (busy) return false
     setBusy(true)
@@ -44,13 +44,30 @@ export function CaptureForm({
         content: form.content,
         summary: form.summary,
         source_url: form.source_url || null,
-        topics: form.topics.split(/[、,，]/).map((x) => x.trim()).filter(Boolean),
+        topics: form.topics
+          .split(/[、,，]/)
+          .map((x) => x.trim())
+          .filter(Boolean),
       }
-      const result = await libraryRequest(savedCapture && savedCapture.type === form.type
-        ? { action: 'update', kind: savedCapture.item.kind, id: savedCapture.item.id,
-            expected_revision: savedCapture.item.revision, changes }
-        : { action: 'capture', input: { ...changes, type: form.type, request_key: requestKey,
-            collection_ids: collection ? [collection] : [] } })
+      const result = await libraryRequest(
+        savedCapture && savedCapture.type === form.type
+          ? {
+              action: 'update',
+              kind: savedCapture.item.kind,
+              id: savedCapture.item.id,
+              expected_revision: savedCapture.item.revision,
+              changes,
+            }
+          : {
+              action: 'capture',
+              input: {
+                ...changes,
+                type: form.type,
+                request_key: requestKey,
+                collection_ids: collection ? [collection] : [],
+              },
+            },
+      )
       setSavedCapture({ item: result.item, type: form.type })
       setSavedForm(JSON.stringify(form))
       setRequestKey(crypto.randomUUID())
@@ -68,6 +85,7 @@ export function CaptureForm({
       setBusy(false)
     }
   }
+
   return (
     <form
       className="capture-form"
@@ -152,8 +170,12 @@ export function CaptureForm({
           />
         </label>
       </div>
-      {error && <p role="alert">{error}</p>}
-      <button className="brain-button" disabled={busy}>
+      {error && (
+        <p className="admin-form-error" role="alert">
+          {error}
+        </p>
+      )}
+      <button className="brain-button brain-cta" disabled={busy}>
         保存到资料库
       </button>
     </form>
