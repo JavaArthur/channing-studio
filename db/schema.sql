@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS posts (
 CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
 CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category);
 CREATE INDEX IF NOT EXISTS idx_posts_published ON posts(published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_posts_public_feed ON posts(is_pinned DESC, published_at DESC) WHERE status = 'published' AND deleted_at IS NULL AND password IS NULL AND is_hidden = 0;
 
 -- 全文搜索：FTS5 在 Cloudflare D1 上目前有 shadow table 损坏问题
 -- (SQLITE_CORRUPT_VTAB, see emdash-cms/emdash#252). 源码层使用
@@ -486,6 +487,7 @@ CREATE TABLE library_metadata (
   PRIMARY KEY(kind,item_id)
 );
 CREATE INDEX library_source_lookup ON library_metadata(kind,canonical_source);
+CREATE INDEX IF NOT EXISTS idx_library_meta_filter ON library_metadata(archived, favorite, kind, item_id);
 CREATE TABLE library_captures (
   key_hash TEXT PRIMARY KEY,
   request_hash TEXT NOT NULL,
@@ -582,7 +584,7 @@ INSERT INTO library_metadata(kind,item_id) SELECT 'post',CAST(slug AS TEXT) FROM
 CREATE TRIGGER library_post_insert AFTER INSERT ON posts BEGIN
   INSERT OR IGNORE INTO library_metadata(kind,item_id) VALUES ('post',CAST(NEW.slug AS TEXT));
 END;
-CREATE TRIGGER library_post_update AFTER UPDATE ON posts BEGIN
+CREATE TRIGGER library_post_update AFTER UPDATE OF slug, title, content, description, category, tags, status, source_url, is_hidden, deleted_at ON posts BEGIN
   INSERT INTO library_metadata(kind,item_id) VALUES ('post',CAST(NEW.slug AS TEXT))
   ON CONFLICT(kind,item_id) DO UPDATE SET revision=revision+1;
 END;
