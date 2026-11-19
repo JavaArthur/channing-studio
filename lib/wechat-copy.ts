@@ -4,23 +4,9 @@ import juice from 'juice'
 import { buildWechatExportCss, normalizeWechatExportHtml, type WechatExportStyleTokens } from './wechat-export-style'
 
 type ExportMode = 'clipboard' | 'pdf'
-type Html2PdfWorker = {
-  set(options: unknown): {
-    from(element: HTMLElement): {
-      save(): Promise<void>
-    }
-  }
-}
-type Html2PdfFactory = () => Html2PdfWorker
 
-declare global {
-  interface Window {
-    html2pdf?: Html2PdfFactory
-  }
-}
-
-const HTML2PDF_SCRIPT_URL = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.14.0/dist/html2pdf.bundle.min.js'
-let html2pdfLoadPromise: Promise<Html2PdfFactory> | undefined
+const PRINT_MEDIA_WAIT_TIMEOUT_MS = 5000
+const PRINT_IFRAME_FALLBACK_CLEANUP_MS = 1000
 
 const URL_ATTRIBUTES = [
   ['img', 'src'],
@@ -48,36 +34,17 @@ function absolutizeUrls(root: Document | Element, baseUrl: string) {
   }
 }
 
-function waitForLayout() {
+function waitForLayout(win: Window = window) {
+  if (typeof win.requestAnimationFrame !== 'function') {
+    return Promise.resolve()
+  }
   return new Promise<void>((resolve) => {
-    window.requestAnimationFrame(() => resolve())
+    win.requestAnimationFrame(() => resolve())
   })
 }
 
-function loadHtml2Pdf() {
-  if (window.html2pdf) return Promise.resolve(window.html2pdf)
-  if (html2pdfLoadPromise) return html2pdfLoadPromise
-
-  html2pdfLoadPromise = new Promise<Html2PdfFactory>((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = HTML2PDF_SCRIPT_URL
-    script.async = true
-    script.onload = () => {
-      if (window.html2pdf) {
-        resolve(window.html2pdf)
-      } else {
-        reject(new Error('PDF 导出组件加载失败'))
-      }
-    }
-    script.onerror = () => reject(new Error('PDF 导出组件加载失败，请检查网络后重试'))
-    document.head.appendChild(script)
-  })
-
-  return html2pdfLoadPromise
-}
-
-async function waitForMediaReady(root: HTMLElement) {
-  const imageTasks = Array.from(root.querySelectorAll<HTMLImageElement>('img'))
+async function waitForDocumentMediaReady(doc: Document, timeoutMs = PRINT_MEDIA_WAIT_TIMEOUT_MS) {
+  const imageTasks = Array.from(doc.querySelectorAll<HTMLImageElement>('img'))
     .filter((img) => !img.complete)
     .map((img) => new Promise<void>((resolve) => {
       const cleanup = () => {
@@ -90,11 +57,27 @@ async function waitForMediaReady(root: HTMLElement) {
       img.addEventListener('error', cleanup, { once: true })
     }))
 
-  const fontsReady = typeof document.fonts?.ready?.then === 'function'
-    ? document.fonts.ready.then(() => undefined).catch(() => undefined)
+  const fontsReady = typeof doc.fonts?.ready?.then === 'function'
+    ? doc.fonts.ready.then(() => undefined).catch(() => undefined)
     : Promise.resolve()
 
-  await Promise.all([fontsReady, ...imageTasks])
+  const allReady = Promise.all([fontsReady, ...imageTasks]).then(() => undefined)
+  if (timeoutMs <= 0) {
+    await allReady
+    return
+  }
+
+  let timer: ReturnType<typeof setTimeout> | undefined
+  try {
+    await Promise.race([
+      allReady,
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, timeoutMs)
+      }),
+    ])
+  } finally {
+    if (timer !== undefined) clearTimeout(timer)
+  }
 }
 
 function escapeHtml(value: string) {
@@ -292,45 +275,103 @@ function buildWechatExportFragment(title: string, html: string) {
   `
 }
 
-function createStageRoot(title: string, html: string, css: string) {
-  const stage = document.createElement('div')
-  stage.style.position = 'fixed'
-  stage.style.left = '-20000px'
-  stage.style.top = '0'
-  stage.style.width = '720px'
-  stage.style.pointerEvents = 'none'
-  stage.style.background = '#ffffff'
-  stage.style.zIndex = '-1'
-
-  stage.innerHTML = `
-    <style>${css}</style>
-    ${buildWechatExportFragment(title, html)}
-  `
-
-  document.body.appendChild(stage)
-  return stage
+export function buildArticlePrintCss(tokens: WechatExportStyleTokens) {
+  return `
+@page {
+  size: A4 portrait;
+  margin: 18mm 16mm 18mm 16mm;
 }
 
-async function prepareArticleExportStage(title: string, html: string) {
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+  }
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: ${tokens.articleBodyColor};
+  font-family: ${tokens.bodyFontFamily};
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.wechat-export-root {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.wechat-export-article {
+  padding: 0;
+}
+
+.wechat-export-title {
+  margin: 0 0 1.25em;
+  padding-bottom: 0.6em;
+  border-bottom: 1px solid ${tokens.lineColor};
+  color: ${tokens.articleHeadingColor};
+  font-family: ${tokens.titleFontFamily};
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.38;
+  letter-spacing: 0.01em;
+}
+
+.wechat-export-content pre.code__pre,
+.wechat-export-content .hljs.code__pre,
+.wechat-export-content pre {
+  background: ${tokens.codeBackground};
+  border: 1px solid ${tokens.codeBorderColor};
+  border-radius: 6px;
+  overflow: visible;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.wechat-export-content pre.code__pre > code,
+.wechat-export-content .hljs.code__pre > code,
+.wechat-export-content pre > code {
+  display: block;
+  padding: 0.85em 1em;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: visible;
+}
+
+.wechat-export-content img {
+  max-width: 100% !important;
+  height: auto !important;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+`.trim()
+}
+
+export function buildArticlePrintDocument(
+  title: string,
+  normalizedHtml: string,
+  tokens: WechatExportStyleTokens,
+) {
   const normalizedTitle = title.trim() || '无标题'
-  const normalizedHtml = normalizeExportMarkup(html, 'pdf')
-  const css = buildWechatExportCss(readWechatExportStyleTokens())
-  const stage = createStageRoot(normalizedTitle, normalizedHtml, css)
-  const article = stage.querySelector('.wechat-export-article')
+  const baseCss = buildWechatExportCss(tokens)
+  const printCss = buildArticlePrintCss(tokens)
+  const fragment = buildWechatExportFragment(normalizedTitle, normalizedHtml)
 
-  if (!(article instanceof HTMLElement)) {
-    stage.remove()
-    throw new Error('生成导出内容失败')
-  }
-
-  await waitForLayout()
-  await waitForMediaReady(stage)
-
-  return {
-    stage,
-    article,
-    normalizedTitle,
-  }
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>${escapeHtml(normalizedTitle)}</title>
+    <style>${baseCss}\n${printCss}</style>
+  </head>
+  <body>
+    ${fragment}
+  </body>
+</html>`
 }
 
 function buildWechatClipboardHtml(title: string, html: string) {
@@ -429,42 +470,65 @@ export async function downloadArticleAsPdf(title: string, html: string) {
     throw new Error('当前环境不支持导出 PDF')
   }
 
-  let prepared:
-    | {
-      stage: HTMLDivElement
-      article: HTMLElement
-      normalizedTitle: string
+  const normalizedTitle = title.trim() || '无标题'
+  const normalizedHtml = normalizeExportMarkup(html, 'pdf')
+  const tokens = readWechatExportStyleTokens()
+  const printDocumentHtml = buildArticlePrintDocument(normalizedTitle, normalizedHtml, tokens)
+
+  const iframe = document.createElement('iframe')
+  iframe.setAttribute('aria-hidden', 'true')
+  iframe.setAttribute('title', normalizedTitle)
+  iframe.style.position = 'fixed'
+  iframe.style.right = '0'
+  iframe.style.bottom = '0'
+  iframe.style.width = '0'
+  iframe.style.height = '0'
+  iframe.style.border = '0'
+  iframe.style.visibility = 'hidden'
+  iframe.style.pointerEvents = 'none'
+
+  let cleaned = false
+  let fallbackTimer: ReturnType<typeof setTimeout> | undefined
+  const cleanup = () => {
+    if (cleaned) return
+    cleaned = true
+    if (fallbackTimer !== undefined) {
+      clearTimeout(fallbackTimer)
+      fallbackTimer = undefined
     }
-    | undefined
+    iframe.remove()
+  }
+
+  document.body.appendChild(iframe)
 
   try {
-    prepared = await prepareArticleExportStage(title, html)
-    const html2pdf = await loadHtml2Pdf()
-    const pdfOptions = {
-      margin: [16, 12, 16, 12],
-      filename: `${prepared.normalizedTitle}.pdf`,
-      image: { type: 'jpeg', quality: 0.96 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-      },
-      jsPDF: {
-        unit: 'mm',
-        format: 'a4',
-        orientation: 'portrait',
-      },
-      pagebreak: {
-        mode: ['css', 'legacy'],
-        avoid: ['img', 'pre', 'blockquote', 'table', 'figure', 'p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', '.pdf-media-placeholder'],
-      },
+    const frameWindow = iframe.contentWindow
+    const frameDocument = iframe.contentDocument ?? frameWindow?.document
+
+    if (!frameWindow || !frameDocument) {
+      throw new Error('初始化打印容器失败')
     }
 
-    await html2pdf()
-      .set(pdfOptions as never)
-      .from(prepared.article)
-      .save()
-  } finally {
-    prepared?.stage.remove()
+    frameDocument.open()
+    frameDocument.write(printDocumentHtml)
+    frameDocument.close()
+
+    await waitForLayout(frameWindow)
+    await waitForDocumentMediaReady(frameDocument)
+
+    if (typeof frameWindow.addEventListener === 'function') {
+      frameWindow.addEventListener('afterprint', cleanup, { once: true })
+    }
+
+    frameWindow.focus?.()
+    if (typeof frameWindow.print !== 'function') {
+      throw new Error('当前浏览器不支持打印导出 PDF')
+    }
+    frameWindow.print()
+
+    fallbackTimer = setTimeout(cleanup, PRINT_IFRAME_FALLBACK_CLEANUP_MS)
+  } catch (error) {
+    cleanup()
+    throw error
   }
 }

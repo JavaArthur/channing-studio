@@ -5,8 +5,16 @@ import {
   jsonOk,
   parseJsonBody,
 } from '@/lib/server/route-helpers'
+import {
+  assertSafeRemoteUrl,
+  readTextUpToBytes,
+  safeFetchWithRedirects,
+  UnsafeRemoteUrlError,
+} from '@/lib/net-safety'
 import type { ToolType } from '@/lib/repositories/tools'
 import type { NextRequest } from 'next/server'
+
+const MAX_META_HTML_BYTES = 64_000
 
 function decodeEntities(text: string): string {
   return text
@@ -59,26 +67,34 @@ export async function POST(req: NextRequest) {
     const rawUrl = typeof payload.url === 'string' ? payload.url.trim() : ''
     if (!rawUrl) return jsonError('URL 不能为空', 400)
 
+    const hasScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(rawUrl) || /^(?:javascript|data|file|vbscript):/i.test(rawUrl)
     let target: URL
     try {
-      target = new URL(rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`)
-    } catch {
+      target = assertSafeRemoteUrl(hasScheme ? rawUrl : `https://${rawUrl}`)
+    } catch (err) {
+      if (err instanceof UnsafeRemoteUrlError) {
+        return jsonError(err.message, err.status)
+      }
       return jsonError('URL 格式不正确', 400)
     }
 
     let html = ''
     try {
-      const resp = await fetch(target.href, {
-        redirect: 'follow',
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ChanningBlogBot/1.0)' },
+      const resp = await safeFetchWithRedirects(target, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MorningAIBlogBot/1.0)' },
         signal: AbortSignal.timeout(8000),
       })
       if (resp.ok) {
-        // 只读前 64KB，meta 都在 <head> 里
-        html = (await resp.text()).slice(0, 64_000)
+        // 只流式读取前 64KB，meta 都在 <head> 里
+        html = await readTextUpToBytes(resp, MAX_META_HTML_BYTES)
+      } else {
+        await resp.body?.cancel().catch(() => {})
       }
-    } catch {
-      // 抓取失败也返回基础信息，让用户手填
+    } catch (err) {
+      if (err instanceof UnsafeRemoteUrlError) {
+        return jsonError(err.message, err.status)
+      }
+      // 网络抓取失败也返回基础信息，让用户手填
     }
 
     const title =
@@ -94,15 +110,16 @@ export async function POST(req: NextRequest) {
 
     // 站点图标只认 <link rel="icon">，不要用 og:image（那是分享大图/截图，不是图标）
     let icon = pickIconHref(html)
-    if (icon && !/^https?:\/\//i.test(icon)) {
+    if (icon) {
       try {
-        icon = new URL(icon, target.href).href
+        const iconUrl = new URL(icon, target.href)
+        icon = iconUrl.protocol === 'http:' || iconUrl.protocol === 'https:' ? iconUrl.href : null
       } catch {
         icon = null
       }
     }
     if (!icon) {
-      icon = `https://www.google.com/s2/favicons?domain=${target.hostname}&sz=128`
+      icon = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(target.hostname)}&sz=128`
     }
 
     return jsonOk({

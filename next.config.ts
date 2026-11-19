@@ -12,52 +12,77 @@ function initCloudflareForDev() {
   void initOpenNextCloudflareForDev({ configPath: wranglerConfigPath, ...(process.env.CF_LOCAL_PERSIST_PATH ? { persist: { path: resolve(process.env.CF_LOCAL_PERSIST_PATH) } } : {}) });
 }
 
-const nextConfig: NextConfig = {
-  poweredByHeader: false,
-  devIndicators: false,
+function buildContentSecurityPolicy(isDev: boolean): string {
+  const scriptSrc = isDev
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://platform.twitter.com"
+    : "script-src 'self' 'unsafe-inline' https://platform.twitter.com"
 
-  images: {
-    unoptimized: true,
-  },
+  return [
+    "default-src 'self'",
+    scriptSrc,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    "connect-src 'self' https:",
+    "media-src 'self' blob: https:",
+    "frame-src 'self' https://platform.twitter.com https://syndication.twitter.com https://www.youtube.com https://www.youtube-nocookie.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'self'",
+  ].join('; ')
+}
 
-  turbopack: {
-    root: resolve(process.cwd()),
-    // CSS inlining only needs string/DOM parsing. Node resource fetching pulls
-    // Undici's runtime-compiled WASM into Workers, where code generation is forbidden.
-    resolveAlias: {
-      juice: 'juice/client',
-      cheerio: 'cheerio/slim',
+function createNextConfig(isDev: boolean): NextConfig {
+  return {
+    poweredByHeader: false,
+    devIndicators: false,
+
+    images: {
+      unoptimized: true,
     },
-  },
 
-  headers: async () => [
-    ...['/admin/:path*', '/api/admin/:path*', '/editor', '/api/editor/:path*'].map(source => ({
-      source, headers: [
-        { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
-        { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
-      ],
-    })),
-    {
-      source: '/(.*)',
-      headers: [
-        { key: 'X-Content-Type-Options', value: 'nosniff' },
-        { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-        { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-      ],
+    turbopack: {
+      root: resolve(process.cwd()),
+      // CSS inlining only needs string/DOM parsing. Node resource fetching pulls
+      // Undici's runtime-compiled WASM into Workers, where code generation is forbidden.
+      resolveAlias: {
+        juice: 'juice/client',
+        cheerio: 'cheerio/slim',
+      },
     },
-  ],
 
-  experimental: {
-    workerThreads: false,
-    cpus: 1,
-  },
-};
+    headers: async () => [
+      ...['/admin/:path*', '/api/admin/:path*', '/editor', '/api/editor/:path*'].map(source => ({
+        source, headers: [
+          { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+        ],
+      })),
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Content-Security-Policy', value: buildContentSecurityPolicy(isDev) },
+        ],
+      },
+    ],
+
+    experimental: {
+      workerThreads: false,
+      cpus: 1,
+    },
+  }
+}
 
 export default function config(phase: string): NextConfig {
-  if (phase === PHASE_DEVELOPMENT_SERVER) {
+  const isDev = phase === PHASE_DEVELOPMENT_SERVER;
+  if (isDev) {
     initCloudflareForDev();
   }
 
-  return nextConfig;
+  return createNextConfig(isDev);
 }

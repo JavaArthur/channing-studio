@@ -119,7 +119,10 @@ function fromBase64(input: string): Uint8Array {
 }
 
 async function deriveAesKey(secret: string): Promise<CryptoKey> {
-  const normalized = secret.trim() || 'qmblog-ai-config'
+  const normalized = secret.trim()
+  if (!normalized) {
+    throw new Error('缺少加密密钥 AI_CONFIG_ENCRYPTION_SECRET，已拒绝加解密 AI 供应商凭据')
+  }
   const cached = keyCache.get(normalized)
   if (cached) return cached
 
@@ -169,17 +172,17 @@ export function maskApiKey(apiKey: string): string {
 
 export function resolveAiConfigSecret(env?: Record<string, unknown>): string {
   const envSecret = typeof env?.AI_CONFIG_ENCRYPTION_SECRET === 'string'
-    ? env.AI_CONFIG_ENCRYPTION_SECRET
+    ? env.AI_CONFIG_ENCRYPTION_SECRET.trim()
     : ''
   const envSalt = typeof env?.ADMIN_TOKEN_SALT === 'string'
-    ? env.ADMIN_TOKEN_SALT
+    ? env.ADMIN_TOKEN_SALT.trim()
     : ''
 
   const secret = (
     envSecret ||
-    process.env.AI_CONFIG_ENCRYPTION_SECRET ||
+    process.env.AI_CONFIG_ENCRYPTION_SECRET?.trim() ||
     envSalt ||
-    process.env.ADMIN_TOKEN_SALT
+    process.env.ADMIN_TOKEN_SALT?.trim()
   )
   if (!secret) throw new Error('AI 配置加密密钥未配置，请设置 AI_CONFIG_ENCRYPTION_SECRET')
   return secret
@@ -209,8 +212,9 @@ export async function decryptApiKey(value: string, secret: string): Promise<stri
   const parts = normalized.split(':')
   if (parts.length !== 4) return ''
 
+  const key = await deriveAesKey(secret)
+
   try {
-    const key = await deriveAesKey(secret)
     const iv = new Uint8Array(fromBase64(parts[2]))
     const cipherBytes = new Uint8Array(fromBase64(parts[3]))
     const decrypted = await crypto.subtle.decrypt(

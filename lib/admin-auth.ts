@@ -44,8 +44,36 @@ export async function isAdminAuthConfigured(): Promise<boolean> {
 export const COOKIE_NAME = 'qmblog_admin'
 export const COOKIE_MAX_AGE = 60 * 60 * 24 * 30 // 30 天
 
+interface SubtleWithTimingSafeEqual extends SubtleCrypto {
+  timingSafeEqual?: (a: BufferSource, b: BufferSource) => boolean
+}
+
 /**
- * 生成会话 token（SHA-256 of password+salt）
+ * 常量时间字符串比对：先做 SHA-256 归一化为等长 32 字节，再使用 timingSafeEqual / XOR 循环比对
+ */
+export async function constantTimeEqual(a: string, b: string): Promise<boolean> {
+  const encoder = new TextEncoder()
+  const [digestA, digestB] = await Promise.all([
+    crypto.subtle.digest('SHA-256', encoder.encode(a)),
+    crypto.subtle.digest('SHA-256', encoder.encode(b)),
+  ])
+  const bytesA = new Uint8Array(digestA)
+  const bytesB = new Uint8Array(digestB)
+
+  const subtle = crypto.subtle as SubtleWithTimingSafeEqual
+  if (typeof subtle.timingSafeEqual === 'function') {
+    return subtle.timingSafeEqual(bytesA, bytesB)
+  }
+
+  let diff = bytesA.length ^ bytesB.length
+  for (let i = 0; i < bytesA.length; i += 1) {
+    diff |= bytesA[i] ^ bytesB[i]
+  }
+  return diff === 0
+}
+
+/**
+ * 生成会话 token（HMAC-SHA256 using salt as key and password as message）
  * 同一实例永远返回相同值，可安全用于 cookie 比对
  */
 export async function getSessionToken(): Promise<string> {
@@ -53,25 +81,33 @@ export async function getSessionToken(): Promise<string> {
   if (!password || !salt) return ''
 
   const encoder = new TextEncoder()
-  const data = encoder.encode(`${password}:${salt}`)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(salt),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(password))
+  const hashArray = Array.from(new Uint8Array(signature))
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-/** 校验密码是否正确 */
+/** 校验密码是否正确（常量时间比对） */
 export async function verifyPassword(password: string): Promise<boolean> {
   const config = await getAdminAuthConfig()
-  return Boolean(config.password) && password === config.password
+  if (!config.password || !password) return false
+  return constantTimeEqual(password, config.password)
 }
 
-/** 从请求 cookie 中校验 admin 会话 */
+/** 从请求 cookie 中校验 admin 会话（常量时间比对） */
 export async function isAdminAuthenticated(
   cookieValue: string | undefined
 ): Promise<boolean> {
   if (!cookieValue) return false
   const expected = await getSessionToken()
-  return Boolean(expected) && cookieValue === expected
+  if (!expected) return false
+  return constantTimeEqual(cookieValue, expected)
 }
 
 // ── API Token 认证 ──
