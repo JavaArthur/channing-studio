@@ -1,0 +1,321 @@
+/* ==========================================================================
+   Channing Studio · Article Reading Prose (.rich-content)
+   Loaded only on article routes (/[slug]) and private admin/editor previews.
+   ========================================================================== */
+
+.rich-content {
+  color: var(--article-body);
+  max-width: none;
+  font-size: 1rem;
+  line-height: 1.85;
+  font-family: var(--body-font, inherit);
+}
+
+.article-display-title {
+  font-family: var(--font-serif);
+}
+
+@media (min-width: 640px) {
+  .rich-content {
+    font-size: 1.06rem;
+    line-height: 1.9;
+  }
+}
+
+.rich-content > :first-child {
+  margin-top: 0;
+}
+
+.rich-content > * + * {
+  margin-top: 1.2em;
+}
+
+.rich-content h1,
+.rich-content h2,
+.rich-content h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.28;
+  color: var(--article-heading);
+}
+
+.rich-content h1 {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+}
+
+.rich-content h2 {
+  margin-top: 1.85em;
+  font-size: clamp(1.45rem, 2.8vw, 1.85rem);
+}
+
+.rich-content h3 {
+  margin-top: 1.5em;
+  font-size: clamp(1.18rem, 2vw, 1.38rem);
+}
+
+.rich-content strong {
+  color: var(--article-heading);
+  font-weight: 600;
+}
+
+.rich-content p,
+.rich-content li {
+  color: inherit;
+}
+
+.rich-content a {
+  color: var(--editor-link);
+  text-decoration: underline;
+  text-decoration-color: var(--atelier-vermilion-line);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.24em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  transition: text-decoration-color 140ms ease, color 140ms ease;
+}
+
+.rich-content a:hover {
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+}
+
+.rich-content ul,
+.rich-content ol {
+  padding-left: 1.4rem;
+}
+
+.rich-content ul {
+  list-style: disc;
+}
+
+.rich-content ol {
+  list-style: decimal;
+}
+
+.rich-content li + li {
+  margin-top: 0.42rem;
+}
+
+.rich-content blockquote {
+  border-left: 2px solid var(--article-quote-border);
+  background: var(--editor-quote-bg);
+  padding: 0.95rem 1.25rem;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--article-quote);
+  font-style: normal;
+}
+
+.rich-content blockquote > * + * {
+  margin-top: 0.6em;
+}
+
+.rich-content blockquote p:first-child {
+  margin-top: 0;
+}
+
+.rich-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Nested blockquotes */
+.rich-content blockquote blockquote {
+  border-left-color: var(--article-quote-nested-border);
+  background: var(--article-quote-nested-bg);
+  margin-top: 0.6em;
+}
+
+/* Monograph tables */
+.rich-content table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--editor-line);
+  margin-block: 1.35em;
+  font-size: 0.95em;
+}
+
+.rich-content table th,
+.rich-content table td {
+  border: 1px solid var(--editor-line);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+  min-width: 80px;
+}
+
+.rich-content table th {
+  background: var(--editor-soft);
+  font-weight: 600;
+  color: var(--editor-ink);
+  font-size: 0.9em;
+  letter-spacing: 0.01em;
+}
+
+.rich-content table td {
+  background: var(--editor-panel);
+}
+
+.rich-content table tr:nth-child(even) td {
+  background: var(--background);
+}
+
+.rich-content hr {
+  border: 0;
+  border-top: 1px solid var(--editor-line);
+  margin-block: 2.25rem;
+}
+
+.rich-content code {
+  border: 1px solid var(--editor-code-border);
+  background: var(--editor-code-bg);
+  border-radius: var(--radius-xs);
+  padding: 0.12rem 0.36rem;
+  font-family: var(--font-mono-tech);
+  font-size: 0.89em;
+}
+
+.rich-content pre {
+  overflow-x: auto;
+  border: 1px solid var(--editor-code-border);
+  border-radius: var(--radius-sm);
+  background: var(--editor-code-bg);
+  color: var(--article-body);
+  padding: 1.05rem 1.2rem;
+  line-height: 1.7;
+  font-size: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .rich-content pre {
+    font-size: 0.9rem;
+  }
+}
+
+.rich-content pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.rich-content img {
+  display: block;
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--editor-line);
+}
+
+.rich-content ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.rich-content ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.rich-content ul[data-type="taskList"] li > label {
+  margin-top: 0.2rem;
+  user-select: none;
+}
+
+.rich-content ul[data-type="taskList"] li > div {
+  flex: 1;
+}
+
+.rich-content ul[data-type="taskList"] input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--atelier-vermilion);
+}
+
+/* ── Kaiti Reading Mode Typography ── */
+[data-font="kaiti"] .rich-content {
+  font-size: 1.08rem;
+  line-height: 2;
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 640px) {
+  [data-font="kaiti"] .rich-content {
+    font-size: 1.14rem;
+    line-height: 2.05;
+  }
+}
+
+[data-font="kaiti"] :is(.rich-content) h1,
+[data-font="kaiti"] :is(.rich-content) h2,
+[data-font="kaiti"] :is(.rich-content) h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+[data-font="kaiti"] .article-display-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+}
+
+/* ── Embedded Video, Audio, YouTube, Twitter & Math Blocks ── */
+.rich-content video {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--editor-line);
+  background: var(--editor-soft);
+}
+
+.rich-content audio {
+  max-width: 100%;
+  margin: 1rem 0;
+}
+
+.rich-content div[data-youtube-video] {
+  position: relative;
+  width: 100% !important;
+  height: 0 !important;
+  padding-bottom: 56.25%;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--editor-line);
+  overflow: hidden;
+  background: var(--editor-soft);
+}
+
+.rich-content div[data-youtube-video] iframe {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0;
+}
+
+.rich-content div[data-twitter-src] {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+  background: transparent;
+}
+
+.math-display {
+  text-align: center;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+
+.math-inline {
+  display: inline;
+}
+
+.math-block-wrapper {
+  margin: 1.5rem 0;
+  text-align: center;
+  overflow-x: auto;
+}

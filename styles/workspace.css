@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Channing Studio · Workspace & Shared Control Primitives
-   Obsidian & Warm Paper · Precision Editorial Atelier
+   Channing Studio · Public Header & Shared Global Control Primitives
+   Admin/workbench-only rules live in styles/admin/*.css.
    ========================================================================== */
 
 a,
@@ -99,70 +99,7 @@ textarea {
   background: var(--editor-soft);
 }
 
-/* ── Shared Brain / Workbench Surface & Control Primitives ── */
-.brain-panel,
-.admin-card {
-  border: 1px solid var(--editor-line);
-  background: var(--editor-panel);
-  border-radius: var(--radius-sm, 6px);
-  padding: 20px;
-}
-
-.brain-input {
-  min-height: 44px;
-  min-width: 44px;
-  width: 100%;
-  border: 1px solid var(--editor-line);
-  border-radius: var(--radius-sm, 6px);
-  padding: 10px 12px;
-  background: var(--editor-panel);
-  color: var(--editor-ink);
-  transition: border-color 140ms ease, box-shadow 140ms ease;
-}
-
-.brain-input:focus {
-  outline: none;
-  border-color: var(--focus-ring);
-  box-shadow: 0 0 0 2px var(--atelier-vermilion-soft);
-}
-
-.brain-button {
-  min-height: 44px;
-  min-width: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid transparent;
-  padding: 10px 16px;
-  background: var(--editor-accent);
-  color: var(--editor-accent-ink);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 140ms ease, background-color 140ms ease, border-color 140ms ease;
-}
-
-.brain-button:hover:not(:disabled) {
-  opacity: 0.92;
-}
-
-.brain-button:disabled {
-  background: var(--cta-disabled-bg);
-  color: var(--cta-disabled-ink);
-  cursor: not-allowed;
-}
-
-.brain-button[aria-busy="true"] {
-  cursor: progress;
-}
-
-.brain-button:not(:disabled):active,
-.brain-secondary:not(:disabled):active {
-  transform: translateY(1px);
-}
-
+/* Shared secondary action button (used in FrontPostAdminBoundary & workbench) */
 .brain-secondary {
   background: var(--editor-panel);
   box-shadow: none;
@@ -189,13 +126,8 @@ textarea {
   border-color: var(--editor-line-strong);
 }
 
-.brain-kicker {
-  font-family: var(--font-mono-tech);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--editor-muted);
-  font-weight: 500;
+.brain-secondary:not(:disabled):active {
+  transform: translateY(1px);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -212,167 +144,17 @@ textarea {
   [role="tooltip"] {
     display: none;
   }
-}
 
-@media (max-width: 1023px) {
-  .editor-settings-panel {
-    position: static !important;
-    width: 100% !important;
-    height: auto !important;
-    border-left: 0;
-    border-top: 1px solid var(--editor-line);
-  }
-}
-
-/* Primary actions opt into Signal Vermilion; structural fills remain Studio Carbon. */
-.brain-cta {
-  background: var(--cta-bg);
-  color: var(--cta-ink);
-  border-color: var(--cta-bg);
-}
-
-.brain-cta:hover:not(:disabled) {
-  background: var(--cta-bg-hover);
-  border-color: var(--cta-bg-hover);
-  opacity: 1;
-}
-
-.brain-cta:disabled {
-  background: var(--cta-disabled-bg);
-  color: var(--cta-disabled-ink);
-  border-color: transparent;
-  opacity: 1;
-  cursor: not-allowed;
-}
-
-@media (max-width: 639px) {
   .public-header-inner {
     padding-inline: 16px;
     gap: 12px;
   }
+
   .public-header-inner > div:last-child {
     gap: 4px;
   }
+
   .brand {
     gap: 8px;
-  }
-}
-
-/* ── Scoped Workspace Overflow, Validation & Pointer Accessibility ── */
-.workspace-shell .workspace-nav,
-.workspace-shell .workspace-nav-main,
-.workspace-shell .workspace-nav-group,
-.workspace-shell .workspace-collection-nav,
-.admin-dialog .admin-dialog-header > div {
-  min-width: 0;
-}
-
-.workspace-shell .workspace-nav a > span:not(.workspace-nav-count) {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.workspace-shell .workspace-nav-count {
-  flex-shrink: 0;
-  font-variant-numeric: tabular-nums;
-}
-
-.workspace-shell .workspace-sidebar {
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.admin-dialog[data-state]:not(.admin-sheet) {
-  width: min(620px, calc(100% - 32px));
-}
-
-.admin-dialog.admin-sheet {
-  max-width: 100%;
-}
-
-.admin-dialog .admin-dialog-header {
-  flex-shrink: 0;
-}
-
-.admin-dialog .admin-dialog-header h2 {
-  overflow-wrap: anywhere;
-}
-
-.admin-dialog .admin-dialog-header > button {
-  flex-shrink: 0;
-}
-
-.admin-dialog .admin-dialog-body {
-  min-height: 0;
-}
-
-.admin-dialog .admin-form-actions {
-  flex-wrap: wrap;
-}
-
-.admin-dialog .admin-form-error {
-  padding: 8px 12px;
-  border-left: 2px solid var(--danger);
-  background: var(--danger-soft-bg);
-  color: var(--danger);
-  border-radius: 0 var(--radius-xs, 4px) var(--radius-xs, 4px) 0;
-}
-
-:is(.workspace-shell, .admin-dialog) :is(.admin-input, .brain-input)[aria-invalid="true"],
-.studio-login input[aria-invalid="true"] {
-  border-color: var(--danger);
-}
-
-:is(.workspace-shell, .admin-dialog) :is(.admin-input, .brain-input):disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-:is(.workspace-shell, .admin-dialog) .admin-button[aria-busy="true"] {
-  cursor: progress;
-}
-
-.studio-login :is(input, button, a):focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
-}
-
-.studio-login input:focus-visible {
-  outline-offset: 0;
-}
-
-.studio-login .studio-login-feedback {
-  min-height: 1.5em;
-}
-
-.studio-login button[aria-busy="true"] {
-  cursor: progress;
-}
-
-@media (max-width: 639px) {
-  .admin-dialog.admin-sheet {
-    width: 100%;
-  }
-  .admin-dialog[data-state]:not(.admin-sheet) {
-    width: calc(100% - 24px);
-  }
-  :is(.workspace-shell, .admin-dialog)
-    :is(
-      input.admin-input,
-      select.admin-input,
-      textarea.admin-input,
-      input.brain-input,
-      textarea.brain-input
-    ) {
-    font-size: 16px;
-  }
-}
-
-@media (pointer: coarse) {
-  .admin-dialog .admin-dialog-header > button,
-  .workspace-shell .workspace-nav a,
-  .workspace-shell .workspace-launch-btn {
-    min-height: 44px;
-    min-width: 44px;
   }
 }

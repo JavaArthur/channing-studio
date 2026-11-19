@@ -1,3 +1,5 @@
+import '@/styles/article-prose.css'
+import '@/styles/editor-prose.css'
 import '@/styles/admin.css'
 import '@/styles/learning.css'
 import '@/styles/operations.css'

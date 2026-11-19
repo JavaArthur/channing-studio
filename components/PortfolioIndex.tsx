@@ -1,4 +1,5 @@
 import { ArrowUpRight } from 'lucide-react'
+import '@/styles/portfolio.css'
 import {
   portfolioHref,
   PORTFOLIO_STATUS_LABELS,

@@ -1,0 +1,63 @@
+/* ==========================================================================
+   Channing Studio · Atelier Editor Chrome (/editor)
+   ========================================================================== */
+
+@media (max-width: 1023px) {
+  .editor-settings-panel {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    border-left: 0;
+    border-top: 1px solid var(--editor-line);
+  }
+}
+
+/* ── 07. Atelier Editor Chrome (/editor) ── */
+.article-editor-shell {
+  --control-height: 34px;
+  background: var(--editor-app-bg);
+  color: var(--editor-ink);
+}
+
+.article-editor-shell > header {
+  background: color-mix(in srgb, var(--atelier-rail) 90%, transparent);
+  border-bottom: 1px solid var(--editor-line);
+  backdrop-filter: blur(12px);
+}
+
+.article-editor-shell header button {
+  border-radius: var(--radius-xs);
+}
+
+.article-editor-shell .editor-settings-panel {
+  position: fixed !important;
+  right: 0;
+  top: 56px !important;
+  z-index: 50;
+  max-width: 100vw;
+  background: var(--atelier-rail);
+  border-left: 1px solid var(--editor-line);
+  box-shadow: -12px 0 32px rgba(20, 19, 17, 0.08);
+}
+
+.article-editor-shell .editor-settings-panel > div {
+  max-width: 100vw;
+}
+
+.article-editor-shell .editor-settings-panel :is(input, textarea, select) {
+  border-radius: var(--radius-xs);
+  background: var(--editor-panel);
+  border-color: var(--editor-line);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.article-editor-shell .editor-settings-panel :is(input, textarea, select):focus {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--atelier-vermilion-soft);
+}
+
+.article-editor-shell .editor-title-textarea {
+  font-family: var(--font-editorial-serif), var(--font-body);
+  letter-spacing: -0.025em;
+}
+

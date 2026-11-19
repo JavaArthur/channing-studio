@@ -1,0 +1,485 @@
+/* ==========================================================================
+   Channing Studio · Private Workbench Shell, Navigation Rail & Topbar
+   ========================================================================== */
+
+/* ── Shared Workbench Surface & Control Primitives (extracted from workspace.css) ── */
+.brain-panel,
+.admin-card {
+  border: 1px solid var(--editor-line);
+  background: var(--editor-panel);
+  border-radius: var(--radius-sm, 6px);
+  padding: 20px;
+}
+
+.brain-input {
+  min-height: 44px;
+  min-width: 44px;
+  width: 100%;
+  border: 1px solid var(--editor-line);
+  border-radius: var(--radius-sm, 6px);
+  padding: 10px 12px;
+  background: var(--editor-panel);
+  color: var(--editor-ink);
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.brain-input:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--atelier-vermilion-soft);
+}
+
+.brain-button {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid transparent;
+  padding: 10px 16px;
+  background: var(--editor-accent);
+  color: var(--editor-accent-ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 140ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+
+.brain-button:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.brain-button:disabled {
+  background: var(--cta-disabled-bg);
+  color: var(--cta-disabled-ink);
+  cursor: not-allowed;
+}
+
+.brain-button[aria-busy="true"] {
+  cursor: progress;
+}
+
+.brain-button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.brain-kicker {
+  font-family: var(--font-mono-tech);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--editor-muted);
+  font-weight: 500;
+}
+
+/* Primary actions opt into Signal Vermilion; structural fills remain Studio Carbon. */
+.brain-cta {
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  border-color: var(--cta-bg);
+}
+
+.brain-cta:hover:not(:disabled) {
+  background: var(--cta-bg-hover);
+  border-color: var(--cta-bg-hover);
+  opacity: 1;
+}
+
+.brain-cta:disabled {
+  background: var(--cta-disabled-bg);
+  color: var(--cta-disabled-ink);
+  border-color: transparent;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+/* ── Scoped Workspace Overflow & Scrolling ── */
+.workspace-shell .workspace-nav,
+.workspace-shell .workspace-nav-main,
+.workspace-shell .workspace-nav-group,
+.workspace-shell .workspace-collection-nav {
+  min-width: 0;
+}
+
+.workspace-shell .workspace-nav a > span:not(.workspace-nav-count) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.workspace-shell .workspace-nav-count {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.workspace-shell .workspace-sidebar {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.workspace-shell {
+  --control-height: 34px;
+  --sidebar-width: 256px;
+  background: var(--background);
+  color: var(--editor-ink);
+  min-height: 100dvh;
+  font-size: 13px;
+}
+
+/* ── 01. Architectural Left Navigation Rail (256px Desktop) ── */
+.workspace-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-width);
+  padding: 16px 12px 12px;
+  background: var(--atelier-rail);
+  border-right: 1px solid var(--editor-line);
+  display: flex;
+  flex-direction: column;
+  z-index: 45;
+}
+
+.workspace-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 6px 14px;
+  color: var(--editor-ink);
+  text-decoration: none;
+}
+
+.workspace-brand .brand-mark {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+  letter-spacing: -0.02em;
+  border-radius: var(--radius-xs);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.workspace-brand-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.workspace-brand-title {
+  font-size: 14.5px;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  color: var(--editor-ink);
+}
+
+.workspace-brand small {
+  display: block;
+  font-family: var(--font-mono-tech);
+  font-size: 9.5px;
+  color: var(--stone-gray);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-top: 3px;
+}
+
+/* Sidebar Quick-Action Launch Strip */
+.workspace-launch-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0 2px 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--editor-line);
+}
+
+.workspace-launch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 31px;
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--editor-line-strong);
+  background: var(--editor-panel);
+  color: var(--editor-ink);
+  font-size: 11.5px;
+  font-weight: 550;
+  white-space: nowrap;
+  transition: background-color 130ms ease, border-color 130ms ease, color 130ms ease;
+}
+
+.workspace-launch-btn:hover {
+  background: var(--editor-soft);
+  border-color: var(--editor-ink);
+}
+
+.workspace-launch-btn.is-primary {
+  background: var(--cta-bg);
+  border-color: var(--cta-bg);
+  color: var(--cta-ink);
+}
+
+.workspace-launch-btn.is-primary:hover {
+  background: var(--cta-bg-hover);
+  border-color: var(--cta-bg-hover);
+}
+
+/* Structured Navigation Sections */
+.workspace-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 14px;
+}
+
+.workspace-nav-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.workspace-nav-group,
+.workspace-nav-secondary {
+  display: grid;
+  gap: 2px;
+}
+
+.workspace-nav-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px 4px;
+  font-family: var(--font-mono-tech);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--stone-gray);
+}
+
+.workspace-nav-code {
+  color: var(--atelier-vermilion);
+}
+
+.workspace-nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 10px;
+  min-height: 32px;
+  border-radius: var(--radius-xs);
+  color: var(--editor-muted);
+  font-size: 12.5px;
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.workspace-nav a:hover {
+  background: var(--editor-soft);
+  color: var(--editor-ink);
+}
+
+.workspace-nav a[aria-current="page"],
+.workspace-nav a[aria-current] {
+  background: var(--atelier-vermilion-soft);
+  color: var(--editor-ink);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--atelier-vermilion);
+}
+
+.workspace-nav a[aria-current] svg {
+  color: var(--atelier-vermilion);
+}
+
+.workspace-nav a svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.workspace-nav-secondary {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--editor-line);
+}
+
+.workspace-nav-count {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-family: var(--font-mono-tech);
+  font-size: 10.5px;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--editor-line);
+  background: var(--editor-soft);
+  color: var(--editor-ink);
+}
+
+.workspace-nav-count[data-tone="vermilion"] {
+  border-color: var(--atelier-vermilion-line);
+  background: var(--atelier-vermilion-soft);
+  color: var(--atelier-vermilion);
+}
+
+.workspace-sidebar-footer {
+  padding: 10px 6px 0;
+  margin-top: 10px;
+  border-top: 1px solid var(--editor-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--editor-muted);
+  font-size: 11.5px;
+}
+
+.workspace-footer-site {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 6px;
+  border-radius: var(--radius-xs);
+  color: var(--editor-muted);
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.workspace-footer-site:hover {
+  color: var(--editor-ink);
+  background: var(--editor-soft);
+}
+
+.workspace-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  min-width: 32px;
+  padding: 6px;
+  border-radius: var(--radius-xs);
+  border: 1px solid transparent;
+  color: var(--editor-muted);
+  cursor: pointer;
+  transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
+}
+
+.workspace-logout-btn:hover {
+  color: var(--danger);
+  background: var(--danger-soft-bg);
+  border-color: var(--danger-line);
+}
+
+/* ── 02. Workbench Body & Topbar (Preserves 40px height for Library Density!) ── */
+.workspace-body {
+  padding-left: var(--sidebar-width);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-topbar {
+  height: 40px;
+  padding: 0 20px;
+  background: var(--atelier-rail);
+  border-bottom: 1px solid var(--editor-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workspace-private {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono-tech);
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  color: var(--editor-muted);
+}
+
+.workspace-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.workspace-topbar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: var(--radius-xs);
+  border: 1px solid transparent;
+  font-size: 11.5px;
+  color: var(--editor-muted);
+  white-space: nowrap;
+  transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease;
+}
+
+.workspace-topbar-link:hover {
+  color: var(--editor-ink);
+  background: var(--editor-panel);
+  border-color: var(--editor-line);
+}
+
+.workspace-topbar button {
+  height: 28px;
+  min-height: 28px;
+  width: auto;
+  min-width: 28px;
+  padding: 4px 7px;
+  border-radius: var(--radius-xs);
+}
+
+.workspace-mobile-brand,
+.workspace-mobile-nav {
+  display: none;
+}
+
+.workspace-content {
+  padding: 12px 24px 28px;
+  min-width: 0;
+  flex: 1;
+}
+
+.workspace-content:focus {
+  outline: none;
+}
+
+/* The private workspace is functional UI: headings stay in the sans family. */
+:is(.workspace-shell, .admin-dialog, .admin-menu) :is(h1, h2, h3, h4) {
+  font-family: var(--font-geist-sans), "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.workspace-page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 6px 0 20px;
+}
+
+.workspace-page-heading h1,
+.workspace-content > div > header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  margin: 0;
+}
+
+.workspace-page-heading p {
+  margin-top: 5px;
+  color: var(--editor-muted);
+  font-size: 12px;
+}
+
+.workspace-breadcrumb {
+  display: none;
+}
+

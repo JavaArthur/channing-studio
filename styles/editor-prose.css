@@ -1,0 +1,631 @@
+/* ==========================================================================
+   Channing Studio · Tiptap / Novel Editor Prose & Interactive Node Surfaces
+   Loaded only in /editor and /admin layouts, never on public pages.
+   ========================================================================== */
+
+/* Compact editor icons keep their visual size; margins keep hit areas separate. */
+.hit-44 {
+  position: relative;
+  min-height: 32px;
+  min-width: 32px;
+  margin: 6px;
+}
+
+.hit-44::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translate(-50%, -50%);
+}
+
+/* The publishing preview preserves its platform paper while the frame uses studio tokens. */
+/* Hallmark · dismissed 7b · WeChat publication preview reproduces the destination's white paper; it is not a Studio brand surface. */
+.wechat-studio-device {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  background: var(--editor-panel);
+  border: 1px solid var(--editor-line-strong);
+}
+
+.wechat-studio-device-mobile {
+  width: 100%;
+  max-width: 520px;
+  height: min(1080px, calc(100vh - 10rem));
+  min-height: 620px;
+  border-radius: var(--radius-md);
+  padding: 8px;
+}
+
+.wechat-studio-device-tablet {
+  width: 100%;
+  max-width: 720px;
+  height: min(960px, calc(100vh - 10rem));
+  min-height: 620px;
+  border-radius: var(--radius-md);
+  padding: 8px;
+}
+
+.wechat-studio-device-screen {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--publication-paper);
+}
+
+.wechat-studio-device-scroll {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: transparent;
+}
+
+.wechat-studio-device-home {
+  display: none;
+}
+
+/* ── Editorial Prose & Novel Editor Surfaces ── */
+.editor-surface {
+  min-height: calc(100vh - 13rem);
+}
+
+.novel-prose {
+  min-height: calc(100vh - 13rem);
+  padding: 2.75rem 1.5rem 3rem;
+  color: var(--article-body);
+  font-size: 1.06rem;
+  line-height: 1.9;
+  outline: none;
+  caret-color: var(--atelier-vermilion);
+}
+
+@media (min-width: 640px) {
+  .novel-prose {
+    padding-inline: 2.5rem;
+  }
+}
+
+.editor-main-prose {
+  min-height: calc(100vh - 16rem);
+  padding: 0 0 3rem;
+}
+
+.inline-main-prose {
+  min-height: auto;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.85;
+}
+
+@media (min-width: 640px) {
+  .inline-main-prose {
+    font-size: 1.06rem;
+    line-height: 1.9;
+  }
+}
+
+.editor-title-textarea,
+.editor-title-textarea:focus,
+.editor-title-textarea:focus-visible {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+}
+
+/* Tiptap placeholders are pseudo-elements rather than native placeholders. */
+.novel-prose .is-empty::before,
+.novel-prose p.is-editor-empty:first-child::before,
+.novel-prose [data-placeholder]::before {
+  color: var(--stone-gray);
+  opacity: 1;
+}
+
+.novel-prose > :first-child {
+  margin-top: 0;
+}
+
+.novel-prose > * + * {
+  margin-top: 1.2em;
+}
+
+.novel-prose h1,
+.novel-prose h2,
+.novel-prose h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.28;
+  color: var(--article-heading);
+}
+
+.novel-prose h1 {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+}
+
+.novel-prose h2 {
+  margin-top: 1.85em;
+  font-size: clamp(1.45rem, 2.8vw, 1.85rem);
+}
+
+.novel-prose h3 {
+  margin-top: 1.5em;
+  font-size: clamp(1.18rem, 2vw, 1.38rem);
+}
+
+.novel-prose strong {
+  color: var(--article-heading);
+  font-weight: 600;
+}
+
+.novel-prose p,
+.novel-prose li {
+  color: inherit;
+}
+
+.novel-prose a {
+  color: var(--editor-link);
+  text-decoration: underline;
+  text-decoration-color: var(--atelier-vermilion-line);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.24em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  transition: text-decoration-color 140ms ease, color 140ms ease;
+}
+
+.novel-prose a:hover {
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+}
+
+.novel-prose ul,
+.novel-prose ol {
+  padding-left: 1.4rem;
+}
+
+.novel-prose ul {
+  list-style: disc;
+}
+
+.novel-prose ol {
+  list-style: decimal;
+}
+
+.novel-prose li + li {
+  margin-top: 0.42rem;
+}
+
+.novel-prose blockquote {
+  border-left: 2px solid var(--article-quote-border);
+  background: var(--editor-quote-bg);
+  padding: 0.95rem 1.25rem;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--article-quote);
+  font-style: normal;
+}
+
+.novel-prose blockquote > * + * {
+  margin-top: 0.6em;
+}
+
+.novel-prose blockquote p:first-child {
+  margin-top: 0;
+}
+
+.novel-prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.novel-prose blockquote blockquote {
+  border-left-color: var(--article-quote-nested-border);
+  background: var(--article-quote-nested-bg);
+  margin-top: 0.6em;
+}
+
+.novel-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--editor-line);
+  margin-block: 1.35em;
+  font-size: 0.95em;
+}
+
+.novel-prose table th,
+.novel-prose table td {
+  border: 1px solid var(--editor-line);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+  min-width: 80px;
+}
+
+.novel-prose table th {
+  background: var(--editor-soft);
+  font-weight: 600;
+  color: var(--editor-ink);
+  font-size: 0.9em;
+  letter-spacing: 0.01em;
+}
+
+.novel-prose table td {
+  background: var(--editor-panel);
+}
+
+.novel-prose table tr:nth-child(even) td {
+  background: var(--background);
+}
+
+/* Selected table cell in editor */
+.novel-prose table .selectedCell {
+  background: var(--editor-selection);
+}
+
+.novel-prose hr {
+  border: 0;
+  border-top: 1px solid var(--editor-line);
+  margin-block: 2.25rem;
+}
+
+.novel-prose code {
+  border: 1px solid var(--editor-code-border);
+  background: var(--editor-code-bg);
+  border-radius: var(--radius-xs);
+  padding: 0.12rem 0.36rem;
+  font-family: var(--font-mono-tech);
+  font-size: 0.89em;
+}
+
+.novel-prose pre {
+  overflow-x: auto;
+  border: 1px solid var(--editor-code-border);
+  border-radius: var(--radius-sm);
+  background: var(--editor-code-bg);
+  color: var(--article-body);
+  padding: 1.05rem 1.2rem;
+  line-height: 1.7;
+}
+
+.novel-prose pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.novel-prose img {
+  display: block;
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--editor-line);
+}
+
+.novel-prose img:hover {
+  cursor: pointer;
+  filter: brightness(0.98);
+}
+
+.novel-prose img.ProseMirror-selectednode {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.novel-prose .ProseMirror-selectednode {
+  background: var(--editor-selection);
+}
+
+/* ── Global Block Drag Handle ── */
+.drag-handle {
+  position: fixed;
+  opacity: 0.4;
+  transition: opacity 0.15s ease;
+  cursor: grab;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  z-index: 50;
+}
+
+.drag-handle.hide {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.drag-handle:hover {
+  opacity: 1 !important;
+  background: var(--editor-soft);
+}
+
+.drag-handle::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 14px;
+  background-color: var(--text-disabled-decor);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='14' fill='currentColor'%3E%3Ccircle cx='3' cy='2' r='1.5'/%3E%3Ccircle cx='7' cy='2' r='1.5'/%3E%3Ccircle cx='3' cy='7' r='1.5'/%3E%3Ccircle cx='7' cy='7' r='1.5'/%3E%3Ccircle cx='3' cy='12' r='1.5'/%3E%3Ccircle cx='7' cy='12' r='1.5'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* ── Image Resize Grips ── */
+.resizable-image-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 1em 0;
+}
+
+.resizable-image {
+  position: relative;
+  display: inline-block;
+  transition: none;
+}
+
+.resizable-image.selected {
+  outline: 2px solid var(--atelier-vermilion);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.resizable-image.resizing {
+  user-select: none;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  background: var(--atelier-vermilion);
+  opacity: 0;
+  transition: opacity 0.15s;
+  border-radius: var(--radius-xs);
+}
+
+.resizable-image:hover .resize-handle,
+.resizable-image.selected .resize-handle {
+  opacity: 0.65;
+}
+
+.resize-handle:hover {
+  opacity: 1 !important;
+}
+
+/* Resize grips stay visually narrow with a full-width touch target. */
+.resize-handle::before {
+  content: "";
+  position: absolute;
+  inset: 0 -18px;
+  min-height: 44px;
+}
+
+.resize-handle-left {
+  left: -4px;
+}
+
+.resize-handle-right {
+  right: -4px;
+}
+
+.editor-image-menu-item {
+  min-height: 44px;
+  min-width: 44px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  color: var(--editor-ink);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.editor-image-menu-item:hover {
+  background: var(--editor-soft);
+}
+
+.editor-image-menu-item-active {
+  background: var(--atelier-vermilion-soft);
+  color: var(--atelier-vermilion);
+}
+
+.novel-prose ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.novel-prose ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.novel-prose ul[data-type="taskList"] li > label {
+  margin-top: 0.2rem;
+  user-select: none;
+}
+
+.novel-prose ul[data-type="taskList"] li > div {
+  flex: 1;
+}
+
+.novel-prose ul[data-type="taskList"] input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--atelier-vermilion);
+}
+
+/* Inline article editor integration */
+.inline-editor .novel-prose {
+  min-height: auto;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.85;
+}
+
+@media (min-width: 640px) {
+  .inline-editor .novel-prose {
+    font-size: 1.06rem;
+    line-height: 1.9;
+  }
+}
+
+.inline-editor .editor-surface {
+  min-height: auto;
+}
+
+/* ── Embedded Video, Audio, YouTube & Twitter in Editor ── */
+.novel-prose video {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--editor-line);
+  background: var(--editor-soft);
+}
+
+.novel-prose audio {
+  max-width: 100%;
+  margin: 1rem 0;
+}
+
+.novel-prose div[data-youtube-video] {
+  position: relative;
+  width: 100% !important;
+  height: 0 !important;
+  padding-bottom: 56.25%;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--editor-line);
+  overflow: hidden;
+  background: var(--editor-soft);
+}
+
+.novel-prose div[data-youtube-video] iframe {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0;
+}
+
+.twitter-node-view {
+  margin: 1.5rem auto;
+  display: flex;
+  justify-content: center;
+  background: transparent;
+  max-width: 100%;
+}
+
+.twitter-node-view > div {
+  width: 100%;
+  max-width: 550px;
+}
+
+.twitter-node-view .twitter-tweet-rendered,
+.twitter-node-view twitter-widget,
+.twitter-node-view .twitter-tweet {
+  margin: 0 auto !important;
+  max-width: 100% !important;
+}
+
+.novel-prose div[data-twitter-src] {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+  background: transparent;
+}
+
+.twitter-node-view iframe {
+  max-width: 100% !important;
+}
+
+/* ── LaTeX / Math Editor Node Views ── */
+.math-node-editing {
+  margin: 1rem 0;
+}
+
+.math-editor-container {
+  border: 1px solid var(--editor-line);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  background: var(--editor-soft);
+}
+
+.math-editor-label {
+  display: block;
+  font-family: var(--font-mono-tech);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--editor-muted);
+  margin-bottom: 0.4rem;
+}
+
+.math-editor-input {
+  width: 100%;
+  font-family: var(--font-code);
+  font-size: 0.9rem;
+  border: 1px solid var(--editor-line);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem;
+  background: var(--editor-panel);
+  resize: vertical;
+  outline: none;
+}
+
+.math-editor-input:focus {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+:root[data-color-mode="light"] .math-editor-input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px var(--focus-ring-outer);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-color-mode]) .math-editor-input:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 0;
+    box-shadow: 0 0 0 4px var(--focus-ring-outer);
+  }
+}
+
+.math-node-rendered {
+  margin: 1rem 0;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+
+.math-node-rendered:hover {
+  background: var(--editor-soft);
+}
+
+.math-selected {
+  background: var(--editor-selection);
+}

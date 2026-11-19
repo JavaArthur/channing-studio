@@ -1,0 +1,275 @@
+/* ==========================================================================
+   Channing Studio · Private Vault Login Gate (/admin/login)
+   ========================================================================== */
+
+.studio-login input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.studio-login :is(input, button, a):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.studio-login input:focus-visible {
+  outline-offset: 0;
+}
+
+.studio-login .studio-login-feedback {
+  min-height: 1.5em;
+}
+
+.studio-login button[aria-busy="true"] {
+  cursor: progress;
+}
+
+/* ── 05. Private Vault Login Gate (/admin/login) ── */
+.studio-login {
+  min-height: 100dvh;
+  background-color: var(--background);
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--editor-line) 42%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--editor-line) 42%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  color: var(--editor-ink);
+  display: flex;
+  flex-direction: column;
+}
+
+.vault-topbar {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vault-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 16px 48px;
+}
+
+.vault-dossier {
+  width: 100%;
+  max-width: 420px;
+  background: var(--editor-panel);
+  border: 1px solid var(--editor-line-strong);
+  border-top: 2px solid var(--atelier-vermilion);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-elevated);
+}
+
+.vault-header {
+  padding: 24px 24px 18px;
+}
+
+.vault-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vault-monogram {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  background: #141311;
+  border: 1px solid var(--editor-line-strong);
+  color: #FAF8F5;
+  font-family: var(--font-mono-tech);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.vault-monogram span {
+  color: #FF6B42;
+  margin-left: 1px;
+}
+
+.vault-kicker {
+  display: block;
+  font-family: var(--font-mono-tech);
+  font-size: 10.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--atelier-vermilion);
+}
+
+.vault-identity h1 {
+  font-size: 21px;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  color: var(--editor-ink);
+  margin: 2px 0 0;
+}
+
+.vault-subtitle {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--editor-muted);
+  line-height: 1.6;
+}
+
+.vault-telemetry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 24px;
+  background: var(--atelier-rail);
+  border-block: 1px solid var(--editor-line);
+  font-family: var(--font-mono-tech);
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  color: var(--stone-gray);
+}
+
+.vault-telemetry span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vault-form {
+  padding: 22px 24px;
+  display: grid;
+  gap: 16px;
+}
+
+.vault-field {
+  display: grid;
+  gap: 7px;
+}
+
+.vault-field label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--editor-ink);
+}
+
+.vault-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vault-input-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--stone-gray);
+  pointer-events: none;
+}
+
+.vault-input {
+  min-height: 44px;
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid var(--editor-line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--background);
+  color: var(--editor-ink);
+  font-size: 15px;
+  transition: border-color 130ms ease, box-shadow 130ms ease;
+}
+
+.vault-input:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--atelier-vermilion-soft);
+}
+
+.studio-login input:-webkit-autofill,
+.studio-login input:-webkit-autofill:hover,
+.studio-login input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--background) inset;
+  -webkit-text-fill-color: var(--editor-ink);
+  caret-color: var(--atelier-vermilion);
+}
+
+.studio-login-feedback {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--editor-muted);
+}
+
+.studio-login-feedback.is-error {
+  padding: 8px 11px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--danger-line);
+  background: var(--danger-soft-bg);
+  color: var(--danger);
+}
+
+.vault-submit {
+  min-height: 44px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--cta-bg);
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.vault-submit:hover:not(:disabled) {
+  background: var(--cta-bg-hover);
+  border-color: var(--cta-bg-hover);
+}
+
+.vault-submit:disabled {
+  background: var(--cta-disabled-bg);
+  border-color: transparent;
+  color: var(--cta-disabled-ink);
+  cursor: not-allowed;
+}
+
+.vault-footer {
+  padding: 12px 24px;
+  border-top: 1px solid var(--editor-line);
+  background: var(--atelier-rail);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vault-back-link {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--editor-muted);
+  transition: color 120ms ease;
+}
+
+.vault-back-link:hover {
+  color: var(--editor-ink);
+}
+
+.vault-stamp {
+  font-family: var(--font-mono-tech);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--stone-gray);
+}
+

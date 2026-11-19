@@ -60,6 +60,15 @@ export async function POST(req: NextRequest) {
       sameSite: 'lax',
     })
 
+    // Lightweight non-HttpOnly UI hint so anonymous public visitors skip /api/admin/session fetches.
+    response.cookies.set('studio_admin_hint', '1', {
+      httpOnly: false,
+      secure: true,
+      path: '/',
+      maxAge: COOKIE_MAX_AGE,
+      sameSite: 'lax',
+    })
+
     return response
   } catch {
     return NextResponse.json({ error: '请求格式错误' }, { status: 400 })

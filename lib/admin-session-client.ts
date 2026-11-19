@@ -7,12 +7,26 @@ interface AdminSessionSnapshot {
   checked: boolean
 }
 
+const ADMIN_HINT_COOKIE = 'studio_admin_hint'
+
 const listeners = new Set<() => void>()
 let snapshot: AdminSessionSnapshot = {
   authenticated: false,
   checked: false,
 }
 let inflight: Promise<void> | null = null
+
+export function hasAdminSessionHint() {
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+    return true
+  }
+  if (typeof document === 'undefined') {
+    return false
+  }
+  return document.cookie
+    .split(';')
+    .some((entry) => entry.trim() === `${ADMIN_HINT_COOKIE}=1`)
+}
 
 function emitChange() {
   for (const listener of listeners) {
@@ -61,7 +75,12 @@ async function loadAdminSession(force = false) {
 function subscribe(onStoreChange: () => void) {
   listeners.add(onStoreChange)
 
-  if (!snapshot.checked && !inflight) {
+  if (!hasAdminSessionHint()) {
+    if (snapshot.authenticated || snapshot.checked) {
+      snapshot = { authenticated: false, checked: false }
+      emitChange()
+    }
+  } else if (!snapshot.checked && !inflight) {
     void loadAdminSession()
   }
 
