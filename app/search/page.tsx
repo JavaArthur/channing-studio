@@ -1,10 +1,11 @@
-import { searchPosts } from '@/lib/db'
+import { getCategories, searchPosts } from '@/lib/db'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import Link from 'next/link'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 import type { SiteCategoryLink, SiteNavLink } from '@/lib/site'
 import { getSiteHeaderData } from '@/lib/site'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import type { Theme } from '@/lib/appearance'
 import { resolveRequestTheme } from '@/lib/server-appearance'
 import { formatDate } from '@/lib/format-date'
@@ -30,14 +31,28 @@ export default async function SearchPage({
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const headerData = await getSiteHeaderData(env.DB)
+      const db = env.DB
+      const [headerData, categoryRows, searchResults] = await Promise.all([
+        cachedPublicData(
+          ['site-header', 'nav-only'],
+          [PUBLIC_CACHE_TAGS.nav],
+          () => getSiteHeaderData(db, { includeCategories: false }),
+        ),
+        query
+          ? cachedPublicData(
+              ['category-slugs'],
+              [PUBLIC_CACHE_TAGS.posts],
+              () => getCategories(db),
+            )
+          : Promise.resolve([]),
+        query ? searchPosts(db, query, 100) : Promise.resolve([]),
+      ])
       navLinks = headerData.navLinks
-      categories = headerData.categories
+      categories = categoryRows
+        .filter((category) => category.slug && category.name && category.name !== '未分类')
+        .map((category) => ({ name: category.name, slug: category.slug }))
       defaultTheme = headerData.defaultTheme
-
-      if (query) {
-        posts = await searchPosts(env.DB, query, 100)
-      }
+      posts = searchResults
     }
   } catch (e) {
     console.error('Search page error:', e)

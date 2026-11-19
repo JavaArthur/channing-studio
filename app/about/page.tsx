@@ -1,8 +1,8 @@
 export const dynamic = 'force-dynamic'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
-import { getSiteHeaderData } from '@/lib/site'
 import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
-import { getStudioContent } from '@/lib/studio-settings'
+import { getStudioSettingsWithNav } from '@/lib/studio-settings'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import { StudioShell } from '@/components/StudioSection'
 import { AboutProfile } from '@/components/AboutProfile'
 import { PUBLIC_PROFILE } from '@/lib/public-profile'
@@ -23,13 +23,15 @@ export default async function AboutPage() {
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, studioContent] = await Promise.all([
-        getSiteHeaderData(env.DB),
-        getStudioContent(env.DB),
-      ])
-      navLinks = headerData.navLinks
-      defaultTheme = headerData.defaultTheme
-      content = studioContent
+      const db = env.DB
+      const data = await cachedPublicData(
+        ['about'],
+        [PUBLIC_CACHE_TAGS.nav, PUBLIC_CACHE_TAGS.studio],
+        () => getStudioSettingsWithNav(db),
+      )
+      navLinks = data.navLinks
+      defaultTheme = data.defaultTheme
+      content = data.content
     }
   } catch (error) {
     console.error('About page: failed to fetch content', error)

@@ -5,6 +5,7 @@ import {
   updatePrompt,
 } from '@/lib/repositories/prompts'
 import { ensureAuthenticatedRequest, getRouteEnvWithDb, jsonError, jsonOk, parseJsonBody } from '@/lib/server/route-helpers'
+import { PUBLIC_CACHE_TAGS, revalidatePublicTags } from '@/lib/public-cache'
 import type { NextRequest } from 'next/server'
 
 export async function PATCH(
@@ -38,6 +39,7 @@ export async function PATCH(
     if (updates.title === '' || (typeof updates.prompt === 'string' && !updates.prompt.trim())) return jsonError('标题和提示词正文不能为空', 400)
 
     await updatePrompt(route.db, id, updates)
+    revalidatePublicTags(PUBLIC_CACHE_TAGS.prompts)
     return jsonOk({ success: true })
   } catch (error) {
     console.error('Admin prompt update error:', error)
@@ -59,6 +61,7 @@ export async function DELETE(
 
   try {
     await deletePrompt(route.db, id)
+    revalidatePublicTags(PUBLIC_CACHE_TAGS.prompts)
     return jsonOk({ success: true })
   } catch (error) {
     console.error('Admin prompt delete error:', error)

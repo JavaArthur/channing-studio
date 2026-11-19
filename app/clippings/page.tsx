@@ -6,6 +6,7 @@ import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 import { Pagination } from '@/components/Pagination'
 import { getSiteHeaderData } from '@/lib/site'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import { getSiteUrl } from '@/lib/site-config'
 import { resolveRequestTheme } from '@/lib/server-appearance'
 import { formatDate } from '@/lib/format-date'
@@ -42,12 +43,20 @@ export default async function ClippingsPage({
 
   const env = await getAppCloudflareEnv()
   if (!env?.DB) notFound()
+  const db = env.DB
 
-  const [posts, totalCount, headerData] = await Promise.all([
-    getClippings(env.DB, PAGE_SIZE, (currentPage - 1) * PAGE_SIZE),
-    getClippingsCount(env.DB),
-    getSiteHeaderData(env.DB),
-  ])
+  const { posts, totalCount, headerData } = await cachedPublicData(
+    ['clippings', String(currentPage), String(PAGE_SIZE)],
+    [PUBLIC_CACHE_TAGS.nav, PUBLIC_CACHE_TAGS.posts],
+    async () => {
+      const [clippingPosts, count, header] = await Promise.all([
+        getClippings(db, PAGE_SIZE, (currentPage - 1) * PAGE_SIZE),
+        getClippingsCount(db),
+        getSiteHeaderData(db, { includeCategories: false }),
+      ])
+      return { posts: clippingPosts, totalCount: count, headerData: header }
+    },
+  )
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
   const requestTheme = await resolveRequestTheme(headerData.defaultTheme)

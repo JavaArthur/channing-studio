@@ -1,11 +1,11 @@
 {
-  "name": "晨启AI博客",
-  "short_name": "晨启AI博客",
-  "description": "记录思考，分享所学，留住当下。技术、生活、读书笔记的数字花园。",
+  "name": "晨启AI",
+  "short_name": "晨启AI",
+  "description": "从 Java 后端到 AI Agent，记录企业级 AI 落地、架构取舍与实战复盘的个人技术博客。",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#F6F4EF",
+  "theme_color": "#0D0D0C",
   "icons": [
     {
       "src": "/icon-192.png",

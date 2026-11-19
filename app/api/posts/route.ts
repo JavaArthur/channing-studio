@@ -1,5 +1,6 @@
 import { createPost, updatePostBySlug } from '@/lib/db'
 import { invalidatePublicContentCache } from '@/lib/cache'
+import { PUBLIC_CACHE_TAGS, revalidatePublicTags } from '@/lib/public-cache'
 import { enqueueBackgroundJob } from '@/lib/background-jobs'
 import { nanoid } from 'nanoid'
 import { buildAutoDescription, normalizePostSlug } from '@/lib/post-utils'
@@ -84,6 +85,7 @@ export async function POST(req: NextRequest) {
 
     // 6. 清除缓存
     await invalidatePublicContentCache(env)
+    revalidatePublicTags(PUBLIC_CACHE_TAGS.posts)
 
 
 
@@ -175,6 +177,7 @@ export async function PATCH(req: NextRequest) {
 
     // 清除缓存
     await invalidatePublicContentCache(env)
+    revalidatePublicTags(PUBLIC_CACHE_TAGS.posts)
 
     return jsonOk({ success: true, slug: nextSlug || currentSlug })
   } catch (error) {

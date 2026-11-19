@@ -1,5 +1,7 @@
 import { getSetting } from '@/lib/repositories/settings'
 import type { Database } from '@/lib/repositories/schema'
+import type { Theme } from '@/lib/appearance'
+import { parseSiteNavLinks, type SiteNavLink } from '@/lib/site'
 import {
   parseStudioSettings,
   serializeStudioSettings,
@@ -20,6 +22,27 @@ export async function getStudioSnapshot(db: Database) {
     revision: Number(values.studio_revision || 0),
   }
 }
+
+export async function getStudioSettingsWithNav(db: Database): Promise<{
+  content: StudioContent
+  revision: number
+  navLinks: SiteNavLink[]
+  defaultTheme: Theme
+}> {
+  const keys = [...STUDIO_SETTING_KEYS, 'studio_revision', 'nav_links']
+  const { results } = await db
+    .prepare(`SELECT key,value FROM site_settings WHERE key IN (${keys.map(() => '?').join(',')})`)
+    .bind(...keys)
+    .all<{ key: string; value: string }>()
+  const values = Object.fromEntries(results.map((row) => [row.key, row.value]))
+  return {
+    content: parseStudioSettings(values as StudioSettingValues),
+    revision: Number(values.studio_revision || 0),
+    navLinks: parseSiteNavLinks(values.nav_links),
+    defaultTheme: 'light',
+  }
+}
+
 export async function getStudioContent(db: Database): Promise<StudioContent> {
   return (await getStudioSnapshot(db)).content
 }

@@ -3,6 +3,7 @@ import { COOKIE_NAME, isAdminAuthenticated } from '@/lib/admin-auth'
 import { getRouteEnvWithDb, jsonError, jsonOk } from '@/lib/server/route-helpers'
 import { validateStudioContent } from '@/lib/studio-validation'
 import { setStudioContent } from '@/lib/studio-settings'
+import { PUBLIC_CACHE_TAGS, revalidatePublicTags } from '@/lib/public-cache'
 import { findPublicPostOptions } from '@/lib/repositories/admin-posts'
 export async function GET(req: NextRequest) {
   if (!(await isAdminAuthenticated(req.cookies.get(COOKIE_NAME)?.value)))
@@ -22,7 +23,9 @@ export async function PUT(req: NextRequest) {
     const parsed = validateStudioContent(content)
     const route = await getRouteEnvWithDb()
     if (!route.ok) return route.response
-    return jsonOk({ success: true, revision: await setStudioContent(route.db, parsed, revision) })
+    const nextRevision = await setStudioContent(route.db, parsed, revision)
+    revalidatePublicTags(PUBLIC_CACHE_TAGS.studio)
+    return jsonOk({ success: true, revision: nextRevision })
   } catch (e) {
     const message = e instanceof Error ? e.message : '保存失败'
     return jsonError(message, message.includes('配置已更新') ? 409 : 400)

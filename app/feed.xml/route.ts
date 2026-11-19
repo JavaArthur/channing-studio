@@ -2,8 +2,8 @@ import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getSiteUrl } from '@/lib/site-config'
 
 const SITE_URL = getSiteUrl()
-const SITE_TITLE = '晨启AI博客'
-const SITE_DESCRIPTION = '记录思考，分享所学，留住当下。'
+const SITE_TITLE = '晨启AI'
+const SITE_DESCRIPTION = '从 Java 后端到 AI Agent，记录企业级 AI 落地、架构取舍与实战复盘的个人技术博客。'
 
 interface RssPost {
   slug: string
@@ -23,6 +23,10 @@ function escapeXml(s: string): string {
     .replace(/'/g, '&apos;')
 }
 
+function escapeCdata(s: string): string {
+  return s.replaceAll(']]>', ']]]]><![CDATA[>')
+}
+
 export async function GET() {
   let posts: RssPost[] = []
 
@@ -34,7 +38,11 @@ export async function GET() {
         .prepare(
           `SELECT slug, title, description, html, category, published_at
            FROM posts
-           WHERE status = 'published' AND deleted_at IS NULL AND password IS NULL AND is_hidden = 0
+           WHERE status = 'published'
+             AND deleted_at IS NULL
+             AND password IS NULL
+             AND is_hidden = 0
+             AND (kind = 'post' OR kind IS NULL)
            ORDER BY published_at DESC
            LIMIT 50`
         )
@@ -53,7 +61,7 @@ export async function GET() {
       <link>${SITE_URL}/${p.slug}</link>
       <guid isPermaLink="true">${SITE_URL}/${p.slug}</guid>
       <description>${escapeXml(p.description || '')}</description>
-      <content:encoded><![CDATA[${p.html || ''}]]></content:encoded>
+      <content:encoded><![CDATA[${escapeCdata(p.html || '')}]]></content:encoded>
       <category>${escapeXml(p.category || '未分类')}</category>
       <pubDate>${pubDate}</pubDate>
     </item>`
@@ -75,7 +83,7 @@ ${items}
   return new Response(xml, {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'no-store',
+      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
     },
   })
 }

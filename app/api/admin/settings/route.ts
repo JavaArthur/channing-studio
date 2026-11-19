@@ -1,6 +1,7 @@
 import { isSafeLink } from '@/lib/url'
 import { getSetting, setSetting } from '@/lib/db'
 import { isAdminAuthenticated, COOKIE_NAME } from '@/lib/admin-auth'
+import { PUBLIC_CACHE_TAGS, revalidatePublicTags } from '@/lib/public-cache'
 import { getRouteEnvWithDb, jsonError, jsonOk, parseJsonBody } from '@/lib/server/route-helpers'
 import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
     if (!route.ok) return route.response
 
     await setSetting(route.db, key, JSON.stringify(links.map(({label,url,openInNewTab}) => ({label:label.trim(),url,openInNewTab:Boolean(openInNewTab)}))))
+    revalidatePublicTags(PUBLIC_CACHE_TAGS.nav)
     return jsonOk({ success: true })
   } catch (error) {
     console.error('Set setting error:', error)

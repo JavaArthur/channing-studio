@@ -1,5 +1,6 @@
-import { getPostBySlug, incrementViewCount, isPubliclyAccessiblePost } from '@/lib/db'
-import { getAppCloudflareEnv } from '@/lib/cloudflare'
+import { cache } from 'react'
+import { getCategories, getPostBySlug, incrementViewCount, isPubliclyAccessiblePost } from '@/lib/db'
+import { getAppCloudflareContext } from '@/lib/cloudflare'
 import { verifyPassword } from '@/lib/password'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -11,6 +12,7 @@ import { PasswordPrompt } from '@/components/PasswordPrompt'
 import { DownloadMarkdown } from '@/components/DownloadMarkdown'
 import { TwitterEmbedsEnhancer } from '@/components/TwitterEmbedsEnhancer'
 import { getSiteHeaderData } from '@/lib/site'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import { getPublicContentCacheNamespace } from '@/lib/cache'
 import { getSiteUrl } from '@/lib/site-config'
 import { PUBLIC_PROFILE } from '@/lib/public-profile'
@@ -19,10 +21,21 @@ import { formatDate } from '@/lib/format-date'
 import { stripLeadingTitleHeading } from '@/lib/post-render'
 import { RelatedPosts } from '@/components/RelatedPosts'
 import 'katex/dist/katex.min.css'
+import '@/styles/article-prose.css'
 
 // Cloudflare Workers 缓存策略
 export const dynamic = 'force-dynamic' // Password checks must never share a rendered response
 export const dynamicParams = true
+
+const loadPost = cache(async (slug: string) => {
+  const { env } = await getAppCloudflareContext()
+  if (!env?.DB) return null
+  return getPostBySlug(
+    env.DB,
+    slug,
+    getPublicContentCacheNamespace(env),
+  ).catch(() => null)
+})
 
 export async function generateMetadata({
   params,
@@ -31,16 +44,8 @@ export async function generateMetadata({
 }) {
   const baseUrl = getSiteUrl()
   try {
-    const env = await getAppCloudflareEnv()
     const { slug } = await params
-
-    if (!env?.DB) return {}
-
-    const post = await getPostBySlug(
-      env.DB,
-      slug,
-      getPublicContentCacheNamespace(env),
-    ).catch(() => null)
+    const post = await loadPost(slug)
     if (!post || !isPubliclyAccessiblePost(post)) return {}
 
     const imgMatch = post.html?.match(/<img[^>]+src="([^"]+)"/)
@@ -91,28 +96,40 @@ export default async function PostPage({
   const { slug } = await params
   const { pwd } = await searchParams
 
-  let env: Awaited<ReturnType<typeof getAppCloudflareEnv>> | undefined
+  let context: Awaited<ReturnType<typeof getAppCloudflareContext>> | undefined
   try {
-    env = await getAppCloudflareEnv()
+    context = await getAppCloudflareContext()
   } catch {
     notFound()
   }
+  const { env, ctx } = context
   if (!env?.DB) notFound()
-  const db = env!.DB
+  const db = env.DB
 
-  const post = await getPostBySlug(
-    db,
-    slug,
-    getPublicContentCacheNamespace(env),
-  ).catch(() => null)
+  const [post, headerData, categoryRows] = await Promise.all([
+    loadPost(slug),
+    cachedPublicData(
+      ['site-header', 'nav-only'],
+      [PUBLIC_CACHE_TAGS.nav],
+      () => getSiteHeaderData(db, { includeCategories: false }),
+    ),
+    cachedPublicData(
+      ['category-slugs'],
+      [PUBLIC_CACHE_TAGS.posts],
+      () => getCategories(db),
+    ),
+  ])
   if (!post) notFound()
   if (!isPubliclyAccessiblePost(post)) notFound()
 
-  const headerData = await getSiteHeaderData(db)
   const requestTheme = await resolveRequestTheme(headerData.defaultTheme)
   const activeCategorySlug =
-    headerData.categories.find((category) => category.name === post.category)?.slug ??
-    null
+    categoryRows.find(
+      (category) =>
+        category.name === post.category &&
+        category.name !== '未分类' &&
+        Boolean(category.slug),
+    )?.slug ?? null
 
   let passwordError: string | undefined
   const needsPassword = Boolean(post.password)
@@ -169,7 +186,12 @@ export default async function PostPage({
     }
   }
 
-  void incrementViewCount(db, slug).catch(console.error)
+  const viewCountUpdate = incrementViewCount(db, slug).catch(console.error)
+  if (ctx?.waitUntil) {
+    ctx.waitUntil(viewCountUpdate)
+  } else {
+    void viewCountUpdate
+  }
 
   const textLength = post.content?.length || 0
   const readingMinutes = Math.max(1, Math.ceil(textLength / 400))
@@ -235,7 +257,7 @@ export default async function PostPage({
                   : []),
                 {
                   '@type': 'ListItem',
-                  position: post.category ? 3 : 2,
+                  position: post.category && activeCategorySlug ? 3 : 2,
                   name: post.title,
                   item: `${baseUrl}/${post.slug}`,
                 },

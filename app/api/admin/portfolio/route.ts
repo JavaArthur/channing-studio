@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { COOKIE_NAME, isAdminAuthenticated } from '@/lib/admin-auth'
 import { BrainApiError, readBody } from '@/lib/agent-brain/validation'
 import { invalidatePublicContentCache } from '@/lib/cache'
+import { PUBLIC_CACHE_TAGS, revalidatePublicTags } from '@/lib/public-cache'
 import { parseLibrary } from '@/lib/library/validation'
 import { portfolioInputSchema } from '@/lib/portfolio'
 import {
@@ -46,10 +47,12 @@ export async function POST(req: NextRequest) {
       case 'delete':
         await deletePortfolioProject(route.db, input.id)
         await invalidatePublicContentCache(route.env)
+        revalidatePublicTags(PUBLIC_CACHE_TAGS.portfolio)
         return jsonOk({ id: input.id })
       case 'publish':
         await setPortfolioPublished(route.db, input.id, input.publish)
         await invalidatePublicContentCache(route.env)
+        revalidatePublicTags(PUBLIC_CACHE_TAGS.portfolio)
         return jsonOk({ id: input.id })
     }
   } catch (error) {

@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getSiteHeaderData } from '@/lib/site'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import { getPrompts, type Prompt } from '@/lib/repositories/prompts'
 import { StudioLink, StudioShell } from '@/components/StudioSection'
 import { ResourceTabs } from '@/components/ResourceTabs'
@@ -24,13 +25,25 @@ export default async function PromptsPage() {
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, promptRows] = await Promise.all([
-        getSiteHeaderData(env.DB),
-        getPrompts(env.DB),
-      ])
-      navLinks = headerData.navLinks
-      defaultTheme = headerData.defaultTheme
-      prompts = promptRows
+      const db = env.DB
+      const data = await cachedPublicData(
+        ['prompts'],
+        [PUBLIC_CACHE_TAGS.nav, PUBLIC_CACHE_TAGS.prompts],
+        async () => {
+          const [headerData, promptRows] = await Promise.all([
+            getSiteHeaderData(db, { includeCategories: false }),
+            getPrompts(db),
+          ])
+          return {
+            navLinks: headerData.navLinks,
+            defaultTheme: headerData.defaultTheme,
+            prompts: promptRows,
+          }
+        },
+      )
+      navLinks = data.navLinks
+      defaultTheme = data.defaultTheme
+      prompts = data.prompts
     }
   } catch (error) {
     console.error('Prompts page: failed to fetch prompts', error)

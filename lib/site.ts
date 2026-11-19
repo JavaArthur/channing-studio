@@ -13,6 +13,17 @@ export interface SiteCategoryLink {
   slug: string
 }
 
+export function parseSiteNavLinks(navJson: string | null | undefined): SiteNavLink[] {
+  if (!navJson) return []
+  try {
+    const parsed = JSON.parse(navJson)
+    if (Array.isArray(parsed)) {
+      return parsed.filter((link): link is SiteNavLink => Boolean(link && typeof link.label === 'string' && isSafeLink(link.url)))
+    }
+  } catch {}
+  return []
+}
+
 export async function getSiteHeaderData(
   db: D1Database,
   options: { includeCategories?: boolean } = {},
@@ -31,14 +42,7 @@ export async function getSiteHeaderData(
       options.includeCategories === false ? [] : getPublicCategories(db),
     ])
 
-    if (navJson) {
-      try {
-        const parsed = JSON.parse(navJson)
-        if (Array.isArray(parsed)) {
-          navLinks = parsed.filter((link): link is SiteNavLink => Boolean(link && typeof link.label === 'string' && isSafeLink(link.url)))
-        }
-      } catch {}
-    }
+    navLinks = parseSiteNavLinks(navJson)
 
     categories = categoryRows
       .filter((category) => category.slug && category.name && category.name !== '未分类')

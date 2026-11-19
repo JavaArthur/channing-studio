@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
@@ -10,6 +11,7 @@ import { SiteHeader } from '@/components/SiteHeader'
 import { SiteFooter } from '@/components/SiteFooter'
 import { Pagination } from '@/components/Pagination'
 import { getSiteHeaderData } from '@/lib/site'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import { getSiteUrl } from '@/lib/site-config'
 import { resolveRequestTheme } from '@/lib/server-appearance'
 import { formatDate } from '@/lib/format-date'
@@ -20,6 +22,17 @@ const BASE_URL = getSiteUrl()
 export const dynamicParams = true
 export const dynamic = 'force-dynamic'
 
+const loadPublicCategories = cache(async () => {
+  const env = await getAppCloudflareEnv()
+  if (!env?.DB) return null
+  const db = env.DB
+  return cachedPublicData(
+    ['public-categories'],
+    [PUBLIC_CACHE_TAGS.posts],
+    () => getPublicCategories(db),
+  )
+})
+
 export async function generateMetadata({
   params,
 }: {
@@ -28,10 +41,8 @@ export async function generateMetadata({
   const { slug } = await params
 
   try {
-    const env = await getAppCloudflareEnv()
-    if (!env?.DB) return {}
-
-    const categories = await getPublicCategories(env.DB)
+    const categories = await loadPublicCategories()
+    if (!categories) return {}
     const category = categories.find((item) => item.slug === slug)
     if (!category) return {}
 
@@ -59,21 +70,29 @@ export default async function CategoryPage({
 
   const env = await getAppCloudflareEnv()
   if (!env?.DB) notFound()
+  const db = env.DB
 
-  const categories = await getPublicCategories(env.DB)
-  const category = categories.find((item) => item.slug === slug)
+  const categories = await loadPublicCategories()
+  const category = categories?.find((item) => item.slug === slug)
   if (!category) notFound()
 
-  const [posts, totalCount, headerData] = await Promise.all([
-    getPostsByCategory(
-      env.DB,
-      category.name,
-      PAGE_SIZE,
-      (currentPage - 1) * PAGE_SIZE,
-    ),
-    getPostsCountByCategory(env.DB, category.name),
-    getSiteHeaderData(env.DB),
-  ])
+  const { posts, totalCount, headerData } = await cachedPublicData(
+    ['category', slug, String(currentPage), String(PAGE_SIZE)],
+    [PUBLIC_CACHE_TAGS.nav, PUBLIC_CACHE_TAGS.posts],
+    async () => {
+      const [categoryPosts, count, header] = await Promise.all([
+        getPostsByCategory(
+          db,
+          category.name,
+          PAGE_SIZE,
+          (currentPage - 1) * PAGE_SIZE,
+        ),
+        getPostsCountByCategory(db, category.name),
+        getSiteHeaderData(db, { includeCategories: false }),
+      ])
+      return { posts: categoryPosts, totalCount: count, headerData: header }
+    },
+  )
 
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
   const requestTheme = await resolveRequestTheme(headerData.defaultTheme)

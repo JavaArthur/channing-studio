@@ -5,6 +5,7 @@ import { isHttpUrl, isSafeLink } from '@/lib/url'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { StudioLink, StudioShell } from '@/components/StudioSection'
 import { getSiteHeaderData, type SiteNavLink } from '@/lib/site'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import { getSiteUrl } from '@/lib/site-config'
 import { resolveRequestTheme } from '@/lib/server-appearance'
 import type { Theme } from '@/lib/appearance'
@@ -45,13 +46,25 @@ export default async function ToolsPage() {
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [toolRows, headerData] = await Promise.all([
-        getTools(env.DB),
-        getSiteHeaderData(env.DB),
-      ])
-      tools = toolRows
-      navLinks = headerData.navLinks
-      defaultTheme = headerData.defaultTheme
+      const db = env.DB
+      const data = await cachedPublicData(
+        ['tools'],
+        [PUBLIC_CACHE_TAGS.nav, PUBLIC_CACHE_TAGS.tools],
+        async () => {
+          const [toolRows, headerData] = await Promise.all([
+            getTools(db),
+            getSiteHeaderData(db, { includeCategories: false }),
+          ])
+          return {
+            tools: toolRows,
+            navLinks: headerData.navLinks,
+            defaultTheme: headerData.defaultTheme,
+          }
+        },
+      )
+      tools = data.tools
+      navLinks = data.navLinks
+      defaultTheme = data.defaultTheme
     }
   } catch (error) {
     console.error('Tools page: failed to fetch tools', error)

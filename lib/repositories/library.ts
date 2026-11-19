@@ -15,6 +15,7 @@ import {
 } from '@/lib/library/types'
 import { searchTerms, searchMatch } from '@/lib/library/search'
 import { journalTopics } from '@/lib/library/journal'
+import { PUBLIC_CACHE_TAGS, revalidatePublicTags } from '@/lib/public-cache'
 import type { z } from 'zod'
 
 type Row = Omit<LibraryItem, 'topics' | 'favorite' | 'archived' | 'href'> & {
@@ -618,6 +619,7 @@ export async function publishLibraryResource(
     .bind(Number(publish), JSON.stringify(payload), publish ? 0 : 1, id, kind, id, revision)
     .run()
   if (!result.meta.changes) throw new BrainApiError(412, '内容已变化，请核对最新版本后再发布')
+  revalidatePublicTags(kind === 'tool' ? PUBLIC_CACHE_TAGS.tools : PUBLIC_CACHE_TAGS.prompts)
   return getLibraryItem(db, kind, id)
 }
 

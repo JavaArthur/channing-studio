@@ -5,6 +5,7 @@ import {
   normalizePromptUrl,
 } from '@/lib/repositories/prompts'
 import { ensureAuthenticatedRequest, getRouteEnvWithDb, jsonError, jsonOk, parseJsonBody } from '@/lib/server/route-helpers'
+import { PUBLIC_CACHE_TAGS, revalidatePublicTags } from '@/lib/public-cache'
 import type { NextRequest } from 'next/server'
 
 function text(value: unknown): string {
@@ -51,6 +52,7 @@ export async function POST(req: NextRequest) {
       is_hidden: payload.is_hidden === 1 ? 1 : 0,
       sort_order: typeof payload.sort_order === 'number' ? payload.sort_order : 0,
     })
+    revalidatePublicTags(PUBLIC_CACHE_TAGS.prompts)
     return jsonOk({ success: true, id })
   } catch (error) {
     console.error('Admin prompt create error:', error)

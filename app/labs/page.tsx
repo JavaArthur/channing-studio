@@ -1,8 +1,8 @@
 export const dynamic = 'force-dynamic'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
-import { getSiteHeaderData } from '@/lib/site'
 import { DEFAULT_STUDIO_CONTENT } from '@/lib/studio-content'
-import { getStudioContent } from '@/lib/studio-settings'
+import { getStudioSettingsWithNav } from '@/lib/studio-settings'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import { getTools, type Tool } from '@/lib/repositories/tools'
 import { selectStudioTools } from '@/lib/studio-home'
 import { ArrowUpRight } from 'lucide-react'
@@ -33,15 +33,27 @@ export default async function LabsPage() {
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, studioContent, toolRows] = await Promise.all([
-        getSiteHeaderData(env.DB),
-        getStudioContent(env.DB),
-        getTools(env.DB),
-      ])
-      navLinks = headerData.navLinks
-      defaultTheme = headerData.defaultTheme
-      content = studioContent
-      tools = toolRows
+      const db = env.DB
+      const data = await cachedPublicData(
+        ['labs'],
+        [PUBLIC_CACHE_TAGS.nav, PUBLIC_CACHE_TAGS.studio, PUBLIC_CACHE_TAGS.tools],
+        async () => {
+          const [settings, toolRows] = await Promise.all([
+            getStudioSettingsWithNav(db),
+            getTools(db),
+          ])
+          return {
+            navLinks: settings.navLinks,
+            defaultTheme: settings.defaultTheme,
+            content: settings.content,
+            tools: toolRows,
+          }
+        },
+      )
+      navLinks = data.navLinks
+      defaultTheme = data.defaultTheme
+      content = data.content
+      tools = data.tools
     }
   } catch (error) {
     console.error('Labs page: failed to fetch content', error)

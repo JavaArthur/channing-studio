@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { DatabaseSync } from 'node:sqlite'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { LocalD1 } from '../helpers/local-d1'
-import { searchPosts } from '@/lib/repositories/search'
+import { resetSearchFtsAvailabilityCache, searchPosts } from '@/lib/repositories/search'
 import { getPostBySlug } from '@/lib/repositories/posts'
 import { getRelatedPosts } from '@/lib/related-content'
 import type { Database } from '@/lib/repositories/schema'
@@ -79,5 +79,38 @@ describe('D1 search fallback without FTS', () => {
     const result = await getRelatedPosts(db, null, post!)
     expect(result.source).toBe('rules')
     expect(result.results.map(item => item.slug)).toEqual(['related'])
+  })
+
+  it('omits content/html columns and caches missing posts_fts across searches', async () => {
+    resetSearchFtsAvailabilityCache()
+    insertPost('lightweight-1', 'Agent 缓存优化', '超长正文内容'.repeat(200))
+    insertPost('lightweight-2', 'Agent 检索优化', '超长正文内容'.repeat(200))
+
+    const prepare = vi.spyOn(db, 'prepare')
+    const first = await searchPosts(db, 'Agent')
+    expect(first).toHaveLength(2)
+    expect(first[0].content).toBe('')
+    expect(first[0].html).toBe('')
+    // First search tries posts_fts once, then falls back to LIKE
+    expect(prepare).toHaveBeenCalledTimes(2)
+    for (const [sql] of prepare.mock.calls) {
+      expect(sql).not.toMatch(/SELECT\s+\*/i)
+      expect(sql).not.toContain('posts.*')
+    }
+
+    prepare.mockClear()
+    const second = await searchPosts(db, '缓存')
+    expect(second.map((post) => post.slug)).toEqual(['lightweight-1'])
+    // Subsequent searches skip the failed posts_fts round-trip
+    expect(prepare).toHaveBeenCalledTimes(1)
+
+    prepare.mockClear()
+    const post = await getPostBySlug(db, 'lightweight-1')
+    prepare.mockClear()
+    await getRelatedPosts(db, null, post!)
+    for (const [sql] of prepare.mock.calls) {
+      expect(sql).not.toMatch(/SELECT\s+\*/i)
+      expect(sql).not.toContain('posts.*')
+    }
   })
 })

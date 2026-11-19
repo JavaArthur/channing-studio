@@ -156,13 +156,16 @@ async function getVectorDimensions(index: VectorizeIndex): Promise<number> {
   }
 }
 
+const RELATED_POST_COLUMNS =
+  "id, slug, title, '' AS content, '' AS html, description, category, tags, status, password, is_hidden, deleted_at, published_at"
+
 async function fetchPostsBySlugs(db: D1Database, slugs: string[]): Promise<PostWithTags[]> {
   if (slugs.length === 0) return []
 
   const placeholders = slugs.map(() => '?').join(', ')
   const { results } = await db
     .prepare(
-      `SELECT * FROM posts
+      `SELECT ${RELATED_POST_COLUMNS} FROM posts
        WHERE slug IN (${placeholders})
          AND status = 'published'
          AND password IS NULL
@@ -265,20 +268,22 @@ function scoreCandidate(candidate: PostWithTags, current: PostWithTags, currentT
 
 async function getRuleBasedRelatedPosts(db: D1Database, current: PostWithTags, limit: number): Promise<PostWithTags[]> {
   const query = buildRelatedQuery(current)
-  const fromSearch = query ? await searchPosts(db, query, Math.max(limit * 4, 12)) : []
-  const recentResult = await db
-    .prepare(
-      `SELECT * FROM posts
-       WHERE slug != ?
-         AND status = 'published'
-         AND password IS NULL
-         AND is_hidden = 0
-         AND deleted_at IS NULL
-       ORDER BY published_at DESC
-       LIMIT ?`
-    )
-    .bind(current.slug, Math.max(limit * 12, 48))
-    .all<Post>()
+  const [fromSearch, recentResult] = await Promise.all([
+    query ? searchPosts(db, query, Math.max(limit * 4, 12)) : Promise.resolve([]),
+    db
+      .prepare(
+        `SELECT ${RELATED_POST_COLUMNS} FROM posts
+         WHERE slug != ?
+           AND status = 'published'
+           AND password IS NULL
+           AND is_hidden = 0
+           AND deleted_at IS NULL
+         ORDER BY published_at DESC
+         LIMIT ?`
+      )
+      .bind(current.slug, Math.max(limit * 12, 48))
+      .all<Post>(),
+  ])
 
   const merged = new Map<string, PostWithTags>()
   for (const post of [...fromSearch, ...recentResult.results.map(mapPost)]) {

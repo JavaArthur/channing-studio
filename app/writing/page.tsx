@@ -3,6 +3,7 @@ import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { type Theme } from '@/lib/appearance'
 import type { SiteNavLink } from '@/lib/site'
 import { getSiteHeaderData } from '@/lib/site'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import { ArrowUpRight } from 'lucide-react'
 import { StudioLink, StudioShell } from '@/components/StudioSection'
 import '@/styles/studio-indexes.css'
@@ -38,24 +39,37 @@ export default async function WritingPage({
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, writingPosts, count] = await Promise.all([
-        getSiteHeaderData(env.DB),
-        getPosts(
-          env.DB,
-          PAGE_SIZE,
-          (currentPage - 1) * PAGE_SIZE,
-          false,
-          false,
-          false,
-          false,
-          'post',
-        ),
-        getPostsCount(env.DB, false, false, false, false, 'post'),
-      ])
-      posts = writingPosts
-      totalCount = count
-      navLinks = headerData.navLinks
-      defaultTheme = headerData.defaultTheme
+      const db = env.DB
+      const data = await cachedPublicData(
+        ['writing', String(currentPage), String(PAGE_SIZE)],
+        [PUBLIC_CACHE_TAGS.nav, PUBLIC_CACHE_TAGS.posts],
+        async () => {
+          const [headerData, writingPosts, count] = await Promise.all([
+            getSiteHeaderData(db, { includeCategories: false }),
+            getPosts(
+              db,
+              PAGE_SIZE,
+              (currentPage - 1) * PAGE_SIZE,
+              false,
+              false,
+              false,
+              false,
+              'post',
+            ),
+            getPostsCount(db, false, false, false, false, 'post'),
+          ])
+          return {
+            posts: writingPosts,
+            totalCount: count,
+            navLinks: headerData.navLinks,
+            defaultTheme: headerData.defaultTheme,
+          }
+        },
+      )
+      posts = data.posts
+      totalCount = data.totalCount
+      navLinks = data.navLinks
+      defaultTheme = data.defaultTheme
     }
   } catch (error) {
     console.error('Writing index: failed to fetch posts', error)

@@ -2,6 +2,7 @@ import { clearWorkingCopy } from '@/lib/repositories/drafts'
 import { deletePost, getPostBySlug, updatePost } from '@/lib/db'
 import { isAdminAuthenticated, COOKIE_NAME } from '@/lib/admin-auth'
 import { invalidatePublicContentCache } from '@/lib/cache'
+import { PUBLIC_CACHE_TAGS, revalidatePublicTags } from '@/lib/public-cache'
 import { buildAutoDescription, normalizePostSlug } from '@/lib/post-utils'
 import { enqueueBackgroundJob } from '@/lib/background-jobs'
 import { renderPostMarkdownToHtml } from '@/lib/post-render'
@@ -112,6 +113,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
     } catch (cacheErr) {
       console.warn('Cache invalidation failed:', cacheErr)
     }
+    revalidatePublicTags(PUBLIC_CACHE_TAGS.posts)
 
     await enqueueBackgroundJob(
       env,
@@ -160,6 +162,7 @@ export async function DELETE(req: NextRequest, { params }: Ctx) {
     } catch (cacheErr) {
       console.warn('Cache invalidation failed:', cacheErr)
     }
+    revalidatePublicTags(PUBLIC_CACHE_TAGS.posts)
 
     await enqueueBackgroundJob(
       env,

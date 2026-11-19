@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 import { getAppCloudflareEnv } from '@/lib/cloudflare'
 import { getSiteHeaderData } from '@/lib/site'
+import { cachedPublicData, PUBLIC_CACHE_TAGS } from '@/lib/public-cache'
 import { getPublicPortfolio } from '@/lib/repositories/portfolio'
 import { PortfolioIndex } from '@/components/PortfolioIndex'
 import { StudioLink, StudioShell } from '@/components/StudioSection'
@@ -23,17 +24,29 @@ export default async function WorkPage() {
   try {
     const env = await getAppCloudflareEnv()
     if (env?.DB) {
-      const [headerData, portfolio] = await Promise.all([
-        getSiteHeaderData(env.DB),
-        getPublicPortfolio(env.DB),
-      ])
-      navLinks = headerData.navLinks
-      defaultTheme = headerData.defaultTheme
-      projects = portfolio.filter(
-        (item) =>
-          item.slug !== 'channing-studio' &&
-          !/channing[\s-]*studio/i.test(item.title),
+      const db = env.DB
+      const data = await cachedPublicData(
+        ['work'],
+        [PUBLIC_CACHE_TAGS.nav, PUBLIC_CACHE_TAGS.portfolio],
+        async () => {
+          const [headerData, portfolio] = await Promise.all([
+            getSiteHeaderData(db, { includeCategories: false }),
+            getPublicPortfolio(db),
+          ])
+          return {
+            navLinks: headerData.navLinks,
+            defaultTheme: headerData.defaultTheme,
+            projects: portfolio.filter(
+              (item) =>
+                item.slug !== 'channing-studio' &&
+                !/channing[\s-]*studio/i.test(item.title),
+            ),
+          }
+        },
       )
+      navLinks = data.navLinks
+      defaultTheme = data.defaultTheme
+      projects = data.projects
     }
   } catch (error) {
     console.error('Projects page: failed to fetch content', error)
